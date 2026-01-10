@@ -1,0 +1,3 @@
+model,n,corrupted_mae,remediated_mae,mean_difference,difference_ci_low,difference_ci_high
+hist_gradient_boosting,78960,50.975862124909234,57.27274129437928,6.2968791694700395,3.8931057323020175,9.050567034451518
+seasonal_naive,78960,64.47685696681864,64.47685696681864,0.0,0.0,0.0

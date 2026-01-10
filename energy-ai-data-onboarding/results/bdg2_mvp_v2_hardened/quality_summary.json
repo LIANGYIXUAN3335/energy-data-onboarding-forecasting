@@ -1,0 +1,1030 @@
+{
+  "coverage": {
+    "buildings": 12,
+    "by_primary_use": {
+      "Education": 105264,
+      "Office": 105264
+    },
+    "by_season": {
+      "autumn": 52416,
+      "spring": 52992,
+      "summer": 52992,
+      "winter": 52128
+    },
+    "by_site": {
+      "Eagle": 70176,
+      "Panther": 70176,
+      "Rat": 70176
+    },
+    "by_timezone": {
+      "US/Eastern": 210528
+    },
+    "load_missing": 54,
+    "rows": 210528,
+    "timestamp_max": "2017-12-31T23:00:00+00:00",
+    "timestamp_min": "2016-01-01T00:00:00+00:00"
+  },
+  "created_at_utc": "2026-09-28T19:05:53Z",
+  "dataset": {
+    "doi": "10.5281/zenodo.3887306",
+    "title": "Building Data Genome Project 2",
+    "version": "v1.0"
+  },
+  "detector_validation": {
+    "fault_records": 31
+  },
+  "downstream_faults": {
+    "fault_records": 27
+  },
+  "execution_scope": "verified_bdg2_subset",
+  "fault_cutoff": "2017-01-01T00:00:00+00:00",
+  "privacy": {
+    "analytics": false,
+    "data_scope": "public building-energy observations and reproducibility metadata only",
+    "external_transmission": false,
+    "mode": "stateless"
+  },
+  "quality_gates": {
+    "corrupted": {
+      "affected_observations_sum": 36455,
+      "check_results": [
+        {
+          "count": 0,
+          "denominator": 210528,
+          "enforcement": "hard_structural_count_greater_than_zero",
+          "issue_code": "TIMESTAMP_PARSE_ERROR",
+          "rate": 0.0,
+          "status": "pass",
+          "threshold": {
+            "basis": "count",
+            "comparison": "strictly_greater_than",
+            "fail_above": 0.0,
+            "warn_above": null
+          }
+        },
+        {
+          "count": 0,
+          "denominator": 210528,
+          "enforcement": "configurable_or_detector_default",
+          "issue_code": "TIMESTAMP_ORDER_ERROR",
+          "rate": 0.0,
+          "status": "pass",
+          "threshold": {
+            "basis": "count",
+            "comparison": "strictly_greater_than",
+            "fail_above": 0.0,
+            "warn_above": null
+          }
+        },
+        {
+          "count": 0,
+          "denominator": 210528,
+          "enforcement": "hard_structural_count_greater_than_zero",
+          "issue_code": "DUPLICATE_OBSERVATION_KEY",
+          "rate": 0.0,
+          "status": "pass",
+          "threshold": {
+            "basis": "count",
+            "comparison": "strictly_greater_than",
+            "fail_above": 0.0,
+            "warn_above": null
+          }
+        },
+        {
+          "count": 55,
+          "denominator": 210528,
+          "enforcement": "configurable_or_detector_default",
+          "issue_code": "LOAD_MISSING",
+          "rate": 0.00026124791001671984,
+          "status": "warn",
+          "threshold": {
+            "basis": "rate",
+            "comparison": "strictly_greater_than",
+            "fail_above": 0.05,
+            "warn_above": 0.0
+          }
+        },
+        {
+          "count": 0,
+          "denominator": 210528,
+          "enforcement": "configurable_or_detector_default",
+          "issue_code": "LOAD_INFINITE",
+          "rate": 0.0,
+          "status": "pass",
+          "threshold": {
+            "basis": "count",
+            "comparison": "strictly_greater_than",
+            "fail_above": 0.0,
+            "warn_above": null
+          }
+        },
+        {
+          "count": 1,
+          "denominator": 210528,
+          "enforcement": "configurable_or_detector_default",
+          "issue_code": "NEGATIVE_LOAD",
+          "rate": 4.749962000303997e-06,
+          "status": "fail",
+          "threshold": {
+            "basis": "count",
+            "comparison": "strictly_greater_than",
+            "fail_above": 0.0,
+            "warn_above": null
+          }
+        },
+        {
+          "count": 3543,
+          "denominator": 210528,
+          "enforcement": "configurable_or_detector_default",
+          "issue_code": "ROBUST_OUTLIER",
+          "rate": 0.016829115367077062,
+          "status": "warn",
+          "threshold": {
+            "basis": "rate",
+            "comparison": "strictly_greater_than",
+            "fail_above": 0.2,
+            "warn_above": 0.01
+          }
+        },
+        {
+          "count": 19017,
+          "denominator": 210528,
+          "enforcement": "configurable_or_detector_default",
+          "issue_code": "LONG_ZERO_RUN",
+          "rate": 0.09033002735978111,
+          "status": "warn",
+          "threshold": {
+            "basis": "rate",
+            "comparison": "strictly_greater_than",
+            "fail_above": 0.5,
+            "warn_above": 0.01
+          }
+        },
+        {
+          "count": 12711,
+          "denominator": 210528,
+          "enforcement": "configurable_or_detector_default",
+          "issue_code": "STUCK_SENSOR",
+          "rate": 0.06037676698586411,
+          "status": "warn",
+          "threshold": {
+            "basis": "rate",
+            "comparison": "strictly_greater_than",
+            "fail_above": 0.5,
+            "warn_above": 0.01
+          }
+        },
+        {
+          "count": 1128,
+          "denominator": 210528,
+          "enforcement": "configurable_or_detector_default",
+          "issue_code": "LEVEL_OR_UNIT_SHIFT",
+          "rate": 0.005357957136342909,
+          "status": "warn",
+          "threshold": {
+            "basis": "rate",
+            "comparison": "strictly_greater_than",
+            "fail_above": 0.1,
+            "warn_above": 0.005
+          }
+        },
+        {
+          "count": 0,
+          "denominator": 210528,
+          "enforcement": "hard_structural_count_greater_than_zero",
+          "issue_code": "METADATA_JOIN_MISSING",
+          "rate": 0.0,
+          "status": "pass",
+          "threshold": {
+            "basis": "count",
+            "comparison": "strictly_greater_than",
+            "fail_above": 0.0,
+            "warn_above": null
+          }
+        },
+        {
+          "count": 0,
+          "denominator": 210528,
+          "enforcement": "configurable_or_detector_default",
+          "issue_code": "TIMEZONE_MISSING",
+          "rate": 0.0,
+          "status": "pass",
+          "threshold": {
+            "basis": "rate",
+            "comparison": "strictly_greater_than",
+            "fail_above": 0.1,
+            "warn_above": 0.0
+          }
+        },
+        {
+          "count": 0,
+          "denominator": 210528,
+          "enforcement": "configurable_or_detector_default",
+          "issue_code": "INTERVAL_CONTINUITY_GAP",
+          "rate": 0.0,
+          "status": "pass",
+          "threshold": {
+            "basis": "rate",
+            "comparison": "strictly_greater_than",
+            "fail_above": 0.05,
+            "warn_above": 0.0
+          }
+        },
+        {
+          "count": 0,
+          "denominator": 210528,
+          "enforcement": "configurable_or_detector_default",
+          "issue_code": "COVERAGE_RARE_GROUP",
+          "rate": 0.0,
+          "status": "pass",
+          "threshold": {
+            "basis": "rate",
+            "comparison": "strictly_greater_than",
+            "fail_above": null,
+            "warn_above": 0.0
+          }
+        },
+        {
+          "count": 0,
+          "denominator": 12,
+          "enforcement": "hard_structural_count_greater_than_zero",
+          "issue_code": "SUBGROUP_METADATA_INSTABILITY",
+          "rate": 0.0,
+          "status": "pass",
+          "threshold": {
+            "basis": "count",
+            "comparison": "strictly_greater_than",
+            "fail_above": 0.0,
+            "warn_above": null
+          }
+        }
+      ],
+      "checks": 15,
+      "hard_structural_failures": [],
+      "status": "fail",
+      "status_counts": {
+        "fail": 1,
+        "pass": 9,
+        "warn": 5
+      }
+    },
+    "detector_validation": {
+      "affected_observations_sum": 36450,
+      "check_results": [
+        {
+          "count": 0,
+          "denominator": 210528,
+          "enforcement": "hard_structural_count_greater_than_zero",
+          "issue_code": "TIMESTAMP_PARSE_ERROR",
+          "rate": 0.0,
+          "status": "pass",
+          "threshold": {
+            "basis": "count",
+            "comparison": "strictly_greater_than",
+            "fail_above": 0.0,
+            "warn_above": null
+          }
+        },
+        {
+          "count": 2,
+          "denominator": 210528,
+          "enforcement": "configurable_or_detector_default",
+          "issue_code": "TIMESTAMP_ORDER_ERROR",
+          "rate": 9.499924000607994e-06,
+          "status": "fail",
+          "threshold": {
+            "basis": "count",
+            "comparison": "strictly_greater_than",
+            "fail_above": 0.0,
+            "warn_above": null
+          }
+        },
+        {
+          "count": 4,
+          "denominator": 210528,
+          "enforcement": "hard_structural_count_greater_than_zero",
+          "issue_code": "DUPLICATE_OBSERVATION_KEY",
+          "rate": 1.899984800121599e-05,
+          "status": "fail",
+          "threshold": {
+            "basis": "count",
+            "comparison": "hard_structural_count_greater_than_zero",
+            "fail_above": 0.0,
+            "warn_above": null
+          }
+        },
+        {
+          "count": 55,
+          "denominator": 210528,
+          "enforcement": "configurable_or_detector_default",
+          "issue_code": "LOAD_MISSING",
+          "rate": 0.00026124791001671984,
+          "status": "warn",
+          "threshold": {
+            "basis": "rate",
+            "comparison": "strictly_greater_than",
+            "fail_above": 0.05,
+            "warn_above": 0.0
+          }
+        },
+        {
+          "count": 0,
+          "denominator": 210528,
+          "enforcement": "configurable_or_detector_default",
+          "issue_code": "LOAD_INFINITE",
+          "rate": 0.0,
+          "status": "pass",
+          "threshold": {
+            "basis": "count",
+            "comparison": "strictly_greater_than",
+            "fail_above": 0.0,
+            "warn_above": null
+          }
+        },
+        {
+          "count": 1,
+          "denominator": 210528,
+          "enforcement": "configurable_or_detector_default",
+          "issue_code": "NEGATIVE_LOAD",
+          "rate": 4.749962000303997e-06,
+          "status": "fail",
+          "threshold": {
+            "basis": "count",
+            "comparison": "strictly_greater_than",
+            "fail_above": 0.0,
+            "warn_above": null
+          }
+        },
+        {
+          "count": 3535,
+          "denominator": 210528,
+          "enforcement": "configurable_or_detector_default",
+          "issue_code": "ROBUST_OUTLIER",
+          "rate": 0.016791115671074632,
+          "status": "warn",
+          "threshold": {
+            "basis": "rate",
+            "comparison": "strictly_greater_than",
+            "fail_above": 0.2,
+            "warn_above": 0.01
+          }
+        },
+        {
+          "count": 19027,
+          "denominator": 210528,
+          "enforcement": "configurable_or_detector_default",
+          "issue_code": "LONG_ZERO_RUN",
+          "rate": 0.09037752697978416,
+          "status": "warn",
+          "threshold": {
+            "basis": "rate",
+            "comparison": "strictly_greater_than",
+            "fail_above": 0.5,
+            "warn_above": 0.01
+          }
+        },
+        {
+          "count": 12703,
+          "denominator": 210528,
+          "enforcement": "configurable_or_detector_default",
+          "issue_code": "STUCK_SENSOR",
+          "rate": 0.06033876728986168,
+          "status": "warn",
+          "threshold": {
+            "basis": "rate",
+            "comparison": "strictly_greater_than",
+            "fail_above": 0.5,
+            "warn_above": 0.01
+          }
+        },
+        {
+          "count": 1120,
+          "denominator": 210528,
+          "enforcement": "configurable_or_detector_default",
+          "issue_code": "LEVEL_OR_UNIT_SHIFT",
+          "rate": 0.005319957440340477,
+          "status": "warn",
+          "threshold": {
+            "basis": "rate",
+            "comparison": "strictly_greater_than",
+            "fail_above": 0.1,
+            "warn_above": 0.005
+          }
+        },
+        {
+          "count": 1,
+          "denominator": 210528,
+          "enforcement": "hard_structural_count_greater_than_zero",
+          "issue_code": "METADATA_JOIN_MISSING",
+          "rate": 4.749962000303997e-06,
+          "status": "fail",
+          "threshold": {
+            "basis": "count",
+            "comparison": "hard_structural_count_greater_than_zero",
+            "fail_above": 0.0,
+            "warn_above": null
+          }
+        },
+        {
+          "count": 0,
+          "denominator": 210528,
+          "enforcement": "configurable_or_detector_default",
+          "issue_code": "TIMEZONE_MISSING",
+          "rate": 0.0,
+          "status": "pass",
+          "threshold": {
+            "basis": "rate",
+            "comparison": "strictly_greater_than",
+            "fail_above": 0.1,
+            "warn_above": 0.0
+          }
+        },
+        {
+          "count": 2,
+          "denominator": 210530,
+          "enforcement": "configurable_or_detector_default",
+          "issue_code": "INTERVAL_CONTINUITY_GAP",
+          "rate": 9.499833752909323e-06,
+          "status": "warn",
+          "threshold": {
+            "basis": "rate",
+            "comparison": "strictly_greater_than",
+            "fail_above": 0.05,
+            "warn_above": 0.0
+          }
+        },
+        {
+          "count": 0,
+          "denominator": 210528,
+          "enforcement": "configurable_or_detector_default",
+          "issue_code": "COVERAGE_RARE_GROUP",
+          "rate": 0.0,
+          "status": "pass",
+          "threshold": {
+            "basis": "rate",
+            "comparison": "strictly_greater_than",
+            "fail_above": null,
+            "warn_above": 0.0
+          }
+        },
+        {
+          "count": 0,
+          "denominator": 12,
+          "enforcement": "hard_structural_count_greater_than_zero",
+          "issue_code": "SUBGROUP_METADATA_INSTABILITY",
+          "rate": 0.0,
+          "status": "pass",
+          "threshold": {
+            "basis": "count",
+            "comparison": "strictly_greater_than",
+            "fail_above": 0.0,
+            "warn_above": null
+          }
+        }
+      ],
+      "checks": 15,
+      "hard_structural_failures": [
+        "DUPLICATE_OBSERVATION_KEY",
+        "METADATA_JOIN_MISSING"
+      ],
+      "status": "fail",
+      "status_counts": {
+        "fail": 4,
+        "pass": 5,
+        "warn": 6
+      }
+    },
+    "reference": {
+      "affected_observations_sum": 36426,
+      "check_results": [
+        {
+          "count": 0,
+          "denominator": 210528,
+          "enforcement": "hard_structural_count_greater_than_zero",
+          "issue_code": "TIMESTAMP_PARSE_ERROR",
+          "rate": 0.0,
+          "status": "pass",
+          "threshold": {
+            "basis": "count",
+            "comparison": "strictly_greater_than",
+            "fail_above": 0.0,
+            "warn_above": null
+          }
+        },
+        {
+          "count": 0,
+          "denominator": 210528,
+          "enforcement": "configurable_or_detector_default",
+          "issue_code": "TIMESTAMP_ORDER_ERROR",
+          "rate": 0.0,
+          "status": "pass",
+          "threshold": {
+            "basis": "count",
+            "comparison": "strictly_greater_than",
+            "fail_above": 0.0,
+            "warn_above": null
+          }
+        },
+        {
+          "count": 0,
+          "denominator": 210528,
+          "enforcement": "hard_structural_count_greater_than_zero",
+          "issue_code": "DUPLICATE_OBSERVATION_KEY",
+          "rate": 0.0,
+          "status": "pass",
+          "threshold": {
+            "basis": "count",
+            "comparison": "strictly_greater_than",
+            "fail_above": 0.0,
+            "warn_above": null
+          }
+        },
+        {
+          "count": 54,
+          "denominator": 210528,
+          "enforcement": "configurable_or_detector_default",
+          "issue_code": "LOAD_MISSING",
+          "rate": 0.00025649794801641587,
+          "status": "warn",
+          "threshold": {
+            "basis": "rate",
+            "comparison": "strictly_greater_than",
+            "fail_above": 0.05,
+            "warn_above": 0.0
+          }
+        },
+        {
+          "count": 0,
+          "denominator": 210528,
+          "enforcement": "configurable_or_detector_default",
+          "issue_code": "LOAD_INFINITE",
+          "rate": 0.0,
+          "status": "pass",
+          "threshold": {
+            "basis": "count",
+            "comparison": "strictly_greater_than",
+            "fail_above": 0.0,
+            "warn_above": null
+          }
+        },
+        {
+          "count": 0,
+          "denominator": 210528,
+          "enforcement": "configurable_or_detector_default",
+          "issue_code": "NEGATIVE_LOAD",
+          "rate": 0.0,
+          "status": "pass",
+          "threshold": {
+            "basis": "count",
+            "comparison": "strictly_greater_than",
+            "fail_above": 0.0,
+            "warn_above": null
+          }
+        },
+        {
+          "count": 3525,
+          "denominator": 210528,
+          "enforcement": "configurable_or_detector_default",
+          "issue_code": "ROBUST_OUTLIER",
+          "rate": 0.01674361605107159,
+          "status": "warn",
+          "threshold": {
+            "basis": "rate",
+            "comparison": "strictly_greater_than",
+            "fail_above": 0.2,
+            "warn_above": 0.01
+          }
+        },
+        {
+          "count": 19027,
+          "denominator": 210528,
+          "enforcement": "configurable_or_detector_default",
+          "issue_code": "LONG_ZERO_RUN",
+          "rate": 0.09037752697978416,
+          "status": "warn",
+          "threshold": {
+            "basis": "rate",
+            "comparison": "strictly_greater_than",
+            "fail_above": 0.5,
+            "warn_above": 0.01
+          }
+        },
+        {
+          "count": 12710,
+          "denominator": 210528,
+          "enforcement": "configurable_or_detector_default",
+          "issue_code": "STUCK_SENSOR",
+          "rate": 0.06037201702386381,
+          "status": "warn",
+          "threshold": {
+            "basis": "rate",
+            "comparison": "strictly_greater_than",
+            "fail_above": 0.5,
+            "warn_above": 0.01
+          }
+        },
+        {
+          "count": 1110,
+          "denominator": 210528,
+          "enforcement": "configurable_or_detector_default",
+          "issue_code": "LEVEL_OR_UNIT_SHIFT",
+          "rate": 0.005272457820337437,
+          "status": "warn",
+          "threshold": {
+            "basis": "rate",
+            "comparison": "strictly_greater_than",
+            "fail_above": 0.1,
+            "warn_above": 0.005
+          }
+        },
+        {
+          "count": 0,
+          "denominator": 210528,
+          "enforcement": "hard_structural_count_greater_than_zero",
+          "issue_code": "METADATA_JOIN_MISSING",
+          "rate": 0.0,
+          "status": "pass",
+          "threshold": {
+            "basis": "count",
+            "comparison": "strictly_greater_than",
+            "fail_above": 0.0,
+            "warn_above": null
+          }
+        },
+        {
+          "count": 0,
+          "denominator": 210528,
+          "enforcement": "configurable_or_detector_default",
+          "issue_code": "TIMEZONE_MISSING",
+          "rate": 0.0,
+          "status": "pass",
+          "threshold": {
+            "basis": "rate",
+            "comparison": "strictly_greater_than",
+            "fail_above": 0.1,
+            "warn_above": 0.0
+          }
+        },
+        {
+          "count": 0,
+          "denominator": 210528,
+          "enforcement": "configurable_or_detector_default",
+          "issue_code": "INTERVAL_CONTINUITY_GAP",
+          "rate": 0.0,
+          "status": "pass",
+          "threshold": {
+            "basis": "rate",
+            "comparison": "strictly_greater_than",
+            "fail_above": 0.05,
+            "warn_above": 0.0
+          }
+        },
+        {
+          "count": 0,
+          "denominator": 210528,
+          "enforcement": "configurable_or_detector_default",
+          "issue_code": "COVERAGE_RARE_GROUP",
+          "rate": 0.0,
+          "status": "pass",
+          "threshold": {
+            "basis": "rate",
+            "comparison": "strictly_greater_than",
+            "fail_above": null,
+            "warn_above": 0.0
+          }
+        },
+        {
+          "count": 0,
+          "denominator": 12,
+          "enforcement": "hard_structural_count_greater_than_zero",
+          "issue_code": "SUBGROUP_METADATA_INSTABILITY",
+          "rate": 0.0,
+          "status": "pass",
+          "threshold": {
+            "basis": "count",
+            "comparison": "strictly_greater_than",
+            "fail_above": 0.0,
+            "warn_above": null
+          }
+        },
+        {
+          "count": 0,
+          "denominator": 12,
+          "enforcement": "hard_structural_count_greater_than_zero",
+          "issue_code": "SPLIT_BUILDING_COVERAGE",
+          "rate": 0.0,
+          "status": "pass",
+          "threshold": {
+            "basis": "count",
+            "comparison": "strictly_greater_than",
+            "fail_above": 0.0,
+            "warn_above": null
+          }
+        },
+        {
+          "count": 0,
+          "denominator": 6,
+          "enforcement": "configurable_or_detector_default",
+          "issue_code": "SUBGROUP_SPLIT_COVERAGE",
+          "rate": 0.0,
+          "status": "pass",
+          "threshold": {
+            "basis": "rate",
+            "comparison": "strictly_greater_than",
+            "fail_above": 0.25,
+            "warn_above": 0.0
+          }
+        },
+        {
+          "count": 0,
+          "denominator": 12,
+          "enforcement": "hard_structural_count_greater_than_zero",
+          "issue_code": "METADATA_DUPLICATE_KEY",
+          "rate": 0.0,
+          "status": "pass",
+          "threshold": {
+            "basis": "count",
+            "comparison": "strictly_greater_than",
+            "fail_above": 0.0,
+            "warn_above": null
+          }
+        },
+        {
+          "count": 0,
+          "denominator": 12,
+          "enforcement": "hard_structural_count_greater_than_zero",
+          "issue_code": "METADATA_MISSING_KEY",
+          "rate": 0.0,
+          "status": "pass",
+          "threshold": {
+            "basis": "count",
+            "comparison": "strictly_greater_than",
+            "fail_above": 0.0,
+            "warn_above": null
+          }
+        },
+        {
+          "count": 0,
+          "denominator": 12,
+          "enforcement": "configurable_or_detector_default",
+          "issue_code": "METADATA_REQUIRED_VALUE_MISSING",
+          "rate": 0.0,
+          "status": "pass",
+          "threshold": {
+            "basis": "rate",
+            "comparison": "strictly_greater_than",
+            "fail_above": 0.1,
+            "warn_above": 0.0
+          }
+        }
+      ],
+      "checks": 20,
+      "hard_structural_failures": [],
+      "status": "warn",
+      "status_counts": {
+        "fail": 0,
+        "pass": 15,
+        "warn": 5
+      }
+    },
+    "remediated": {
+      "affected_observations_sum": 34953,
+      "check_results": [
+        {
+          "count": 0,
+          "denominator": 210528,
+          "enforcement": "hard_structural_count_greater_than_zero",
+          "issue_code": "TIMESTAMP_PARSE_ERROR",
+          "rate": 0.0,
+          "status": "pass",
+          "threshold": {
+            "basis": "count",
+            "comparison": "strictly_greater_than",
+            "fail_above": 0.0,
+            "warn_above": null
+          }
+        },
+        {
+          "count": 0,
+          "denominator": 210528,
+          "enforcement": "configurable_or_detector_default",
+          "issue_code": "TIMESTAMP_ORDER_ERROR",
+          "rate": 0.0,
+          "status": "pass",
+          "threshold": {
+            "basis": "count",
+            "comparison": "strictly_greater_than",
+            "fail_above": 0.0,
+            "warn_above": null
+          }
+        },
+        {
+          "count": 0,
+          "denominator": 210528,
+          "enforcement": "hard_structural_count_greater_than_zero",
+          "issue_code": "DUPLICATE_OBSERVATION_KEY",
+          "rate": 0.0,
+          "status": "pass",
+          "threshold": {
+            "basis": "count",
+            "comparison": "strictly_greater_than",
+            "fail_above": 0.0,
+            "warn_above": null
+          }
+        },
+        {
+          "count": 22079,
+          "denominator": 210528,
+          "enforcement": "configurable_or_detector_default",
+          "issue_code": "LOAD_MISSING",
+          "rate": 0.10487441100471197,
+          "status": "fail",
+          "threshold": {
+            "basis": "rate",
+            "comparison": "strictly_greater_than",
+            "fail_above": 0.05,
+            "warn_above": 0.0
+          }
+        },
+        {
+          "count": 0,
+          "denominator": 210528,
+          "enforcement": "configurable_or_detector_default",
+          "issue_code": "LOAD_INFINITE",
+          "rate": 0.0,
+          "status": "pass",
+          "threshold": {
+            "basis": "count",
+            "comparison": "strictly_greater_than",
+            "fail_above": 0.0,
+            "warn_above": null
+          }
+        },
+        {
+          "count": 0,
+          "denominator": 210528,
+          "enforcement": "configurable_or_detector_default",
+          "issue_code": "NEGATIVE_LOAD",
+          "rate": 0.0,
+          "status": "pass",
+          "threshold": {
+            "basis": "count",
+            "comparison": "strictly_greater_than",
+            "fail_above": 0.0,
+            "warn_above": null
+          }
+        },
+        {
+          "count": 1938,
+          "denominator": 210528,
+          "enforcement": "configurable_or_detector_default",
+          "issue_code": "ROBUST_OUTLIER",
+          "rate": 0.009205426356589148,
+          "status": "pass",
+          "threshold": {
+            "basis": "rate",
+            "comparison": "strictly_greater_than",
+            "fail_above": 0.2,
+            "warn_above": 0.01
+          }
+        },
+        {
+          "count": 4310,
+          "denominator": 210528,
+          "enforcement": "configurable_or_detector_default",
+          "issue_code": "LONG_ZERO_RUN",
+          "rate": 0.020472336221310228,
+          "status": "warn",
+          "threshold": {
+            "basis": "rate",
+            "comparison": "strictly_greater_than",
+            "fail_above": 0.5,
+            "warn_above": 0.01
+          }
+        },
+        {
+          "count": 5987,
+          "denominator": 210528,
+          "enforcement": "configurable_or_detector_default",
+          "issue_code": "STUCK_SENSOR",
+          "rate": 0.028438022495820035,
+          "status": "warn",
+          "threshold": {
+            "basis": "rate",
+            "comparison": "strictly_greater_than",
+            "fail_above": 0.5,
+            "warn_above": 0.01
+          }
+        },
+        {
+          "count": 639,
+          "denominator": 210528,
+          "enforcement": "configurable_or_detector_default",
+          "issue_code": "LEVEL_OR_UNIT_SHIFT",
+          "rate": 0.0030352257181942544,
+          "status": "pass",
+          "threshold": {
+            "basis": "rate",
+            "comparison": "strictly_greater_than",
+            "fail_above": 0.1,
+            "warn_above": 0.005
+          }
+        },
+        {
+          "count": 0,
+          "denominator": 210528,
+          "enforcement": "hard_structural_count_greater_than_zero",
+          "issue_code": "METADATA_JOIN_MISSING",
+          "rate": 0.0,
+          "status": "pass",
+          "threshold": {
+            "basis": "count",
+            "comparison": "strictly_greater_than",
+            "fail_above": 0.0,
+            "warn_above": null
+          }
+        },
+        {
+          "count": 0,
+          "denominator": 210528,
+          "enforcement": "configurable_or_detector_default",
+          "issue_code": "TIMEZONE_MISSING",
+          "rate": 0.0,
+          "status": "pass",
+          "threshold": {
+            "basis": "rate",
+            "comparison": "strictly_greater_than",
+            "fail_above": 0.1,
+            "warn_above": 0.0
+          }
+        },
+        {
+          "count": 0,
+          "denominator": 210528,
+          "enforcement": "configurable_or_detector_default",
+          "issue_code": "INTERVAL_CONTINUITY_GAP",
+          "rate": 0.0,
+          "status": "pass",
+          "threshold": {
+            "basis": "rate",
+            "comparison": "strictly_greater_than",
+            "fail_above": 0.05,
+            "warn_above": 0.0
+          }
+        },
+        {
+          "count": 0,
+          "denominator": 210528,
+          "enforcement": "configurable_or_detector_default",
+          "issue_code": "COVERAGE_RARE_GROUP",
+          "rate": 0.0,
+          "status": "pass",
+          "threshold": {
+            "basis": "rate",
+            "comparison": "strictly_greater_than",
+            "fail_above": null,
+            "warn_above": 0.0
+          }
+        },
+        {
+          "count": 0,
+          "denominator": 12,
+          "enforcement": "hard_structural_count_greater_than_zero",
+          "issue_code": "SUBGROUP_METADATA_INSTABILITY",
+          "rate": 0.0,
+          "status": "pass",
+          "threshold": {
+            "basis": "count",
+            "comparison": "strictly_greater_than",
+            "fail_above": 0.0,
+            "warn_above": null
+          }
+        }
+      ],
+      "checks": 15,
+      "hard_structural_failures": [],
+      "status": "fail",
+      "status_counts": {
+        "fail": 1,
+        "pass": 12,
+        "warn": 2
+      }
+    }
+  },
+  "quarantine": {
+    "rows": 22033
+  },
+  "remediation": {
+    "log_rows": 22619,
+    "quarantined_rows": 22033,
+    "repaired_rows": 586
+  },
+  "schema_version": "1.0",
+  "timestamp_semantics": "BDG2 raw meter timestamps are source-local wall-clock readings. For this prototype they are represented with a UTC marker for stable parsing without performing an offset conversion. The committed subset is restricted to sites with the same source timezone (US/Eastern). This must not be described as cross-timezone UTC harmonization; DST interpretation remains a limitation.",
+  "timestamp_semantics_machine": {
+    "basis": "source_local_wall_clock",
+    "canonical_marker": "UTC",
+    "dst_disambiguated": false,
+    "offset_conversion_applied": false
+  }
+}

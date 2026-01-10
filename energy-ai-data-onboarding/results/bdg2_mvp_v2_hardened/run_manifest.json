@@ -1,0 +1,65 @@
+{
+  "code_revision": {
+    "file_count": 14,
+    "files": {
+      "pyproject.toml": "b9db7c8479fdd64c2d0361f8a2a869a445c3c055a5d6bd563c9e0bacc3432703",
+      "src/energy_onboarding/__init__.py": "1d8e59216275c5e09c13a1d2c2687279134cffb3d1842a0ad7ee34cddd5ed8c0",
+      "src/energy_onboarding/__main__.py": "2cdd23d4f5cd6c3b3e4cb690ad16d560637767b9ca5b2a3cf129fcc0a5ebc82b",
+      "src/energy_onboarding/checks.py": "d28a38159631fac08f3e8bafdbb0705df2f9d0d31c6a189bb6494aead02c6903",
+      "src/energy_onboarding/cli.py": "5c582706f2fa2e1d66bde35b47683b0e87b1b0246a9c5a8f39037866ef974ab0",
+      "src/energy_onboarding/contracts.py": "a97b48045f1fce82cf9adf3aa434c943ddfc56d5dd843f0af752d71c5f664fb8",
+      "src/energy_onboarding/downloader.py": "eca177b7618484232a4a45c48109df11a2001383148f8fc4d24c5defc3b021d9",
+      "src/energy_onboarding/faults.py": "4a9f3837ed8c050737af7c9b107b092f7747324c132a38914dc854e1b1682eef",
+      "src/energy_onboarding/gates.py": "0083fa3339b4f9fc9c3a5f456c9f58d9eb1e479bc8feb84b5c97a866a57db101",
+      "src/energy_onboarding/ingest.py": "f85ccde584f610305cbf4da1072f49df0c8f409acbfa3cf0dfac34b09a0557dd",
+      "src/energy_onboarding/io_utils.py": "9e5624eb75788bfe3418dde0391b7f84c96f0ab5027dc0c8ff3c2b04a290e9f3",
+      "src/energy_onboarding/pipeline.py": "98278ab867b9bc5c0136961771595afa27e4ba31c77d0856a1129b208632e86c",
+      "src/energy_onboarding/remediation.py": "1f792d66356441fb2ce7f6dc1c73854d87cf7972d60ac54d613b8a2644c9f2a7",
+      "src/energy_onboarding/reporting.py": "1683ab65c47abaabdb09d0e0eb274db2ab35e95dd10cde6f83460ce2146d676a"
+    },
+    "git_commit": null,
+    "kind": "source_tree_sha256",
+    "note": "Content identity only; no Git commit or earlier creation date is asserted.",
+    "value": "2c17d060d154c11ca413c030cb1e84e94819a5e06bca082815ecdb6b599c1f48"
+  },
+  "config_sha256": "efa3fb705dd0e0695ed31fd50596231a9bdfe164ac41077668b1cec28876dd50",
+  "created_at_utc": "2026-09-28T19:05:53Z",
+  "execution_scope": "verified_bdg2_subset",
+  "fault_cutoff": "2017-01-01T00:00:00+00:00",
+  "fault_event_metadata_version": "1.0",
+  "runtime": {
+    "implementation": "CPython",
+    "numpy": "2.3.5",
+    "pandas": "2.2.3",
+    "platform": "darwin",
+    "python": "3.12.14"
+  },
+  "schema_version": "1.0",
+  "seed": 20251206,
+  "selected_buildings": [
+    "Eagle_education_Alberto",
+    "Eagle_education_April",
+    "Eagle_office_Amanda",
+    "Eagle_office_Bridgett",
+    "Panther_education_Annetta",
+    "Panther_education_Aurora",
+    "Panther_office_Clementine",
+    "Panther_office_Danica",
+    "Rat_education_Kathryn",
+    "Rat_education_Lee",
+    "Rat_office_Avis",
+    "Rat_office_Colby"
+  ],
+  "selected_sites": [
+    "Eagle",
+    "Panther",
+    "Rat"
+  ],
+  "state_policy": "stateless; no conversational memory or personal data",
+  "timestamp_semantics_machine": {
+    "basis": "source_local_wall_clock",
+    "canonical_marker": "UTC",
+    "dst_disambiguated": false,
+    "offset_conversion_applied": false
+  }
+}

@@ -1,0 +1,710 @@
+{
+  "check_counts": {
+    "corrupted": {
+      "fail": 1,
+      "pass": 9,
+      "warn": 5
+    },
+    "detector_validation": {
+      "fail": 4,
+      "pass": 5,
+      "warn": 6
+    },
+    "reference": {
+      "fail": 0,
+      "pass": 15,
+      "warn": 5
+    },
+    "remediated": {
+      "fail": 1,
+      "pass": 12,
+      "warn": 2
+    }
+  },
+  "code_revision": {
+    "file_count": 14,
+    "files": {
+      "pyproject.toml": "b9db7c8479fdd64c2d0361f8a2a869a445c3c055a5d6bd563c9e0bacc3432703",
+      "src/energy_onboarding/__init__.py": "1d8e59216275c5e09c13a1d2c2687279134cffb3d1842a0ad7ee34cddd5ed8c0",
+      "src/energy_onboarding/__main__.py": "2cdd23d4f5cd6c3b3e4cb690ad16d560637767b9ca5b2a3cf129fcc0a5ebc82b",
+      "src/energy_onboarding/checks.py": "d28a38159631fac08f3e8bafdbb0705df2f9d0d31c6a189bb6494aead02c6903",
+      "src/energy_onboarding/cli.py": "5c582706f2fa2e1d66bde35b47683b0e87b1b0246a9c5a8f39037866ef974ab0",
+      "src/energy_onboarding/contracts.py": "a97b48045f1fce82cf9adf3aa434c943ddfc56d5dd843f0af752d71c5f664fb8",
+      "src/energy_onboarding/downloader.py": "eca177b7618484232a4a45c48109df11a2001383148f8fc4d24c5defc3b021d9",
+      "src/energy_onboarding/faults.py": "4a9f3837ed8c050737af7c9b107b092f7747324c132a38914dc854e1b1682eef",
+      "src/energy_onboarding/gates.py": "0083fa3339b4f9fc9c3a5f456c9f58d9eb1e479bc8feb84b5c97a866a57db101",
+      "src/energy_onboarding/ingest.py": "f85ccde584f610305cbf4da1072f49df0c8f409acbfa3cf0dfac34b09a0557dd",
+      "src/energy_onboarding/io_utils.py": "9e5624eb75788bfe3418dde0391b7f84c96f0ab5027dc0c8ff3c2b04a290e9f3",
+      "src/energy_onboarding/pipeline.py": "98278ab867b9bc5c0136961771595afa27e4ba31c77d0856a1129b208632e86c",
+      "src/energy_onboarding/remediation.py": "1f792d66356441fb2ce7f6dc1c73854d87cf7972d60ac54d613b8a2644c9f2a7",
+      "src/energy_onboarding/reporting.py": "1683ab65c47abaabdb09d0e0eb274db2ab35e95dd10cde6f83460ce2146d676a"
+    },
+    "git_commit": null,
+    "kind": "source_tree_sha256",
+    "note": "Content identity only; no Git commit or earlier creation date is asserted.",
+    "value": "2c17d060d154c11ca413c030cb1e84e94819a5e06bca082815ecdb6b599c1f48"
+  },
+  "config_hash": "efa3fb705dd0e0695ed31fd50596231a9bdfe164ac41077668b1cec28876dd50",
+  "created_at_utc": "2026-09-28T19:05:53Z",
+  "dataset": {
+    "doi": "10.5281/zenodo.3887306",
+    "title": "Building Data Genome Project 2",
+    "version": "v1.0"
+  },
+  "dataset_summary": {
+    "buildings": 12,
+    "by_primary_use": {
+      "Education": 105264,
+      "Office": 105264
+    },
+    "by_season": {
+      "autumn": 52416,
+      "spring": 52992,
+      "summer": 52992,
+      "winter": 52128
+    },
+    "by_site": {
+      "Eagle": 70176,
+      "Panther": 70176,
+      "Rat": 70176
+    },
+    "by_timezone": {
+      "US/Eastern": 210528
+    },
+    "load_missing": 54,
+    "rows": 210528,
+    "timestamp_max": "2017-12-31T23:00:00+00:00",
+    "timestamp_min": "2016-01-01T00:00:00+00:00"
+  },
+  "execution_scope": "verified_bdg2_subset",
+  "fault_cutoff": "2017-01-01T00:00:00+00:00",
+  "fault_event_metadata_version": "1.0",
+  "files": {
+    "corrupted.csv.gz": {
+      "columns": [
+        "timestamp",
+        "building_id",
+        "load",
+        "site_id",
+        "primary_use",
+        "condition"
+      ],
+      "path": "corrupted.csv.gz",
+      "rows": 210528,
+      "sha256": "1e2760303fde4f14918b773bf8084c28c468e43562d7b253ec46a33a0670aed4",
+      "size_bytes": 1444275
+    },
+    "data_card.md": {
+      "path": "data_card.md",
+      "sha256": "6ac7e6692503eaacf964d070b0fe7b5ea5c6949f5353e000dd1bdf1968fc225c",
+      "size_bytes": 1893
+    },
+    "detector_metrics.csv": {
+      "columns": [
+        "fault_type",
+        "true_positive",
+        "false_negative",
+        "false_positive",
+        "true_negative",
+        "precision",
+        "recall",
+        "false_positive_rate"
+      ],
+      "path": "detector_metrics.csv",
+      "rows": 10,
+      "sha256": "73feabcf4a4475911e808e50e74518fca7db238bcc450cac48c86e53a2efa57a",
+      "size_bytes": 722
+    },
+    "fault_manifest.json": {
+      "path": "fault_manifest.json",
+      "sha256": "db7f4374a683c0d1de54f196b91a01fe3452333b06b3538c3548c817e673e362",
+      "size_bytes": 43004
+    },
+    "quality_issues.csv.gz": {
+      "columns": [
+        "check_name",
+        "issue_code",
+        "severity",
+        "timestamp",
+        "building_id",
+        "observed_value",
+        "expected_rule",
+        "action",
+        "source_condition",
+        "seeded_fault",
+        "count",
+        "denominator",
+        "rate",
+        "repairable",
+        "message",
+        "threshold_basis",
+        "warn_above",
+        "fail_above",
+        "threshold_comparison"
+      ],
+      "path": "quality_issues.csv.gz",
+      "rows": 150,
+      "sha256": "8619d91666456aacbcb94b62cde32b830f2a0a1cd250770739d1de795fc70f7d",
+      "size_bytes": 3295
+    },
+    "quality_summary.json": {
+      "path": "quality_summary.json",
+      "sha256": "6998443f6ce844e886ac6dcd099dbad59409b8dd27c6bc860e05455721175ce0",
+      "size_bytes": 30602
+    },
+    "quarantine.csv.gz": {
+      "columns": [
+        "timestamp",
+        "building_id",
+        "load",
+        "site_id",
+        "primary_use",
+        "condition",
+        "reason"
+      ],
+      "path": "quarantine.csv.gz",
+      "rows": 22033,
+      "sha256": "a892155ec4df4dda060dceb593842127a326d857b12b2217ca3b5045304e8c0c",
+      "size_bytes": 67045
+    },
+    "reference.csv.gz": {
+      "columns": [
+        "timestamp",
+        "building_id",
+        "load",
+        "site_id",
+        "primary_use",
+        "condition"
+      ],
+      "path": "reference.csv.gz",
+      "rows": 210528,
+      "sha256": "63fc0c2afcc3c316794504c0ff73950f73fd72126d766978c297e3b07e12e234",
+      "size_bytes": 1444294
+    },
+    "remediated.csv.gz": {
+      "columns": [
+        "timestamp",
+        "building_id",
+        "load",
+        "site_id",
+        "primary_use",
+        "condition"
+      ],
+      "path": "remediated.csv.gz",
+      "rows": 210528,
+      "sha256": "ca6361a77754cdb01c4c1842f239cf45e4a2f3c6b92b52598c07a2212d79759b",
+      "size_bytes": 1442676
+    },
+    "remediation_log.csv.gz": {
+      "columns": [
+        "timestamp",
+        "building_id",
+        "original_value",
+        "remediated_value",
+        "rule",
+        "status",
+        "reason"
+      ],
+      "path": "remediation_log.csv.gz",
+      "rows": 22619,
+      "sha256": "9334b1fae2833a4fe016e575ae3c2a62a40ff8b84ca7bfbf1aed635c581221a7",
+      "size_bytes": 71211
+    },
+    "report.html": {
+      "path": "report.html",
+      "sha256": "e11bae074bcf36d994335f9ca9d3677b35e824b22d0a7dc78dc35bc170085ed7",
+      "size_bytes": 45057
+    },
+    "report.md": {
+      "path": "report.md",
+      "sha256": "6b9ddbbd0da9d1b765711783ef6312fb9f8f57a64cf143dc26f367d13d97aee4",
+      "size_bytes": 2571
+    },
+    "run_manifest.json": {
+      "path": "run_manifest.json",
+      "sha256": "e993d701f2a54f5a53bb83d8c2292f088930334e277c8d5b5576ef92057a1d8f",
+      "size_bytes": 2982
+    }
+  },
+  "input_files": {
+    "electricity": {
+      "path": "electricity.csv",
+      "sha256": "039d909d8981e2d69eaeb366144e6ab7e84fa5e7e216aee42bddd95384a66418",
+      "size_bytes": 174239039
+    },
+    "metadata": {
+      "path": "metadata.csv",
+      "sha256": "992d0b29f24f96ad4332bc4dbb534b7bdd7dd2689aad093f94e93068ecddca02",
+      "size_bytes": 272024
+    }
+  },
+  "outputs": {
+    "corrupted.csv.gz": {
+      "columns": [
+        "timestamp",
+        "building_id",
+        "load",
+        "site_id",
+        "primary_use",
+        "condition"
+      ],
+      "path": "corrupted.csv.gz",
+      "rows": 210528,
+      "sha256": "1e2760303fde4f14918b773bf8084c28c468e43562d7b253ec46a33a0670aed4",
+      "size_bytes": 1444275
+    },
+    "data_card.md": {
+      "path": "data_card.md",
+      "sha256": "6ac7e6692503eaacf964d070b0fe7b5ea5c6949f5353e000dd1bdf1968fc225c",
+      "size_bytes": 1893
+    },
+    "detector_metrics.csv": {
+      "columns": [
+        "fault_type",
+        "true_positive",
+        "false_negative",
+        "false_positive",
+        "true_negative",
+        "precision",
+        "recall",
+        "false_positive_rate"
+      ],
+      "path": "detector_metrics.csv",
+      "rows": 10,
+      "sha256": "73feabcf4a4475911e808e50e74518fca7db238bcc450cac48c86e53a2efa57a",
+      "size_bytes": 722
+    },
+    "fault_manifest.json": {
+      "path": "fault_manifest.json",
+      "sha256": "db7f4374a683c0d1de54f196b91a01fe3452333b06b3538c3548c817e673e362",
+      "size_bytes": 43004
+    },
+    "quality_issues.csv.gz": {
+      "columns": [
+        "check_name",
+        "issue_code",
+        "severity",
+        "timestamp",
+        "building_id",
+        "observed_value",
+        "expected_rule",
+        "action",
+        "source_condition",
+        "seeded_fault",
+        "count",
+        "denominator",
+        "rate",
+        "repairable",
+        "message",
+        "threshold_basis",
+        "warn_above",
+        "fail_above",
+        "threshold_comparison"
+      ],
+      "path": "quality_issues.csv.gz",
+      "rows": 150,
+      "sha256": "8619d91666456aacbcb94b62cde32b830f2a0a1cd250770739d1de795fc70f7d",
+      "size_bytes": 3295
+    },
+    "quality_summary.json": {
+      "path": "quality_summary.json",
+      "sha256": "6998443f6ce844e886ac6dcd099dbad59409b8dd27c6bc860e05455721175ce0",
+      "size_bytes": 30602
+    },
+    "quarantine.csv.gz": {
+      "columns": [
+        "timestamp",
+        "building_id",
+        "load",
+        "site_id",
+        "primary_use",
+        "condition",
+        "reason"
+      ],
+      "path": "quarantine.csv.gz",
+      "rows": 22033,
+      "sha256": "a892155ec4df4dda060dceb593842127a326d857b12b2217ca3b5045304e8c0c",
+      "size_bytes": 67045
+    },
+    "reference.csv.gz": {
+      "columns": [
+        "timestamp",
+        "building_id",
+        "load",
+        "site_id",
+        "primary_use",
+        "condition"
+      ],
+      "path": "reference.csv.gz",
+      "rows": 210528,
+      "sha256": "63fc0c2afcc3c316794504c0ff73950f73fd72126d766978c297e3b07e12e234",
+      "size_bytes": 1444294
+    },
+    "remediated.csv.gz": {
+      "columns": [
+        "timestamp",
+        "building_id",
+        "load",
+        "site_id",
+        "primary_use",
+        "condition"
+      ],
+      "path": "remediated.csv.gz",
+      "rows": 210528,
+      "sha256": "ca6361a77754cdb01c4c1842f239cf45e4a2f3c6b92b52598c07a2212d79759b",
+      "size_bytes": 1442676
+    },
+    "remediation_log.csv.gz": {
+      "columns": [
+        "timestamp",
+        "building_id",
+        "original_value",
+        "remediated_value",
+        "rule",
+        "status",
+        "reason"
+      ],
+      "path": "remediation_log.csv.gz",
+      "rows": 22619,
+      "sha256": "9334b1fae2833a4fe016e575ae3c2a62a40ff8b84ca7bfbf1aed635c581221a7",
+      "size_bytes": 71211
+    },
+    "report.html": {
+      "path": "report.html",
+      "sha256": "e11bae074bcf36d994335f9ca9d3677b35e824b22d0a7dc78dc35bc170085ed7",
+      "size_bytes": 45057
+    },
+    "report.md": {
+      "path": "report.md",
+      "sha256": "6b9ddbbd0da9d1b765711783ef6312fb9f8f57a64cf143dc26f367d13d97aee4",
+      "size_bytes": 2571
+    },
+    "run_manifest.json": {
+      "path": "run_manifest.json",
+      "sha256": "e993d701f2a54f5a53bb83d8c2292f088930334e277c8d5b5576ef92057a1d8f",
+      "size_bytes": 2982
+    }
+  },
+  "quarantine_counts": {
+    "rows": 22033
+  },
+  "remediation_counts": {
+    "log_rows": 22619,
+    "quarantined_rows": 22033,
+    "repaired_rows": 586
+  },
+  "runtime": {
+    "implementation": "CPython",
+    "numpy": "2.3.5",
+    "pandas": "2.2.3",
+    "platform": "darwin",
+    "python": "3.12.14"
+  },
+  "schema": {
+    "columns": [
+      "timestamp",
+      "building_id",
+      "load",
+      "site_id",
+      "primary_use",
+      "condition"
+    ],
+    "frequency": "1h",
+    "key": [
+      "timestamp",
+      "building_id"
+    ],
+    "null_policy": "preserve key with null and log/quarantine when unresolved",
+    "unit": "as supplied by BDG2; no unit conversion performed"
+  },
+  "schema_version": "1.0",
+  "seed": 20251206,
+  "selection": {
+    "exclusions": [
+      {
+        "building_id": "Bobcat_education_Rafael",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Bull_assembly_Freda",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Cockatoo_education_Ernesto",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Cockatoo_education_Noah",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Cockatoo_education_Priscilla",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Cockatoo_health_Ashlie",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Cockatoo_industrial_Elina",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Cockatoo_lodging_Fritz",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Cockatoo_office_Nola",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Hog_education_Martha",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Hog_education_Mathilda",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Hog_health_May",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Hog_industrial_Willette",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Hog_office_Darlene",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Hog_office_Ervin",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Hog_office_Eugene",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Hog_office_Jillian",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Hog_services_Cory",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Hog_services_Danny",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Hog_warehouse_Kaye",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Lamb_office_Anthony",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Moose_education_Dennis",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Moose_education_Omar",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Panther_education_Guillermina",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Panther_education_Jarrett",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Panther_education_Joyce",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Panther_education_Lacey",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Panther_education_Richard",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Panther_lodging_Aaron",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Panther_lodging_Alyssa",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Panther_lodging_Amos",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Panther_lodging_Arlene",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Panther_lodging_Bonnie",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Panther_lodging_Carroll",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Panther_lodging_Dean",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Panther_lodging_Drew",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Panther_lodging_Georgie",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Panther_lodging_Heather",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Panther_lodging_Jacquelyn",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Panther_lodging_Juliet",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Panther_lodging_Marlyn",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Panther_lodging_Otis",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Panther_lodging_Paulette",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Panther_lodging_Ricky",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Panther_lodging_Shelia",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Panther_office_Bryce",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Panther_office_Daina",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Panther_office_Gino",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Panther_office_Woodrow",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Panther_other_Ismael",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Panther_other_Iva",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Panther_other_Luis",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Panther_parking_Clarence",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Panther_retail_Jeanette",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Peacock_lodging_Erica",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Peacock_office_Ronda",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Swan_unknown_Darrin",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Swan_unknown_Yoshiko",
+        "reason": "not_present_in_meter_header"
+      }
+    ],
+    "selected_buildings": [
+      "Eagle_education_Alberto",
+      "Eagle_education_April",
+      "Eagle_office_Amanda",
+      "Eagle_office_Bridgett",
+      "Panther_education_Annetta",
+      "Panther_education_Aurora",
+      "Panther_office_Clementine",
+      "Panther_office_Danica",
+      "Rat_education_Kathryn",
+      "Rat_education_Lee",
+      "Rat_office_Avis",
+      "Rat_office_Colby"
+    ],
+    "selected_sites": [
+      "Eagle",
+      "Panther",
+      "Rat"
+    ],
+    "source_rows_read": 17544,
+    "strategy": "metadata_round_robin_by_site_then_primary_use"
+  },
+  "source_manifest": "bdg2_v1.0.json",
+  "source_manifest_hash": "9d8c81a9fe37c24264c25d785b9c5db19bad598395c2ea3204feca5d9f56b23a",
+  "source_verification": {
+    "electricity": {
+      "local_relative_path": "electricity.csv",
+      "name": "electricity.csv",
+      "observed_sha256": "039d909d8981e2d69eaeb366144e6ab7e84fa5e7e216aee42bddd95384a66418",
+      "observed_size_bytes": 174239039,
+      "verification_status": "verified"
+    },
+    "metadata": {
+      "local_relative_path": "metadata.csv",
+      "name": "metadata.csv",
+      "observed_sha256": "992d0b29f24f96ad4332bc4dbb534b7bdd7dd2689aad093f94e93068ecddca02",
+      "observed_size_bytes": 272024,
+      "verification_status": "verified"
+    }
+  },
+  "state_policy": {
+    "analytics": false,
+    "data_scope": "public energy data plus reproducibility artifacts",
+    "external_transmission": false,
+    "mode": "stateless"
+  },
+  "timestamp_semantics": "BDG2 raw meter timestamps are source-local wall-clock readings. For this prototype they are represented with a UTC marker for stable parsing without performing an offset conversion. The committed subset is restricted to sites with the same source timezone (US/Eastern). This must not be described as cross-timezone UTC harmonization; DST interpretation remains a limitation.",
+  "timestamp_semantics_machine": {
+    "basis": "source_local_wall_clock",
+    "canonical_marker": "UTC",
+    "dst_disambiguated": false,
+    "offset_conversion_applied": false
+  }
+}

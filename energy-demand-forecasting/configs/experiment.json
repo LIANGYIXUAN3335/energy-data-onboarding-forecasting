@@ -1,0 +1,14 @@
+{
+  "seed": 20251206,
+  "forecast_horizon_hours": 24,
+  "seasonal_period_hours": 168,
+  "train_end": "2016-12-31T23:00:00Z",
+  "validation_end": "2017-03-31T23:00:00Z",
+  "max_model_iterations": 120,
+  "learning_rate": 0.07,
+  "max_leaf_nodes": 31,
+  "l2_regularization": 0.1,
+  "bootstrap_repetitions": 500,
+  "primary_metric": "mase",
+  "condition_order": ["reference", "corrupted", "remediated"]
+}
