@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
-from typing import Any
+from dataclasses import dataclass, field
+from typing import Any, Mapping
 
 import numpy as np
 import pandas as pd
@@ -20,6 +20,49 @@ class QualityConfig:
     level_shift_ratio: float = 8.0
     causal_window: int = 168
     rare_group_fraction: float = 0.01
+    # Run-detector policy. The defaults reproduce the v2 behaviour exactly.
+    #
+    # ``run_flagging``:
+    #   "tail"      - only run positions at or beyond the threshold are flagged
+    #                 (v2). The head of a long run stays "valid", which lets a
+    #                 forward fill copy the run's own value back into it.
+    #   "whole_run" - once a run reaches the threshold every member of that
+    #                 run is flagged (v3). A run of length L is established by
+    #                 hour L; no value later than the run is consulted.
+    # ``stuck_calibration_quantile``: when set, each building's stuck-sensor
+    #   threshold becomes max(stuck_threshold, ceil(q-quantile of that
+    #   building's natural constant-run lengths before ``calibration_end``) + 1).
+    #   Coarsely quantized meters, whose readings repeat for hours as a matter
+    #   of resolution, therefore stop being flagged as stuck; high-resolution
+    #   meters keep the configured threshold.
+    # ``zero_profile_min_ratio``: when set, a zero run is flagged only during
+    #   hours when the building is normally active, i.e. when the causal
+    #   hour-of-week median over the previous ``profile_weeks`` weeks exceeds
+    #   this ratio times the building's causal 168-hour median. Buildings that
+    #   are genuinely idle at night or at weekends are no longer quarantined.
+    # ``calibration_end``: rows at or after this timestamp never contribute to
+    #   a building's calibration statistics (the fault cutoff is used).
+    run_flagging: str = "tail"
+    stuck_calibration_quantile: float | None = None
+    zero_profile_min_ratio: float | None = None
+    profile_weeks: int = 8
+    calibration_end: str | None = None
+    # Per-building stuck thresholds already calibrated on the reference
+    # condition. When present they override the quantile computation so that
+    # corrupted/remediated inspections never calibrate on injected faults.
+    stuck_thresholds_by_building: Mapping[str, int] | None = field(default=None, compare=False)
+
+    def __post_init__(self) -> None:
+        if self.run_flagging not in {"tail", "whole_run"}:
+            raise ValueError("run_flagging must be 'tail' or 'whole_run'.")
+        if self.stuck_calibration_quantile is not None and not (
+            0 < float(self.stuck_calibration_quantile) <= 1
+        ):
+            raise ValueError("stuck_calibration_quantile must be in (0, 1].")
+        if self.zero_profile_min_ratio is not None and float(self.zero_profile_min_ratio) < 0:
+            raise ValueError("zero_profile_min_ratio must be non-negative.")
+        if int(self.profile_weeks) < 1:
+            raise ValueError("profile_weeks must be at least 1.")
 
 
 def _sample(frame: pd.DataFrame, mask: pd.Series, columns: list[str]) -> tuple[dict, ...]:
@@ -69,11 +112,43 @@ def _causal_run_position(predicate: pd.Series) -> pd.Series:
     return predicate.groupby(run_id, sort=False).cumsum()
 
 
-def causal_anomaly_masks(
-    frame: pd.DataFrame, config: QualityConfig
-) -> dict[str, pd.Series]:
-    """Return anomaly masks computed without future observations."""
+def _run_lengths(predicate: pd.Series) -> tuple[pd.Series, pd.Series]:
+    """Return (run_id, run_length) where run_length is the size of the True run."""
 
+    run_id = (~predicate).cumsum()
+    length = predicate.groupby(run_id, sort=False).transform("sum")
+    return run_id, length.where(predicate, 0).astype(int)
+
+
+def _calibration_boundary(config: QualityConfig) -> pd.Timestamp | None:
+    if config.calibration_end is None:
+        return None
+    boundary = pd.Timestamp(config.calibration_end)
+    return boundary.tz_localize("UTC") if boundary.tzinfo is None else boundary.tz_convert("UTC")
+
+
+def hour_of_week_profile(
+    loads: pd.Series, timestamps: pd.Series, weeks: int
+) -> pd.Series:
+    """Causal hour-of-week median: same weekday/hour over the previous ``weeks``.
+
+    Only observations strictly earlier than each row contribute, so the profile
+    is available at issuance time and never reads a later value.
+    """
+
+    hour_of_week = timestamps.dt.dayofweek * 24 + timestamps.dt.hour
+    profile = pd.Series(np.nan, index=loads.index, dtype=float)
+    for _, positions in hour_of_week.groupby(hour_of_week, sort=False).groups.items():
+        history = loads.loc[positions]
+        profile.loc[positions] = (
+            history.shift(1).rolling(weeks, min_periods=2).median().to_numpy()
+        )
+    return profile
+
+
+def _anomaly_masks_with_calibration(
+    frame: pd.DataFrame, config: QualityConfig
+) -> tuple[dict[str, pd.Series], list[dict[str, Any]]]:
     names = (
         "missing",
         "infinite",
@@ -84,19 +159,22 @@ def causal_anomaly_masks(
         "level_shift",
     )
     masks = {name: pd.Series(False, index=frame.index, dtype=bool) for name in names}
+    calibration: list[dict[str, Any]] = []
     if "load" not in frame or "building_id" not in frame or "timestamp" not in frame:
-        return masks
+        return masks, calibration
 
     numeric = pd.to_numeric(frame["load"], errors="coerce")
     masks["missing"] = numeric.isna()
     masks["infinite"] = pd.Series(np.isinf(numeric), index=frame.index)
     masks["negative"] = numeric.lt(0).fillna(False)
 
+    boundary = _calibration_boundary(config)
     valid = frame.loc[frame["timestamp"].notna()].copy()
     valid["_load_numeric"] = numeric.loc[valid.index]
     valid = valid.sort_values(["building_id", "timestamp"], kind="stable")
-    for _, group in valid.groupby("building_id", sort=False, dropna=False):
+    for building_id, group in valid.groupby("building_id", sort=False, dropna=False):
         loads = group["_load_numeric"].astype(float)
+        timestamps = pd.to_datetime(group["timestamp"], utc=True)
         prior = loads.shift(1)
         minimum = min(6, max(1, config.causal_window))
         median = prior.rolling(config.causal_window, min_periods=minimum).median()
@@ -113,16 +191,66 @@ def causal_anomaly_masks(
             robust_z.gt(config.outlier_mad_z) | ratio_outlier
         ).fillna(False)
 
+        in_calibration = (
+            timestamps.lt(boundary) if boundary is not None else pd.Series(True, index=group.index)
+        )
         is_zero = loads.eq(0)
-        zero_position = _causal_run_position(is_zero)
-        masks["long_zero"].loc[group.index] = (
-            is_zero & zero_position.ge(config.long_zero_threshold)
-        ).fillna(False)
+        same_as_prior = loads.eq(loads.shift(1)) & loads.notna() & ~is_zero
+        # A constant run starts whenever the value changes; its length counts
+        # every member including the first reading. Only finite, non-zero runs
+        # of at least two readings are candidates for the stuck-sensor rule.
+        value_changed = ~loads.eq(loads.shift(1)) | loads.isna()
+        stuck_run_id = value_changed.cumsum()
+        run_size = loads.groupby(stuck_run_id, sort=False).transform("size")
+        stuck_member = loads.notna() & ~is_zero & run_size.ge(2)
+        stuck_length = run_size.where(stuck_member, 0).astype(int)
 
-        same_as_prior = loads.eq(loads.shift(1)) & loads.notna()
-        same_position = _causal_run_position(same_as_prior) + 1
-        stuck = same_as_prior & same_position.ge(config.stuck_threshold) & ~is_zero
+        effective_stuck = int(config.stuck_threshold)
+        run_count = 0
+        run_quantile = None
+        calibration_source = "configured"
+        if config.stuck_calibration_quantile is not None:
+            natural = stuck_member & in_calibration
+            run_sizes = natural.groupby(stuck_run_id, sort=False).sum()
+            run_sizes = run_sizes[run_sizes.ge(2)]
+            run_count = int(len(run_sizes))
+            if run_count:
+                run_quantile = float(
+                    np.quantile(run_sizes.to_numpy(dtype=float), float(config.stuck_calibration_quantile))
+                )
+        fixed = (
+            config.stuck_thresholds_by_building.get(str(building_id))
+            if config.stuck_thresholds_by_building is not None
+            else None
+        )
+        if fixed is not None:
+            effective_stuck = max(effective_stuck, int(fixed))
+            calibration_source = "reference_calibration"
+        elif run_quantile is not None:
+            effective_stuck = max(effective_stuck, int(np.ceil(run_quantile)) + 1)
+            calibration_source = "quantile_on_inspected_frame"
+
+        if config.run_flagging == "whole_run":
+            stuck = stuck_member & stuck_length.ge(effective_stuck)
+        else:
+            same_position = _causal_run_position(same_as_prior) + 1
+            stuck = same_as_prior & same_position.ge(effective_stuck) & ~is_zero
         masks["stuck"].loc[group.index] = stuck.fillna(False)
+
+        _, zero_length = _run_lengths(is_zero)
+        if config.run_flagging == "whole_run":
+            long_zero = is_zero & zero_length.ge(config.long_zero_threshold)
+        else:
+            zero_position = _causal_run_position(is_zero)
+            long_zero = is_zero & zero_position.ge(config.long_zero_threshold)
+        profile_available = None
+        if config.zero_profile_min_ratio is not None:
+            profile = hour_of_week_profile(loads, timestamps, int(config.profile_weeks))
+            normally_active = profile.gt(float(config.zero_profile_min_ratio) * median)
+            profile_available = profile.notna() & median.notna()
+            # Where no causal profile exists yet the plain run rule applies.
+            long_zero = long_zero & (~profile_available | normally_active)
+        masks["long_zero"].loc[group.index] = long_zero.fillna(False)
 
         short_prior = prior.rolling(24, min_periods=6).median()
         shift = short_prior.gt(0) & (
@@ -130,7 +258,77 @@ def causal_anomaly_masks(
             | loads.lt(short_prior / config.level_shift_ratio)
         )
         masks["level_shift"].loc[group.index] = shift.fillna(False)
+
+        calibrated_rows = int(in_calibration.sum())
+        calibration.append(
+            {
+                "building_id": str(building_id),
+                "calibration_rows": calibrated_rows,
+                "repeat_rate": (
+                    float(same_as_prior.loc[in_calibration].mean()) if calibrated_rows else None
+                ),
+                "zero_rate": float(is_zero.loc[in_calibration].mean()) if calibrated_rows else None,
+                "constant_run_count": run_count,
+                "constant_run_length_quantile": run_quantile,
+                "stuck_threshold_configured": int(config.stuck_threshold),
+                "stuck_threshold_effective": int(effective_stuck),
+                "calibration_source": calibration_source,
+                "long_zero_threshold": int(config.long_zero_threshold),
+                "zero_profile_min_ratio": config.zero_profile_min_ratio,
+                "profile_weeks": int(config.profile_weeks),
+                "run_flagging": config.run_flagging,
+                "zero_rows_exempted_by_profile": (
+                    int(
+                        (
+                            is_zero
+                            & zero_length.ge(config.long_zero_threshold)
+                            & ~long_zero
+                        ).sum()
+                    )
+                    if profile_available is not None
+                    else 0
+                ),
+            }
+        )
+    return masks, calibration
+
+
+def causal_anomaly_masks(
+    frame: pd.DataFrame, config: QualityConfig
+) -> dict[str, pd.Series]:
+    """Return anomaly masks computed without future observations.
+
+    Run-based flags (long zero runs, stuck readings) are assigned to a run once
+    its length is known; no reading later than the run itself is consulted.
+    """
+
+    masks, _ = _anomaly_masks_with_calibration(frame, config)
     return masks
+
+
+def detector_calibration_table(
+    frame: pd.DataFrame, config: QualityConfig
+) -> pd.DataFrame:
+    """Per-building run-detector calibration actually applied to ``frame``."""
+
+    _, calibration = _anomaly_masks_with_calibration(frame, config)
+    columns = [
+        "building_id",
+        "calibration_rows",
+        "repeat_rate",
+        "zero_rate",
+        "constant_run_count",
+        "constant_run_length_quantile",
+        "stuck_threshold_configured",
+        "stuck_threshold_effective",
+        "calibration_source",
+        "long_zero_threshold",
+        "zero_profile_min_ratio",
+        "profile_weeks",
+        "run_flagging",
+        "zero_rows_exempted_by_profile",
+    ]
+    return pd.DataFrame(calibration, columns=columns)
 
 
 def _continuity_gaps(

@@ -24,6 +24,14 @@
       "expected_size_bytes": 272024,
       "expected_sha256": "992d0b29f24f96ad4332bc4dbb534b7bdd7dd2689aad093f94e93068ecddca02",
       "git_lfs_note": "This is the Git LFS media object, not the small pointer file."
+    },
+    {
+      "name": "weather.csv",
+      "url": "https://media.githubusercontent.com/media/buds-lab/building-data-genome-project-2/v1.0/data/weather/weather.csv",
+      "expected_size_bytes": 19457782,
+      "expected_sha256": "94dc014ebaf1b67488c8321936ad76e22628ed2ca9f30dfdbeda911b64026484",
+      "git_lfs_note": "This is the Git LFS media object, not the small pointer file.",
+      "role_note": "Site-level hourly weather; optional input used by v3 configurations."
     }
   ],
   "observed": null,

@@ -83,23 +83,57 @@ def _choose_block(
     length: int,
     rng: np.random.Generator,
     reserved: set[int],
+    *,
+    require_positive: bool = False,
 ) -> list[int]:
-    candidates: list[list[int]] = []
+    """Pick one contiguous hourly block of ``length`` rows not touching ``reserved``.
+
+    Candidate enumeration is vectorized per building: a start position is
+    eligible when every step inside the window is exactly one hour, no row in
+    the window is reserved and, when ``require_positive`` is set, every load in
+    the window is strictly positive (a zero block, a stuck value or a unit
+    scale written over zeros would be an invisible, unfalsifiable fault).
+    Sampling is uniform over all eligible starts across buildings, so the
+    choice is fully determined by ``rng``.
+    """
+
+    candidates: list[tuple[list[int], int, np.ndarray]] = []
+    total = 0
     for group in groups:
-        indices = [int(value) for value in group]
-        for start in range(0, max(0, len(indices) - length + 1)):
-            block = indices[start : start + length]
-            timestamps = pd.DatetimeIndex(frame.loc[block, "timestamp"])
-            if any(index in reserved for index in block):
-                continue
-            if len(timestamps) > 1 and not (timestamps[1:] - timestamps[:-1] == pd.Timedelta(hours=1)).all():
-                continue
-            candidates.append(block)
-    if not candidates:
+        indices = np.asarray([int(value) for value in group], dtype=np.int64)
+        count = len(indices)
+        if count < length:
+            continue
+        timestamps = pd.DatetimeIndex(frame.loc[indices, "timestamp"])
+        steps = np.ones(max(count - 1, 0), dtype=bool)
+        if count > 1:
+            steps = (timestamps[1:] - timestamps[:-1]) == pd.Timedelta(hours=1)
+        reserved_mask = np.fromiter((int(value) in reserved for value in indices), dtype=bool, count=count)
+        if require_positive:
+            loads = pd.to_numeric(frame.loc[indices, "load"], errors="coerce").to_numpy(dtype=float)
+            reserved_mask = reserved_mask | ~(np.isfinite(loads) & (loads > 0))
+        window_steps = length - 1
+        if window_steps:
+            step_ok = np.convolve(steps.astype(np.int64), np.ones(window_steps, dtype=np.int64), mode="valid") == window_steps
+        else:
+            step_ok = np.ones(count, dtype=bool)
+        reserved_hits = np.convolve(reserved_mask.astype(np.int64), np.ones(length, dtype=np.int64), mode="valid")
+        eligible = step_ok[: count - length + 1] & (reserved_hits == 0)
+        starts = np.flatnonzero(eligible)
+        if starts.size:
+            candidates.append((indices.tolist(), int(starts.size), starts))
+            total += int(starts.size)
+    if not total:
         raise ValueError(
             f"Not enough contiguous pre-cutoff observations for a {length}-row fault block."
         )
-    return candidates[int(rng.integers(0, len(candidates)))]
+    choice = int(rng.integers(0, total))
+    for indices, size, starts in candidates:
+        if choice < size:
+            start = int(starts[choice])
+            return indices[start : start + length]
+        choice -= size
+    raise AssertionError("Block selection fell through; this should be unreachable.")
 
 
 def _set_fault(
@@ -248,11 +282,21 @@ def inject_downstream_faults(
     cutoff: str | pd.Timestamp,
     seed: int,
     severity: str = "medium",
+    events_per_type: int = 1,
 ) -> FaultSuiteResult:
-    """Inject value-only faults while preserving every observation key."""
+    """Inject value-only faults while preserving every observation key.
+
+    ``events_per_type`` seeds that many independent events of every fault
+    family (six families). Event ``k`` of a family has ``fault_id``
+    ``downstream_forecasting:<family>:00k``. With the default of one event per
+    family the suite is identical to the v2 suite for the same seed.
+    """
 
     if severity not in SEVERITY_PARAMETERS:
         raise ValueError(f"Unknown severity {severity!r}; choose {sorted(SEVERITY_PARAMETERS)}")
+    if int(events_per_type) < 1:
+        raise ValueError("events_per_type must be at least 1.")
+    events_per_type = int(events_per_type)
     boundary = _utc_timestamp(cutoff)
     corrupted = reference.copy(deep=True).reset_index(drop=True)
     corrupted["timestamp"] = pd.to_datetime(corrupted["timestamp"], errors="coerce", utc=True)
@@ -267,60 +311,67 @@ def inject_downstream_faults(
         ("negative_value", lambda value, _: -abs(float(value)) - 1.0),
         ("positive_spike", lambda value, _: max(abs(float(value)), 1.0) * float(parameters["spike"])),
     )
-    for fault_type, transform in single_specs:
-        index = _choose_single(groups, rng, reserved)
-        reserved.add(index)
+    block_length = int(parameters["block"])
+    for event in range(1, events_per_type + 1):
+        for fault_type, transform in single_specs:
+            index = _choose_single(groups, rng, reserved)
+            reserved.add(index)
+            _set_fault(
+                corrupted,
+                [index],
+                fault_type=fault_type,
+                severity=severity,
+                suite="downstream_forecasting",
+                fault_id=f"downstream_forecasting:{fault_type}:{event:03d}",
+                transform=transform,
+                faults=faults,
+            )
+
+        zero_block = _choose_block(
+            corrupted, groups, block_length, rng, reserved, require_positive=True
+        )
+        reserved.update(zero_block)
         _set_fault(
             corrupted,
-            [index],
-            fault_type=fault_type,
+            zero_block,
+            fault_type="long_zero_block",
             severity=severity,
             suite="downstream_forecasting",
-            fault_id=f"downstream_forecasting:{fault_type}:001",
-            transform=transform,
+            fault_id=f"downstream_forecasting:long_zero_block:{event:03d}",
+            transform=lambda _value, _position: 0.0,
             faults=faults,
         )
 
-    block_length = int(parameters["block"])
-    zero_block = _choose_block(corrupted, groups, block_length, rng, reserved)
-    reserved.update(zero_block)
-    _set_fault(
-        corrupted,
-        zero_block,
-        fault_type="long_zero_block",
-        severity=severity,
-        suite="downstream_forecasting",
-        fault_id="downstream_forecasting:long_zero_block:001",
-        transform=lambda _value, _position: 0.0,
-        faults=faults,
-    )
+        stuck_block = _choose_block(
+            corrupted, groups, block_length, rng, reserved, require_positive=True
+        )
+        reserved.update(stuck_block)
+        stuck_value = float(corrupted.loc[stuck_block[0], "load"]) * 0.731 + 0.123
+        _set_fault(
+            corrupted,
+            stuck_block,
+            fault_type="stuck_segment",
+            severity=severity,
+            suite="downstream_forecasting",
+            fault_id=f"downstream_forecasting:stuck_segment:{event:03d}",
+            transform=lambda _value, _position, stuck_value=stuck_value: stuck_value,
+            faults=faults,
+        )
 
-    stuck_block = _choose_block(corrupted, groups, block_length, rng, reserved)
-    reserved.update(stuck_block)
-    stuck_value = float(corrupted.loc[stuck_block[0], "load"]) * 0.731 + 0.123
-    _set_fault(
-        corrupted,
-        stuck_block,
-        fault_type="stuck_segment",
-        severity=severity,
-        suite="downstream_forecasting",
-        fault_id="downstream_forecasting:stuck_segment:001",
-        transform=lambda _value, _position: stuck_value,
-        faults=faults,
-    )
-
-    scale_block = _choose_block(corrupted, groups, block_length, rng, reserved)
-    reserved.update(scale_block)
-    _set_fault(
-        corrupted,
-        scale_block,
-        fault_type="unit_scale_segment",
-        severity=severity,
-        suite="downstream_forecasting",
-        fault_id="downstream_forecasting:unit_scale_segment:001",
-        transform=lambda value, _position: float(value) * float(parameters["scale"]),
-        faults=faults,
-    )
+        scale_block = _choose_block(
+            corrupted, groups, block_length, rng, reserved, require_positive=True
+        )
+        reserved.update(scale_block)
+        _set_fault(
+            corrupted,
+            scale_block,
+            fault_type="unit_scale_segment",
+            severity=severity,
+            suite="downstream_forecasting",
+            fault_id=f"downstream_forecasting:unit_scale_segment:{event:03d}",
+            transform=lambda value, _position: float(value) * float(parameters["scale"]),
+            faults=faults,
+        )
 
     original_keys = reference[["timestamp", "building_id"]].astype(str)
     corrupted_keys = corrupted[["timestamp", "building_id"]].astype(str)
@@ -340,11 +391,16 @@ def inject_detector_validation_faults(
     cutoff: str | pd.Timestamp,
     seed: int,
     severity: str = "medium",
+    events_per_type: int = 1,
 ) -> FaultSuiteResult:
     """Inject a separate structural/value suite used only to validate detectors."""
 
     base = inject_downstream_faults(
-        reference, cutoff=cutoff, seed=seed + 101, severity=severity
+        reference,
+        cutoff=cutoff,
+        seed=seed + 101,
+        severity=severity,
+        events_per_type=events_per_type,
     )
     detector = base.frame.copy(deep=True)
     faults = [

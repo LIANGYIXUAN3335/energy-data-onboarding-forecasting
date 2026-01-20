@@ -64,10 +64,76 @@ This is not an operational utility dataset or a production service.
 
 ## Privacy
 
-The pipeline is stateless. It contains public energy data and reproducibility
-metadata only; it has no conversational memory, prompt store, embeddings,
-personal profiles, analytics, or personal data.
+The pipeline is stateless. It contains public energy data, public site
+weather and reproducibility metadata only; it stores no personal data.
 """
+
+
+def _policy_paragraph(summary: dict[str, Any]) -> str:
+    policy = summary.get("detector_policy")
+    repair = summary.get("remediation_policy")
+    if not policy or not repair:
+        return (
+            "Run detectors use fixed thresholds (v2 policy) and remediation is a "
+            "past-only forward fill with quarantine of everything it cannot cover."
+        )
+    if policy.get("run_flagging") == "whole_run":
+        detector_text = (
+            "Run detectors flag every reading of a run once it reaches its threshold. "
+            f"The stuck-sensor threshold ({policy['stuck_threshold_configured']} h) is raised per "
+            "building to just above the "
+            f"{policy['stuck_calibration_quantile']:g} quantile of that building's natural "
+            "constant-run lengths (`detector_calibration.csv`), so coarsely quantized meters are "
+            "not mistaken for stuck sensors. A zero run of at least "
+            f"{policy['long_zero_threshold']} h counts only during hours when the building is "
+            "normally active (causal hour-of-week median over the previous "
+            f"{policy['profile_weeks']} weeks above {policy['zero_profile_min_ratio']:g} times the "
+            "trailing 168-hour median). Calibration uses the reference condition strictly before "
+            "the fault cutoff, so seeded faults never shape their own thresholds."
+        )
+    else:
+        detector_text = (
+            "Run detectors flag only run positions at or beyond a fixed threshold (v2 policy)."
+        )
+    if repair.get("repair_strategy") == "forward_then_profile":
+        repair_text = (
+            f"Remediation first forward-fills gaps of at most {repair['maximum_forward_fill_hours']} h "
+            "from the last valid reading, then fills gaps of at most "
+            f"{repair['maximum_profile_fill_hours']} h with the median of the same weekday and hour "
+            f"over the previous {repair['profile_weeks']} weeks, using only earlier, originally "
+            "valid readings. Longer gaps are quarantined as null."
+            + (
+                " Suspected unit or level shifts are replaced by that profile value rather than "
+                "divided by an inferred factor."
+                if repair.get("profile_fill_ambiguous_scale")
+                else " Suspected unit or level shifts are always quarantined."
+            )
+        )
+    else:
+        repair_text = (
+            f"Remediation forward-fills gaps of at most {repair['maximum_forward_fill_hours']} h "
+            "from the last valid reading and quarantines everything else as null."
+        )
+    return detector_text + "\n\n" + repair_text
+
+
+def _weather_paragraph(summary: dict[str, Any]) -> str:
+    weather = summary.get("weather")
+    if not weather:
+        return "No weather artifact was published in this run."
+    rates = weather.get("missing_rate_by_site", {})
+    worst = max(
+        (rate for site in rates.values() for rate in site.values()), default=0.0
+    )
+    return (
+        f"Site weather (`weather.csv.gz`, {weather['rows']} rows for "
+        f"{', '.join(weather['sites'])}) is published on the same hourly grid as the meters. "
+        f"{weather['duplicate_keys_averaged']} duplicate source keys were averaged and "
+        f"{weather['grid_hours_materialized_as_null']} missing grid hours were materialized as null; "
+        f"the highest per-variable missing rate is {worst:.1%} (cloud cover). Weather is never "
+        "modified by the fault suites and is imputed downstream only inside training-fitted "
+        "preprocessing."
+    )
 
 
 def render_report(summary: dict[str, Any]) -> str:
@@ -116,6 +182,12 @@ actions, including `{remediation['repaired_rows']}` repaired rows and
 contains `{quarantine['rows']}` rows. A suspected unit scale is never silently
 corrected by dividing by an inferred factor.
 
+## Detector and remediation policy
+
+{_policy_paragraph(summary)}
+
+{_weather_paragraph(summary)}
+
 ## Limitations
 
 - This is a local batch research prototype, not real-time or production-grade.
@@ -129,9 +201,9 @@ corrected by dividing by an inferred factor.
 
 ## Privacy and data boundary
 
-Only public dataset content and reproducibility metadata are processed. No
-personal information, conversation, prompt, model memory, embedding, vector
-database, user profile, or telemetry is retained.
+Only public dataset content, public site weather and reproducibility
+metadata are processed. No personal information is retained and nothing is
+transmitted.
 """
 
 
