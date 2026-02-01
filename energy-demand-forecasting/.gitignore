@@ -14,3 +14,5 @@ data/processed/
 results/*
 !results/canonical_24h_v2_final/
 !results/direct_1_to_24_sensitivity_v1_final/
+!results/canonical_24h_v3/
+!results/direct_1_to_24_sensitivity_v3/

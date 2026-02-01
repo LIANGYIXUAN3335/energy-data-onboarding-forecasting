@@ -17,6 +17,13 @@ values; calendar features preserve those wall-clock values. A producer-added
 UTC marker is used for canonical comparison and must not be described as proof
 that the source observations were offset-converted to true UTC.
 
+A v3 bundle additionally publishes `weather.csv.gz` (`timestamp`, `site_id`,
+`air_temperature`, `dew_temperature`, `wind_speed`, `cloud_coverage`,
+`precip_depth_1hr`, `sea_lvl_pressure`) on the same hourly grid; the consumer
+accepts it only when its SHA-256 matches the entry in `dataset_manifest.json`,
+joins it by site and timestamp, and derives features from observations at
+t-24 or earlier only.
+
 The bundle must also contain `dataset_manifest.json` and
 `fault_manifest.json`. The dataset manifest binds every condition file to its
 SHA-256 digest and may bind row counts and columns. The fault manifest binds the
@@ -61,7 +68,7 @@ imputed by a preprocessing stage fitted on that condition's training partition.
 
 The schema contains public building identifiers and aggregate building meter
 observations only. It has no fields for a person, private communication,
-credentials, conversational state, or user profile. Personally identifying
+credentials, or user profile. Personally identifying
 material must not be added.
 
 ## Known data risks

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="678" viewBox="0 0 960 678" role="img" aria-labelledby="title desc">
+<title id="title">Test MAE by condition and model</title>
+<desc id="desc">Deterministic chart generated from metrics.csv; horizontal bars show MAE (reference-only test targets).</desc>
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="310" y="36" font-family="system-ui, sans-serif" font-size="24" font-weight="700" fill="#17202a">Test MAE by condition and model</text>
+<text x="310" y="63" font-family="system-ui, sans-serif" font-size="13" fill="#4d5656">MAE (reference-only test targets); lower is better</text>
+<line x1="310.00" y1="80" x2="310.00" y2="596" stroke="#e5e7e9"/>
+<text x="310.00" y="635" text-anchor="middle" font-family="ui-monospace, monospace" font-size="12" fill="#566573">0</text>
+<line x1="458.75" y1="80" x2="458.75" y2="596" stroke="#e5e7e9"/>
+<text x="458.75" y="635" text-anchor="middle" font-family="ui-monospace, monospace" font-size="12" fill="#566573">21.91</text>
+<line x1="607.50" y1="80" x2="607.50" y2="596" stroke="#e5e7e9"/>
+<text x="607.50" y="635" text-anchor="middle" font-family="ui-monospace, monospace" font-size="12" fill="#566573">43.82</text>
+<line x1="756.25" y1="80" x2="756.25" y2="596" stroke="#e5e7e9"/>
+<text x="756.25" y="635" text-anchor="middle" font-family="ui-monospace, monospace" font-size="12" fill="#566573">65.73</text>
+<line x1="905.00" y1="80" x2="905.00" y2="596" stroke="#e5e7e9"/>
+<text x="905.00" y="635" text-anchor="middle" font-family="ui-monospace, monospace" font-size="12" fill="#566573">87.64</text>
+<text x="298" y="114" text-anchor="end" font-family="system-ui, sans-serif" font-size="13" fill="#17202a">hist_gradient_boosting / reference</text>
+<rect x="310" y="99" width="319.62" height="21" rx="2" fill="#2f6b3b"/>
+<text x="636.62" y="114" font-family="ui-monospace, monospace" font-size="12" fill="#17202a">47.0761</text>
+<text x="298" y="156" text-anchor="end" font-family="system-ui, sans-serif" font-size="13" fill="#17202a">hist_gradient_boosting / corrupted</text>
+<rect x="310" y="141" width="595.00" height="21" rx="2" fill="#b64b3c"/>
+<text x="912.00" y="156" font-family="ui-monospace, monospace" font-size="12" fill="#17202a">87.6376</text>
+<text x="298" y="198" text-anchor="end" font-family="system-ui, sans-serif" font-size="13" fill="#17202a">hist_gradient_boosting / remediated</text>
+<rect x="310" y="183" width="303.98" height="21" rx="2" fill="#3568a8"/>
+<text x="620.98" y="198" font-family="ui-monospace, monospace" font-size="12" fill="#17202a">44.7728</text>
+<text x="298" y="240" text-anchor="end" font-family="system-ui, sans-serif" font-size="13" fill="#17202a">random_forest / reference</text>
+<rect x="310" y="225" width="311.83" height="21" rx="2" fill="#2f6b3b"/>
+<text x="628.83" y="240" font-family="ui-monospace, monospace" font-size="12" fill="#17202a">45.9297</text>
+<text x="298" y="282" text-anchor="end" font-family="system-ui, sans-serif" font-size="13" fill="#17202a">random_forest / corrupted</text>
+<rect x="310" y="267" width="437.46" height="21" rx="2" fill="#b64b3c"/>
+<text x="754.46" y="282" font-family="ui-monospace, monospace" font-size="12" fill="#17202a">64.4338</text>
+<text x="298" y="324" text-anchor="end" font-family="system-ui, sans-serif" font-size="13" fill="#17202a">random_forest / remediated</text>
+<rect x="310" y="309" width="305.45" height="21" rx="2" fill="#3568a8"/>
+<text x="622.45" y="324" font-family="ui-monospace, monospace" font-size="12" fill="#17202a">44.9902</text>
+<text x="298" y="366" text-anchor="end" font-family="system-ui, sans-serif" font-size="13" fill="#17202a">ridge / reference</text>
+<rect x="310" y="351" width="341.36" height="21" rx="2" fill="#2f6b3b"/>
+<text x="658.36" y="366" font-family="ui-monospace, monospace" font-size="12" fill="#17202a">50.2788</text>
+<text x="298" y="408" text-anchor="end" font-family="system-ui, sans-serif" font-size="13" fill="#17202a">ridge / corrupted</text>
+<rect x="310" y="393" width="501.33" height="21" rx="2" fill="#b64b3c"/>
+<text x="818.33" y="408" font-family="ui-monospace, monospace" font-size="12" fill="#17202a">73.8415</text>
+<text x="298" y="450" text-anchor="end" font-family="system-ui, sans-serif" font-size="13" fill="#17202a">ridge / remediated</text>
+<rect x="310" y="435" width="338.14" height="21" rx="2" fill="#3568a8"/>
+<text x="655.14" y="450" font-family="ui-monospace, monospace" font-size="12" fill="#17202a">49.8042</text>
+<text x="298" y="492" text-anchor="end" font-family="system-ui, sans-serif" font-size="13" fill="#17202a">seasonal_naive / reference</text>
+<rect x="310" y="477" width="437.52" height="21" rx="2" fill="#2f6b3b"/>
+<text x="754.52" y="492" font-family="ui-monospace, monospace" font-size="12" fill="#17202a">64.4430</text>
+<text x="298" y="534" text-anchor="end" font-family="system-ui, sans-serif" font-size="13" fill="#17202a">seasonal_naive / corrupted</text>
+<rect x="310" y="519" width="437.52" height="21" rx="2" fill="#b64b3c"/>
+<text x="754.52" y="534" font-family="ui-monospace, monospace" font-size="12" fill="#17202a">64.4430</text>
+<text x="298" y="576" text-anchor="end" font-family="system-ui, sans-serif" font-size="13" fill="#17202a">seasonal_naive / remediated</text>
+<rect x="310" y="561" width="437.52" height="21" rx="2" fill="#3568a8"/>
+<text x="754.52" y="576" font-family="ui-monospace, monospace" font-size="12" fill="#17202a">64.4430</text>
+<text x="607.50" y="665" text-anchor="middle" font-family="system-ui, sans-serif" font-size="13" fill="#34495e">MAE (reference-only test targets)</text>
+</svg>

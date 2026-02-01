@@ -155,7 +155,7 @@ def render_horizon_lines_svg(horizon_metrics: pd.DataFrame) -> str:
         "corrupted": "#b64b3c",
         "remediated": "#3568a8",
     }
-    dashes = {"seasonal_naive": "8,5", "hist_gradient_boosting": "none"}
+    dashes = {"seasonal_naive": "8,5", "hist_gradient_boosting": "none", "ridge": "2,3", "random_forest": "12,4,2,4"}
     lines = [
         '<?xml version="1.0" encoding="UTF-8"?>',
         (
@@ -206,11 +206,13 @@ def render_horizon_lines_svg(horizon_metrics: pd.DataFrame) -> str:
                 f'<polyline points="{" ".join(points)}" fill="none" stroke="{color}" '
                 f'stroke-width="2.5" stroke-dasharray="{dash}"/>'
             )
-        legend_x = left + index * 145
+        # Six entries per row keeps the v2 layout byte-identical; later rows stack upward.
+        legend_x = left + (index % 6) * 145
+        legend_row_y = legend_y - 14 * (index // 6)
         lines.extend(
             [
-                f'<line x1="{legend_x}" y1="{legend_y - 4}" x2="{legend_x + 25}" y2="{legend_y - 4}" stroke="{color}" stroke-width="2.5" stroke-dasharray="{dash}"/>',
-                f'<text x="{legend_x + 30}" y="{legend_y}" font-family="system-ui, sans-serif" font-size="10" fill="#34495e">{escape(str(condition))}/{escape(str(model))}</text>',
+                f'<line x1="{legend_x}" y1="{legend_row_y - 4}" x2="{legend_x + 25}" y2="{legend_row_y - 4}" stroke="{color}" stroke-width="2.5" stroke-dasharray="{dash}"/>',
+                f'<text x="{legend_x + 30}" y="{legend_row_y}" font-family="system-ui, sans-serif" font-size="10" fill="#34495e">{escape(str(condition))}/{escape(str(model))}</text>',
             ]
         )
     lines.extend(

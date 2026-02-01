@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="600" viewBox="0 0 1040 600" role="img" aria-labelledby="title desc">
+<title id="title">Direct 1–24 hour sensitivity MAE by horizon</title>
+<desc id="desc">Deterministic lines generated from horizon_metrics.csv.</desc>
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="92" y="34" font-family="system-ui, sans-serif" font-size="24" font-weight="700" fill="#17202a">Direct 1–24 hour sensitivity</text>
+<text x="92" y="58" font-family="system-ui, sans-serif" font-size="13" fill="#4d5656">MAE by target horizon; lower is better</text>
+<line x1="92" y1="520.00" x2="995" y2="520.00" stroke="#e5e7e9"/>
+<text x="82" y="524.00" text-anchor="end" font-family="ui-monospace, monospace" font-size="12" fill="#566573">0</text>
+<line x1="92" y1="408.75" x2="995" y2="408.75" stroke="#e5e7e9"/>
+<text x="82" y="412.75" text-anchor="end" font-family="ui-monospace, monospace" font-size="12" fill="#566573">23.26</text>
+<line x1="92" y1="297.50" x2="995" y2="297.50" stroke="#e5e7e9"/>
+<text x="82" y="301.50" text-anchor="end" font-family="ui-monospace, monospace" font-size="12" fill="#566573">46.53</text>
+<line x1="92" y1="186.25" x2="995" y2="186.25" stroke="#e5e7e9"/>
+<text x="82" y="190.25" text-anchor="end" font-family="ui-monospace, monospace" font-size="12" fill="#566573">69.79</text>
+<line x1="92" y1="75.00" x2="995" y2="75.00" stroke="#e5e7e9"/>
+<text x="82" y="79.00" text-anchor="end" font-family="ui-monospace, monospace" font-size="12" fill="#566573">93.06</text>
+<line x1="92.00" y1="75" x2="92.00" y2="520" stroke="#f2f3f4"/>
+<text x="92.00" y="554" text-anchor="middle" font-family="ui-monospace, monospace" font-size="12" fill="#566573">1</text>
+<line x1="209.78" y1="75" x2="209.78" y2="520" stroke="#f2f3f4"/>
+<text x="209.78" y="554" text-anchor="middle" font-family="ui-monospace, monospace" font-size="12" fill="#566573">4</text>
+<line x1="366.83" y1="75" x2="366.83" y2="520" stroke="#f2f3f4"/>
+<text x="366.83" y="554" text-anchor="middle" font-family="ui-monospace, monospace" font-size="12" fill="#566573">8</text>
+<line x1="523.87" y1="75" x2="523.87" y2="520" stroke="#f2f3f4"/>
+<text x="523.87" y="554" text-anchor="middle" font-family="ui-monospace, monospace" font-size="12" fill="#566573">12</text>
+<line x1="680.91" y1="75" x2="680.91" y2="520" stroke="#f2f3f4"/>
+<text x="680.91" y="554" text-anchor="middle" font-family="ui-monospace, monospace" font-size="12" fill="#566573">16</text>
+<line x1="837.96" y1="75" x2="837.96" y2="520" stroke="#f2f3f4"/>
+<text x="837.96" y="554" text-anchor="middle" font-family="ui-monospace, monospace" font-size="12" fill="#566573">20</text>
+<line x1="995.00" y1="75" x2="995.00" y2="520" stroke="#f2f3f4"/>
+<text x="995.00" y="554" text-anchor="middle" font-family="ui-monospace, monospace" font-size="12" fill="#566573">24</text>
+<polyline points="92.00,265.36 131.26,260.38 170.52,246.97 209.78,243.54 249.04,217.55 288.30,244.28 327.57,227.59 366.83,205.74 406.09,196.02 445.35,179.28 484.61,160.59 523.87,156.81 563.13,158.43 602.39,145.36 641.65,137.96 680.91,133.02 720.17,107.40 759.43,144.76 798.70,150.63 837.96,157.13 877.22,157.98 916.48,189.75 955.74,145.56 995.00,145.02" fill="none" stroke="#b64b3c" stroke-width="2.5" stroke-dasharray="none"/>
+<line x1="92" y1="581" x2="117" y2="581" stroke="#b64b3c" stroke-width="2.5" stroke-dasharray="none"/>
+<text x="122" y="585" font-family="system-ui, sans-serif" font-size="10" fill="#34495e">corrupted/hist_gradient_boosting</text>
+<polyline points="92.00,202.68 131.26,197.42 170.52,192.94 209.78,193.89 249.04,189.68 288.30,228.71 327.57,192.37 366.83,140.56 406.09,126.88 445.35,97.96 484.61,86.80 523.87,75.00 563.13,79.88 602.39,94.11 641.65,112.37 680.91,129.65 720.17,156.14 759.43,177.34 798.70,190.70 837.96,187.93 877.22,195.53 916.48,190.25 955.74,174.98 995.00,176.06" fill="none" stroke="#b64b3c" stroke-width="2.5" stroke-dasharray="2,3"/>
+<line x1="237" y1="581" x2="262" y2="581" stroke="#b64b3c" stroke-width="2.5" stroke-dasharray="2,3"/>
+<text x="267" y="585" font-family="system-ui, sans-serif" font-size="10" fill="#34495e">corrupted/ridge</text>
+<polyline points="92.00,265.75 131.26,276.44 170.52,273.86 209.78,271.71 249.04,266.95 288.30,253.07 327.57,207.52 366.83,177.28 406.09,169.96 445.35,161.97 484.61,168.64 523.87,171.31 563.13,172.93 602.39,169.84 641.65,159.87 680.91,162.94 720.17,177.00 759.43,188.60 798.70,198.82 837.96,209.14 877.22,220.24 916.48,242.97 955.74,252.11 995.00,261.33" fill="none" stroke="#b64b3c" stroke-width="2.5" stroke-dasharray="8,5"/>
+<line x1="382" y1="581" x2="407" y2="581" stroke="#b64b3c" stroke-width="2.5" stroke-dasharray="8,5"/>
+<text x="412" y="585" font-family="system-ui, sans-serif" font-size="10" fill="#34495e">corrupted/seasonal_naive</text>
+<polyline points="92.00,354.35 131.26,349.09 170.52,342.12 209.78,334.20 249.04,299.64 288.30,330.93 327.57,288.50 366.83,266.35 406.09,266.51 445.35,257.82 484.61,258.91 523.87,255.85 563.13,256.65 602.39,244.33 641.65,246.99 680.91,249.49 720.17,259.50 759.43,261.52 798.70,264.71 837.96,265.56 877.22,271.94 916.48,298.46 955.74,313.67 995.00,307.63" fill="none" stroke="#2f6b3b" stroke-width="2.5" stroke-dasharray="none"/>
+<line x1="527" y1="581" x2="552" y2="581" stroke="#2f6b3b" stroke-width="2.5" stroke-dasharray="none"/>
+<text x="557" y="585" font-family="system-ui, sans-serif" font-size="10" fill="#34495e">reference/hist_gradient_boosting</text>
+<polyline points="92.00,226.94 131.26,219.49 170.52,217.40 209.78,224.81 249.04,225.86 288.30,270.03 327.57,243.09 366.83,202.07 406.09,178.57 445.35,145.42 484.61,133.28 523.87,118.06 563.13,122.44 602.39,133.56 641.65,149.23 680.91,162.97 720.17,189.15 759.43,209.66 798.70,217.92 837.96,208.49 877.22,214.17 916.48,208.49 955.74,195.50 995.00,197.29" fill="none" stroke="#2f6b3b" stroke-width="2.5" stroke-dasharray="2,3"/>
+<line x1="672" y1="581" x2="697" y2="581" stroke="#2f6b3b" stroke-width="2.5" stroke-dasharray="2,3"/>
+<text x="702" y="585" font-family="system-ui, sans-serif" font-size="10" fill="#34495e">reference/ridge</text>
+<polyline points="92.00,265.75 131.26,276.44 170.52,273.86 209.78,271.71 249.04,266.95 288.30,253.07 327.57,207.52 366.83,177.28 406.09,169.96 445.35,161.97 484.61,168.64 523.87,171.31 563.13,172.93 602.39,169.84 641.65,159.87 680.91,162.94 720.17,177.00 759.43,188.60 798.70,198.82 837.96,209.14 877.22,220.24 916.48,242.97 955.74,252.11 995.00,261.33" fill="none" stroke="#2f6b3b" stroke-width="2.5" stroke-dasharray="8,5"/>
+<line x1="817" y1="581" x2="842" y2="581" stroke="#2f6b3b" stroke-width="2.5" stroke-dasharray="8,5"/>
+<text x="847" y="585" font-family="system-ui, sans-serif" font-size="10" fill="#34495e">reference/seasonal_naive</text>
+<polyline points="92.00,373.20 131.26,362.28 170.52,356.22 209.78,349.88 249.04,310.70 288.30,341.71 327.57,298.19 366.83,275.09 406.09,273.94 445.35,266.74 484.61,268.78 523.87,264.35 563.13,264.35 602.39,255.36 641.65,257.98 680.91,262.06 720.17,266.21 759.43,265.95 798.70,268.69 837.96,270.11 877.22,281.58 916.48,305.23 955.74,316.41 995.00,316.33" fill="none" stroke="#3568a8" stroke-width="2.5" stroke-dasharray="none"/>
+<line x1="92" y1="567" x2="117" y2="567" stroke="#3568a8" stroke-width="2.5" stroke-dasharray="none"/>
+<text x="122" y="571" font-family="system-ui, sans-serif" font-size="10" fill="#34495e">remediated/hist_gradient_boosting</text>
+<polyline points="92.00,231.99 131.26,223.37 170.52,221.46 209.78,230.18 249.04,231.80 288.30,276.30 327.57,248.75 366.83,205.31 406.09,181.84 445.35,147.15 484.61,133.59 523.87,117.54 563.13,121.54 602.39,133.30 641.65,150.56 680.91,165.16 720.17,191.64 759.43,212.67 798.70,223.42 837.96,214.45 877.22,220.31 916.48,213.97 955.74,200.03 995.00,200.69" fill="none" stroke="#3568a8" stroke-width="2.5" stroke-dasharray="2,3"/>
+<line x1="237" y1="567" x2="262" y2="567" stroke="#3568a8" stroke-width="2.5" stroke-dasharray="2,3"/>
+<text x="267" y="571" font-family="system-ui, sans-serif" font-size="10" fill="#34495e">remediated/ridge</text>
+<polyline points="92.00,265.75 131.26,276.44 170.52,273.86 209.78,271.71 249.04,266.95 288.30,253.07 327.57,207.52 366.83,177.28 406.09,169.96 445.35,161.97 484.61,168.64 523.87,171.31 563.13,172.93 602.39,169.84 641.65,159.87 680.91,162.94 720.17,177.00 759.43,188.60 798.70,198.82 837.96,209.14 877.22,220.24 916.48,242.97 955.74,252.11 995.00,261.33" fill="none" stroke="#3568a8" stroke-width="2.5" stroke-dasharray="8,5"/>
+<line x1="382" y1="567" x2="407" y2="567" stroke="#3568a8" stroke-width="2.5" stroke-dasharray="8,5"/>
+<text x="412" y="571" font-family="system-ui, sans-serif" font-size="10" fill="#34495e">remediated/seasonal_naive</text>
+<text x="543.50" y="554" text-anchor="middle" font-family="system-ui, sans-serif" font-size="13" fill="#34495e">Horizon (hours)</text>
+<text x="20" y="297.50" transform="rotate(-90 20 297.50)" text-anchor="middle" font-family="system-ui, sans-serif" font-size="13" fill="#34495e">MAE</text>
+</svg>

@@ -23,8 +23,9 @@ from .dataset import (
 )
 from .features import (
     CATEGORICAL_FEATURES,
-    NUMERIC_FEATURES,
+    WEATHER_VARIABLES,
     build_features,
+    numeric_feature_columns,
     seasonal_naive_prediction,
 )
 from .figures import write_canonical_figures
@@ -36,7 +37,7 @@ from .metrics import (
     seasonal_scale,
     seasonal_scales_by_building,
 )
-from .models import ModelConfig, fit_and_predict
+from .models import LEARNED_MODELS, SUPPORTED_MODELS, ModelConfig, fit_and_predict
 from .report import write_reports
 from .verification import verify_input_bundle, verify_result_directory
 
@@ -91,7 +92,81 @@ def load_config(path: str | Path) -> dict[str, Any]:
             "Configuration requires explicit train_end/validation_end or fixture-only "
             "train_fraction/validation_fraction"
         )
+    models = config.get("models", ["seasonal_naive", "hist_gradient_boosting"])
+    if (
+        not isinstance(models, list)
+        or len(models) != len(set(models))
+        or "seasonal_naive" not in models
+        or not any(model in LEARNED_MODELS for model in models)
+        or any(model not in SUPPORTED_MODELS for model in models)
+    ):
+        raise ValueError(
+            "models must list seasonal_naive plus at least one learned model from "
+            f"{LEARNED_MODELS}, without duplicates"
+        )
+    config["models"] = list(models)
+    feature_set = str(config.get("feature_set", "v2"))
+    weather_features = bool(config.get("weather_features", False))
+    # Validates the combination and raises for weather with the v2 set.
+    numeric_feature_columns(feature_set, weather=weather_features)
+    config["feature_set"] = feature_set
+    config["weather_features"] = weather_features
     return config
+
+
+def _model_config(config: dict[str, Any], seed: int) -> ModelConfig:
+    return ModelConfig(
+        seed=seed,
+        max_iter=int(config["max_model_iterations"]),
+        learning_rate=float(config["learning_rate"]),
+        max_leaf_nodes=int(config["max_leaf_nodes"]),
+        l2_regularization=float(config["l2_regularization"]),
+        ridge_alpha=float(config.get("ridge_alpha", 1.0)),
+        random_forest_n_estimators=int(config.get("random_forest_n_estimators", 200)),
+        random_forest_min_samples_leaf=int(config.get("random_forest_min_samples_leaf", 5)),
+        random_forest_max_features=float(config.get("random_forest_max_features", 0.5)),
+        random_forest_n_jobs=int(config.get("random_forest_n_jobs", 4)),
+    )
+
+
+def load_weather_bundle(
+    reference_path: str | Path,
+    producer_manifest: dict[str, Any],
+    weather_path: str | Path | None = None,
+) -> tuple[pd.DataFrame, dict[str, Any]]:
+    """Load the producer's weather artifact and bind it to the producer manifest.
+
+    The file must be registered in ``dataset_manifest.files`` and its SHA-256
+    must match; a weather file that the producer did not publish is refused.
+    """
+
+    path = Path(weather_path) if weather_path is not None else Path(reference_path).parent / "weather.csv.gz"
+    files = producer_manifest.get("files")
+    if not isinstance(files, dict) or "weather.csv.gz" not in files:
+        raise ValueError("Producer manifest does not register weather.csv.gz; weather features unavailable")
+    expected = str(files["weather.csv.gz"].get("sha256", "")).lower()
+    observed = sha256_file(path)
+    if observed != expected:
+        raise ValueError("weather.csv.gz does not match the producer manifest hash")
+    weather = pd.read_csv(path)
+    missing = sorted({"timestamp", "site_id", *WEATHER_VARIABLES}.difference(weather.columns))
+    if missing:
+        raise ValueError(f"weather.csv.gz is missing columns: {missing}")
+    weather["timestamp"] = pd.to_datetime(weather["timestamp"], errors="coerce", utc=True)
+    if weather["timestamp"].isna().any():
+        raise ValueError("weather.csv.gz contains unparseable timestamps")
+    weather["site_id"] = weather["site_id"].astype("string")
+    for column in WEATHER_VARIABLES:
+        weather[column] = pd.to_numeric(weather[column], errors="coerce")
+    summary = {
+        "path": path.name,
+        "sha256": observed,
+        "rows": int(len(weather)),
+        "sites": sorted(set(weather["site_id"].astype(str))),
+        "variables": list(WEATHER_VARIABLES),
+        "availability_rule": "every weather feature is observed at t-24 or earlier",
+    }
+    return weather, summary
 
 
 def _prediction_frame(
@@ -99,24 +174,36 @@ def _prediction_frame(
     featured: pd.DataFrame,
     boundary: SplitBoundary,
     model_config: ModelConfig,
+    models: list[str] | None = None,
+    numeric_features: list[str] | None = None,
 ) -> tuple[pd.DataFrame, dict[str, int]]:
     parts = partition(featured, boundary)
     train = featured.loc[parts == "train"].copy()
     test = featured.loc[parts == "test"].copy()
     if train.empty or test.empty:
         raise ValueError(f"{condition} has an empty train or test partition")
+    models = list(models or ["seasonal_naive", "hist_gradient_boosting"])
+    numeric = list(numeric_features or numeric_feature_columns("v2"))
 
     keys = ["timestamp", "building_id", "site_id", "primary_use"]
-    seasonal = test[keys].copy()
-    seasonal["condition"] = condition
-    seasonal["model"] = "seasonal_naive"
-    seasonal["prediction"] = seasonal_naive_prediction(test).to_numpy()
-
-    gradient = test[keys].copy()
-    gradient["condition"] = condition
-    gradient["model"] = "hist_gradient_boosting"
-    gradient["prediction"] = fit_and_predict(train, test, model_config)
-    return pd.concat([seasonal, gradient], ignore_index=True), {
+    parts_out: list[pd.DataFrame] = []
+    for model_name in models:
+        block = test[keys].copy()
+        block["condition"] = condition
+        block["model"] = model_name
+        if model_name == "seasonal_naive":
+            block["prediction"] = seasonal_naive_prediction(test).to_numpy()
+        else:
+            block["prediction"] = fit_and_predict(
+                train,
+                test,
+                model_config,
+                model_name=model_name,
+                numeric_features=numeric,
+                categorical_features=CATEGORICAL_FEATURES,
+            )
+        parts_out.append(block)
+    return pd.concat(parts_out, ignore_index=True), {
         "total_rows": int(len(featured)),
         "train_rows": int(len(train)),
         "train_target_rows": int(train["load"].notna().sum()),
@@ -220,6 +307,7 @@ def run_experiment(
     *,
     producer_manifest_path: str | Path,
     fault_manifest_path: str | Path,
+    weather_path: str | Path | None = None,
 ) -> dict[str, Any]:
     output = Path(output_dir)
     if output.exists() and any(output.iterdir()):
@@ -286,26 +374,31 @@ def run_experiment(
         reference.loc[reference_parts == "train"],
         int(config["seasonal_period_hours"]),
     )
-    model_config = ModelConfig(
-        seed=seed,
-        max_iter=int(config["max_model_iterations"]),
-        learning_rate=float(config["learning_rate"]),
-        max_leaf_nodes=int(config["max_leaf_nodes"]),
-        l2_regularization=float(config["l2_regularization"]),
-    )
+    model_config = _model_config(config, seed)
+    models = list(config["models"])
+    feature_set = str(config["feature_set"])
+    numeric_features = numeric_feature_columns(feature_set, weather=bool(config["weather_features"]))
+    weather: pd.DataFrame | None = None
+    weather_summary: dict[str, Any] | None = None
+    if bool(config["weather_features"]):
+        weather, weather_summary = load_weather_bundle(
+            paths["reference"], verified.producer_manifest, weather_path
+        )
 
     prediction_parts: list[pd.DataFrame] = []
     partition_counts: dict[str, dict[str, int]] = {}
     forecast_horizon = int(config["forecast_horizon_hours"])
     for condition in condition_order:
-        featured = build_features(frames[condition], forecast_horizon)
+        featured = build_features(
+            frames[condition], forecast_horizon, feature_set=feature_set, weather=weather
+        )
         condition_predictions, condition_counts = _prediction_frame(
-            condition, featured, boundary, model_config
+            condition, featured, boundary, model_config, models, numeric_features
         )
         prediction_parts.append(condition_predictions)
         partition_counts[condition] = condition_counts
     predictions = pd.concat(prediction_parts, ignore_index=True)
-    expected_pairs = len(prediction_parts) * 2
+    expected_pairs = len(prediction_parts) * len(models)
 
     targets = reference.loc[
         reference["timestamp"] > boundary.validation_end,
@@ -396,7 +489,7 @@ def run_experiment(
         },
         "python_version": sys.version,
         "platform": platform.platform(),
-        "state_policy": "stateless; no conversational state or personal data",
+        "state_policy": "stateless batch run; public data and reproducibility metadata only, no personal data",
         "timestamp_semantics": (
             "canonical comparison timestamps; intended Panther/Eagle/Rat inputs "
             "preserve US/Eastern source-local wall-clock calendar values and do not "
@@ -450,12 +543,18 @@ def run_experiment(
             "values": config,
         },
         "models": {
-            "seasonal_naive": {
-                "fallback_order_hours": [168, 24],
-            },
-            "hist_gradient_boosting": asdict(model_config),
+            name: (
+                asdict(model_config)
+                if name == "hist_gradient_boosting" and feature_set == "v2"
+                else model_config.parameters(name)
+            )
+            for name in models
         },
-        "features": NUMERIC_FEATURES + CATEGORICAL_FEATURES,
+        "model_order": models,
+        "feature_set": feature_set,
+        "features": numeric_features + CATEGORICAL_FEATURES,
+        "feature_count": len(numeric_features) + len(CATEGORICAL_FEATURES),
+        "weather": weather_summary,
         "partition_row_counts": partition_counts,
         "common_prediction_count": common_prediction_count,
         "prediction_rows": int(len(predictions)),

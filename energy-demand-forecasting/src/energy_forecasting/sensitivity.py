@@ -34,11 +34,11 @@ from .metrics import (
     seasonal_scale,
     seasonal_scales_by_building,
 )
-from .models import ModelConfig
+from .features import WEATHER_VARIABLES
+from .models import LEARNED_MODELS, SUPPORTED_MODELS, ModelConfig, build_model
 from .verification import (
-    EXPECTED_CONDITION_MODEL_PAIRS,
-    EXPECTED_MODELS,
     _json_integer,
+    expected_models,
     verify_input_bundle,
     verify_post_cutoff_condition_parity,
     verify_result_source_binding,
@@ -62,6 +62,15 @@ DIRECT_NUMERIC_FEATURES = [
     "target_dow_cos",
 ]
 DIRECT_CATEGORICAL_FEATURES = ["building_id", "site_id", "primary_use"]
+# v3: site weather observed at or before the forecast origin.
+DIRECT_WEATHER_FEATURES = [
+    "origin_air_temperature",
+    "origin_air_temperature_lag_24",
+    "origin_air_temperature_lag_168",
+    "origin_dew_temperature",
+    "origin_wind_speed",
+    "origin_air_temperature_mean_24",
+]
 FORECAST_KEYS = [
     "forecast_origin",
     "horizon_hours",
@@ -120,6 +129,20 @@ def load_sensitivity_config(path: str | Path) -> dict[str, Any]:
         raise ValueError("bootstrap_block must be 'building_week'")
     if int(config["bootstrap_repetitions"]) < 1:
         raise ValueError("bootstrap_repetitions must be positive")
+    models = config.get("models", ["seasonal_naive", "hist_gradient_boosting"])
+    if (
+        not isinstance(models, list)
+        or len(models) != len(set(models))
+        or "seasonal_naive" not in models
+        or not any(model in LEARNED_MODELS for model in models)
+        or any(model not in SUPPORTED_MODELS for model in models)
+    ):
+        raise ValueError(
+            "models must list seasonal_naive plus at least one learned model from "
+            f"{LEARNED_MODELS}, without duplicates"
+        )
+    config["models"] = list(models)
+    config["weather_features"] = bool(config.get("weather_features", False))
     return config
 
 
@@ -144,12 +167,39 @@ def _complete_hourly_grid(frame: pd.DataFrame) -> pd.DataFrame:
     return ordered
 
 
+def build_direct_weather(weather: pd.DataFrame) -> pd.DataFrame:
+    """Site weather features observed at or before each candidate origin hour."""
+
+    ordered = weather.copy()
+    ordered["timestamp"] = pd.to_datetime(ordered["timestamp"], errors="coerce", utc=True)
+    ordered["site_id"] = ordered["site_id"].astype("string")
+    ordered = ordered.sort_values(["site_id", "timestamp"]).reset_index(drop=True)
+    if ordered.duplicated(["site_id", "timestamp"]).any():
+        raise ValueError("Weather frame contains duplicate site/timestamp keys")
+    deltas = ordered.groupby("site_id", sort=False, observed=True)["timestamp"].diff()
+    if (deltas.notna() & (deltas != pd.Timedelta(hours=1))).any():
+        raise ValueError("Weather features require a complete hourly grid per site")
+    groups = ordered.groupby("site_id", sort=False, observed=True)
+    ordered["origin_air_temperature"] = ordered["air_temperature"]
+    ordered["origin_air_temperature_lag_24"] = groups["air_temperature"].shift(24)
+    ordered["origin_air_temperature_lag_168"] = groups["air_temperature"].shift(168)
+    ordered["origin_dew_temperature"] = ordered["dew_temperature"]
+    ordered["origin_wind_speed"] = ordered["wind_speed"]
+    ordered["origin_air_temperature_mean_24"] = (
+        groups["air_temperature"].rolling(window=24, min_periods=6).mean().reset_index(level=0, drop=True)
+    )
+    return ordered[["timestamp", "site_id", *DIRECT_WEATHER_FEATURES]].rename(
+        columns={"timestamp": "forecast_origin"}
+    )
+
+
 def build_direct_examples(
     frame: pd.DataFrame,
     *,
     horizons: tuple[int, ...] = HORIZONS,
     origin_hour: int = 23,
     origin_stride_hours: int = 24,
+    weather: pd.DataFrame | None = None,
 ) -> pd.DataFrame:
     """Build one daily origin with 24 direct targets and past-only features.
 
@@ -251,6 +301,19 @@ def build_direct_examples(
     expanded["target_hour_cos"] = np.cos(2 * np.pi * target_hour / 24.0)
     expanded["target_dow_sin"] = np.sin(2 * np.pi * target_day / 7.0)
     expanded["target_dow_cos"] = np.cos(2 * np.pi * target_day / 7.0)
+    if weather is not None:
+        from .features import _match_timezone
+
+        origin_weather = _match_timezone(
+            build_direct_weather(weather), "forecast_origin", expanded["forecast_origin"]
+        )
+        expanded["site_id"] = expanded["site_id"].astype("string")
+        before = len(expanded)
+        expanded = expanded.merge(
+            origin_weather, on=["site_id", "forecast_origin"], how="left", validate="many_to_one"
+        )
+        if len(expanded) != before:
+            raise AssertionError("Weather join changed the number of sensitivity rows")
     return expanded.sort_values(FORECAST_KEYS).reset_index(drop=True)
 
 
@@ -311,33 +374,21 @@ def validate_exclusive_fault_boundary(
         )
 
 
-def _build_direct_model(config: ModelConfig) -> Pipeline:
-    numeric = Pipeline(
-        [("impute", SimpleImputer(strategy="median", add_indicator=True))]
+def _direct_numeric_features(weather: bool) -> list[str]:
+    return DIRECT_NUMERIC_FEATURES + (DIRECT_WEATHER_FEATURES if weather else [])
+
+
+def _build_direct_model(
+    config: ModelConfig,
+    model_name: str = "hist_gradient_boosting",
+    numeric_features: list[str] | None = None,
+) -> Pipeline:
+    return build_model(
+        model_name,
+        config,
+        list(numeric_features or DIRECT_NUMERIC_FEATURES),
+        DIRECT_CATEGORICAL_FEATURES,
     )
-    categorical = Pipeline(
-        [
-            ("impute", SimpleImputer(strategy="most_frequent")),
-            ("one_hot", OneHotEncoder(handle_unknown="ignore", sparse_output=False)),
-        ]
-    )
-    preprocessing = ColumnTransformer(
-        [
-            ("numeric", numeric, DIRECT_NUMERIC_FEATURES),
-            ("categorical", categorical, DIRECT_CATEGORICAL_FEATURES),
-        ],
-        remainder="drop",
-    )
-    model = HistGradientBoostingRegressor(
-        loss="squared_error",
-        learning_rate=config.learning_rate,
-        max_iter=config.max_iter,
-        max_leaf_nodes=config.max_leaf_nodes,
-        l2_regularization=config.l2_regularization,
-        random_state=config.seed,
-        early_stopping=False,
-    )
-    return Pipeline([("preprocess", preprocessing), ("model", model)])
 
 
 def _prediction_frame(
@@ -345,6 +396,8 @@ def _prediction_frame(
     examples: pd.DataFrame,
     labels: pd.Series,
     model_config: ModelConfig,
+    models: list[str] | None = None,
+    numeric_features: list[str] | None = None,
 ) -> tuple[pd.DataFrame, dict[str, int]]:
     train = examples.loc[labels == "train"].copy()
     test = examples.loc[labels == "test"].copy()
@@ -353,28 +406,24 @@ def _prediction_frame(
     usable = train[train["condition_target"].notna()].copy()
     if usable.empty:
         raise ValueError(f"Sensitivity {condition} has no finite training targets")
+    models = list(models or ["seasonal_naive", "hist_gradient_boosting"])
+    numeric = list(numeric_features or DIRECT_NUMERIC_FEATURES)
 
     key_columns = FORECAST_KEYS + ["cutoff_timestamp", "site_id", "primary_use"]
-    seasonal = test[key_columns].copy()
-    seasonal["condition"] = condition
-    seasonal["model"] = "seasonal_naive"
-    seasonal["prediction"] = test["direct_lag_168"].fillna(
-        test["direct_lag_24"]
-    ).to_numpy()
-
-    estimator = _build_direct_model(model_config)
-    estimator.fit(
-        usable[DIRECT_NUMERIC_FEATURES + DIRECT_CATEGORICAL_FEATURES],
-        usable["condition_target"],
-    )
-    gradient = test[key_columns].copy()
-    gradient["condition"] = condition
-    gradient["model"] = "hist_gradient_boosting"
-    gradient["prediction"] = estimator.predict(
-        test[DIRECT_NUMERIC_FEATURES + DIRECT_CATEGORICAL_FEATURES]
-    )
+    parts: list[pd.DataFrame] = []
+    for model_name in models:
+        block = test[key_columns].copy()
+        block["condition"] = condition
+        block["model"] = model_name
+        if model_name == "seasonal_naive":
+            block["prediction"] = test["direct_lag_168"].fillna(test["direct_lag_24"]).to_numpy()
+        else:
+            estimator = _build_direct_model(model_config, model_name, numeric)
+            estimator.fit(usable[numeric + DIRECT_CATEGORICAL_FEATURES], usable["condition_target"])
+            block["prediction"] = estimator.predict(test[numeric + DIRECT_CATEGORICAL_FEATURES])
+        parts.append(block)
     counts = labels.value_counts().to_dict()
-    return pd.concat([seasonal, gradient], ignore_index=True), {
+    return pd.concat(parts, ignore_index=True), {
         "total_example_rows": int(len(examples)),
         "train_rows": int((labels == "train").sum()),
         "train_target_rows": int(len(usable)),
@@ -698,6 +747,7 @@ def run_sensitivity_experiment(
     *,
     producer_manifest_path: str | Path,
     fault_manifest_path: str | Path,
+    weather_path: str | Path | None = None,
 ) -> dict[str, Any]:
     config = load_sensitivity_config(config_path)
     output = _prepare_empty_output(output_dir)
@@ -730,13 +780,17 @@ def run_sensitivity_experiment(
     pooled_scale = seasonal_scale(reference_train, period)
     building_scales = seasonal_scales_by_building(reference_train, period)
     seed = int(config["seed"])
-    model_config = ModelConfig(
-        seed=seed,
-        max_iter=int(config["max_model_iterations"]),
-        learning_rate=float(config["learning_rate"]),
-        max_leaf_nodes=int(config["max_leaf_nodes"]),
-        l2_regularization=float(config["l2_regularization"]),
-    )
+    from .experiment import _model_config, load_weather_bundle
+
+    model_config = _model_config(config, seed)
+    models = list(config["models"])
+    numeric_features = _direct_numeric_features(bool(config["weather_features"]))
+    weather: pd.DataFrame | None = None
+    weather_summary: dict[str, Any] | None = None
+    if bool(config["weather_features"]):
+        weather, weather_summary = load_weather_bundle(
+            paths["reference"], verified.producer_manifest, weather_path
+        )
 
     example_frames: dict[str, pd.DataFrame] = {}
     prediction_parts: list[pd.DataFrame] = []
@@ -761,10 +815,11 @@ def run_sensitivity_experiment(
             horizons=HORIZONS,
             origin_hour=int(config["origin_hour"]),
             origin_stride_hours=int(config["origin_stride_hours"]),
+            weather=weather,
         )
         labels = assign_origin_partitions(examples, boundary)
         predictions, counts = _prediction_frame(
-            condition, examples, labels, model_config
+            condition, examples, labels, model_config, models, numeric_features
         )
         example_frames[condition] = examples.assign(_partition=labels)
         prediction_parts.append(predictions)
@@ -787,9 +842,7 @@ def run_sensitivity_experiment(
         zip(predictions["condition"], predictions["model"], strict=True)
     )
     expected_pair_set = {
-        (condition, model)
-        for condition in condition_order
-        for model in ("seasonal_naive", "hist_gradient_boosting")
+        (condition, model) for condition in condition_order for model in models
     }
     if produced_pairs != expected_pair_set:
         raise ValueError(
@@ -838,7 +891,7 @@ def run_sensitivity_experiment(
         },
         "python_version": sys.version,
         "platform": platform.platform(),
-        "state_policy": "stateless; no conversational state or personal data",
+        "state_policy": "stateless batch run; public data and reproducibility metadata only, no personal data",
         "timestamp_semantics": {
             "storage": "UTC-marked canonical comparison timestamps",
             "source_semantics": "source-local wall-clock calendar values",
@@ -904,10 +957,17 @@ def run_sensitivity_experiment(
             "values": config,
         },
         "models": {
-            "seasonal_naive": {"target_lag_fallback_order_hours": [168, 24]},
-            "hist_gradient_boosting": asdict(model_config),
+            name: (
+                asdict(model_config)
+                if name == "hist_gradient_boosting" and not config["weather_features"] and models == ["seasonal_naive", "hist_gradient_boosting"]
+                else model_config.parameters(name)
+            )
+            for name in models
         },
-        "features": DIRECT_NUMERIC_FEATURES + DIRECT_CATEGORICAL_FEATURES,
+        "model_order": models,
+        "weather": weather_summary,
+        "features": numeric_features + DIRECT_CATEGORICAL_FEATURES,
+        "feature_count": len(numeric_features) + len(DIRECT_CATEGORICAL_FEATURES),
         "prediction_key": PREDICTION_KEYS,
         "partition_row_counts": partition_counts,
         "common_alignment": common_alignment,
@@ -1073,16 +1133,19 @@ def verify_sensitivity_result_directory(
     )
     if pairs != prediction_pairs:
         raise ValueError("Sensitivity metric and prediction pairs differ")
-    if pairs != EXPECTED_CONDITION_MODEL_PAIRS or metrics.duplicated(
-        ["condition", "model"]
-    ).any():
+    manifest_pairs = {
+        (condition, model)
+        for condition in ("reference", "corrupted", "remediated")
+        for model in expected_models(manifest)
+    }
+    if pairs != manifest_pairs or metrics.duplicated(["condition", "model"]).any():
         raise ValueError(
-            "Sensitivity results must contain exactly the six expected "
+            "Sensitivity results must contain exactly the expected "
             "condition/model pairs"
         )
     expected_horizon_keys = {
         (condition, model, horizon)
-        for condition, model in EXPECTED_CONDITION_MODEL_PAIRS
+        for condition, model in manifest_pairs
         for horizon in HORIZONS
     }
     observed_horizon_keys = set(
@@ -1175,11 +1238,12 @@ def verify_sensitivity_result_directory(
         repetitions,
         seed,
     )
+    manifest_models = expected_models(manifest)
     observed_paired = pd.read_csv(directory / "paired_differences.csv")
     if (
-        len(observed_paired) != len(EXPECTED_MODELS)
+        len(observed_paired) != len(manifest_models)
         or observed_paired.duplicated(["model"]).any()
-        or set(observed_paired["model"]) != EXPECTED_MODELS
+        or set(observed_paired["model"]) != set(manifest_models)
     ):
         raise ValueError(
             "paired_differences.csv must contain exactly one aggregate row per model"
@@ -1197,7 +1261,7 @@ def verify_sensitivity_result_directory(
         observed_horizon_paired, "horizon_paired_differences.csv"
     )
     expected_paired_horizon_keys = {
-        (model, horizon) for model in EXPECTED_MODELS for horizon in HORIZONS
+        (model, horizon) for model in manifest_models for horizon in HORIZONS
     }
     observed_paired_horizon_keys = set(
         zip(
@@ -1212,7 +1276,7 @@ def verify_sensitivity_result_directory(
         or observed_paired_horizon_keys != expected_paired_horizon_keys
     ):
         raise ValueError(
-            "horizon_paired_differences.csv must contain exactly two models "
+            "horizon_paired_differences.csv must contain exactly the expected models "
             "times horizons 1 through 24"
         )
     _assert_metric_frame_matches(

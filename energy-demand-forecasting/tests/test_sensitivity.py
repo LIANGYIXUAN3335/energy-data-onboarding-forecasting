@@ -268,7 +268,7 @@ def test_sensitivity_end_to_end_alignment_and_tamper_detection(
         1, "horizon_hours"
     ]
     changed_horizon_paired.to_csv(horizon_paired_path, index=False)
-    with pytest.raises(ValueError, match="exactly two models times horizons"):
+    with pytest.raises(ValueError, match="exactly the expected models times horizons"):
         verify_sensitivity_result_directory(output)
     horizon_paired_path.write_bytes(original_horizon_paired_payload)
 
@@ -297,7 +297,7 @@ def test_sensitivity_end_to_end_alignment_and_tamper_detection(
         index=False,
         compression={"method": "gzip", "compresslevel": 9, "mtime": 0},
     )
-    with pytest.raises(ValueError, match="exactly the six expected"):
+    with pytest.raises(ValueError, match="exactly the expected condition/model pairs"):
         verify_sensitivity_result_directory(output)
     metrics_path.write_bytes(original_metrics_payload)
     predictions_path.write_bytes(original_predictions_payload)

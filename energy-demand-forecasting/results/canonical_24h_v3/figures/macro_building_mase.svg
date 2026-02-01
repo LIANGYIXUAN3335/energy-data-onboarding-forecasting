@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="678" viewBox="0 0 960 678" role="img" aria-labelledby="title desc">
+<title id="title">Supplementary macro building MASE</title>
+<desc id="desc">Deterministic chart generated from metrics.csv; horizontal bars show Unweighted mean of finite per-building MASE.</desc>
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="310" y="36" font-family="system-ui, sans-serif" font-size="24" font-weight="700" fill="#17202a">Supplementary macro building MASE</text>
+<text x="310" y="63" font-family="system-ui, sans-serif" font-size="13" fill="#4d5656">Unweighted mean of finite per-building MASE; lower is better</text>
+<line x1="310.00" y1="80" x2="310.00" y2="596" stroke="#e5e7e9"/>
+<text x="310.00" y="635" text-anchor="middle" font-family="ui-monospace, monospace" font-size="12" fill="#566573">0</text>
+<line x1="458.75" y1="80" x2="458.75" y2="596" stroke="#e5e7e9"/>
+<text x="458.75" y="635" text-anchor="middle" font-family="ui-monospace, monospace" font-size="12" fill="#566573">1.241</text>
+<line x1="607.50" y1="80" x2="607.50" y2="596" stroke="#e5e7e9"/>
+<text x="607.50" y="635" text-anchor="middle" font-family="ui-monospace, monospace" font-size="12" fill="#566573">2.483</text>
+<line x1="756.25" y1="80" x2="756.25" y2="596" stroke="#e5e7e9"/>
+<text x="756.25" y="635" text-anchor="middle" font-family="ui-monospace, monospace" font-size="12" fill="#566573">3.724</text>
+<line x1="905.00" y1="80" x2="905.00" y2="596" stroke="#e5e7e9"/>
+<text x="905.00" y="635" text-anchor="middle" font-family="ui-monospace, monospace" font-size="12" fill="#566573">4.965</text>
+<text x="298" y="114" text-anchor="end" font-family="system-ui, sans-serif" font-size="13" fill="#17202a">hist_gradient_boosting / reference</text>
+<rect x="310" y="99" width="148.70" height="21" rx="2" fill="#2f6b3b"/>
+<text x="465.70" y="114" font-family="ui-monospace, monospace" font-size="12" fill="#17202a">1.2409</text>
+<text x="298" y="156" text-anchor="end" font-family="system-ui, sans-serif" font-size="13" fill="#17202a">hist_gradient_boosting / corrupted</text>
+<rect x="310" y="141" width="286.35" height="21" rx="2" fill="#b64b3c"/>
+<text x="603.35" y="156" font-family="ui-monospace, monospace" font-size="12" fill="#17202a">2.3895</text>
+<text x="298" y="198" text-anchor="end" font-family="system-ui, sans-serif" font-size="13" fill="#17202a">hist_gradient_boosting / remediated</text>
+<rect x="310" y="183" width="137.14" height="21" rx="2" fill="#3568a8"/>
+<text x="454.14" y="198" font-family="ui-monospace, monospace" font-size="12" fill="#17202a">1.1444</text>
+<text x="298" y="240" text-anchor="end" font-family="system-ui, sans-serif" font-size="13" fill="#17202a">random_forest / reference</text>
+<rect x="310" y="225" width="128.21" height="21" rx="2" fill="#2f6b3b"/>
+<text x="445.21" y="240" font-family="ui-monospace, monospace" font-size="12" fill="#17202a">1.0699</text>
+<text x="298" y="282" text-anchor="end" font-family="system-ui, sans-serif" font-size="13" fill="#17202a">random_forest / corrupted</text>
+<rect x="310" y="267" width="265.35" height="21" rx="2" fill="#b64b3c"/>
+<text x="582.35" y="282" font-family="ui-monospace, monospace" font-size="12" fill="#17202a">2.2143</text>
+<text x="298" y="324" text-anchor="end" font-family="system-ui, sans-serif" font-size="13" fill="#17202a">random_forest / remediated</text>
+<rect x="310" y="309" width="125.07" height="21" rx="2" fill="#3568a8"/>
+<text x="442.07" y="324" font-family="ui-monospace, monospace" font-size="12" fill="#17202a">1.0437</text>
+<text x="298" y="366" text-anchor="end" font-family="system-ui, sans-serif" font-size="13" fill="#17202a">ridge / reference</text>
+<rect x="310" y="351" width="340.02" height="21" rx="2" fill="#2f6b3b"/>
+<text x="657.02" y="366" font-family="ui-monospace, monospace" font-size="12" fill="#17202a">2.8374</text>
+<text x="298" y="408" text-anchor="end" font-family="system-ui, sans-serif" font-size="13" fill="#17202a">ridge / corrupted</text>
+<rect x="310" y="393" width="595.00" height="21" rx="2" fill="#b64b3c"/>
+<text x="912.00" y="408" font-family="ui-monospace, monospace" font-size="12" fill="#17202a">4.9652</text>
+<text x="298" y="450" text-anchor="end" font-family="system-ui, sans-serif" font-size="13" fill="#17202a">ridge / remediated</text>
+<rect x="310" y="435" width="318.81" height="21" rx="2" fill="#3568a8"/>
+<text x="635.81" y="450" font-family="ui-monospace, monospace" font-size="12" fill="#17202a">2.6604</text>
+<text x="298" y="492" text-anchor="end" font-family="system-ui, sans-serif" font-size="13" fill="#17202a">seasonal_naive / reference</text>
+<rect x="310" y="477" width="136.56" height="21" rx="2" fill="#2f6b3b"/>
+<text x="453.56" y="492" font-family="ui-monospace, monospace" font-size="12" fill="#17202a">1.1395</text>
+<text x="298" y="534" text-anchor="end" font-family="system-ui, sans-serif" font-size="13" fill="#17202a">seasonal_naive / corrupted</text>
+<rect x="310" y="519" width="136.56" height="21" rx="2" fill="#b64b3c"/>
+<text x="453.56" y="534" font-family="ui-monospace, monospace" font-size="12" fill="#17202a">1.1395</text>
+<text x="298" y="576" text-anchor="end" font-family="system-ui, sans-serif" font-size="13" fill="#17202a">seasonal_naive / remediated</text>
+<rect x="310" y="561" width="136.56" height="21" rx="2" fill="#3568a8"/>
+<text x="453.56" y="576" font-family="ui-monospace, monospace" font-size="12" fill="#17202a">1.1395</text>
+<text x="607.50" y="665" text-anchor="middle" font-family="system-ui, sans-serif" font-size="13" fill="#34495e">Unweighted mean of finite per-building MASE</text>
+</svg>
