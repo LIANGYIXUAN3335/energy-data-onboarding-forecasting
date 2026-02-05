@@ -3,15 +3,15 @@ set -euo pipefail
 
 # Runs the onboarding pipeline on the committed BDG2 subset and then the
 # canonical fixed-24h forecasting experiment into fresh output directories.
-# The committed final bundles (results/bdg2_mvp_v2_hardened and
-# results/canonical_24h_v2_final) are never overwritten by this script.
+# The committed bundles (v2 baseline and v3 amendment) are never overwritten
+# by this script; it writes to fresh *_run directories.
 
 WORKSPACE_DIR="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
 VENV_DIR="$WORKSPACE_DIR/.venv"
 ONBOARD_REPO="$WORKSPACE_DIR/energy-ai-data-onboarding"
 FORECAST_REPO="$WORKSPACE_DIR/energy-demand-forecasting"
-ONBOARD_RESULTS="${ONBOARD_RESULTS:-$ONBOARD_REPO/results/bdg2_mvp_v2_run}"
-FORECAST_RESULTS="${FORECAST_RESULTS:-$FORECAST_REPO/results/canonical_24h_v2_run}"
+ONBOARD_RESULTS="${ONBOARD_RESULTS:-$ONBOARD_REPO/results/bdg2_v3_run}"
+FORECAST_RESULTS="${FORECAST_RESULTS:-$FORECAST_REPO/results/canonical_24h_v3_run}"
 
 test -x "$VENV_DIR/bin/energy-onboard" || { echo "missing venv; run scripts/bootstrap.sh first" >&2; exit 1; }
 test -x "$VENV_DIR/bin/energy-forecast"
@@ -21,11 +21,13 @@ test -f "$ONBOARD_REPO/data/raw/electricity.csv" || {
   exit 1
 }
 test -f "$ONBOARD_REPO/data/raw/metadata.csv"
+test -f "$ONBOARD_REPO/data/raw/weather.csv" || { echo "missing weather.csv; run the download command above" >&2; exit 1; }
 
 "$VENV_DIR/bin/energy-onboard" run \
-  --config "$ONBOARD_REPO/configs/bdg2_mvp_v2.json" \
+  --config "$ONBOARD_REPO/configs/bdg2_v3.json" \
   --electricity-csv "$ONBOARD_REPO/data/raw/electricity.csv" \
   --metadata-csv "$ONBOARD_REPO/data/raw/metadata.csv" \
+  --weather-csv "$ONBOARD_REPO/data/raw/weather.csv" \
   --output-dir "$ONBOARD_RESULTS"
 
 "$VENV_DIR/bin/energy-onboard" verify --result-dir "$ONBOARD_RESULTS"
@@ -37,7 +39,7 @@ test -f "$ONBOARD_REPO/data/raw/metadata.csv"
   --remediated "$ONBOARD_RESULTS/remediated.csv.gz" \
   --producer-manifest "$ONBOARD_RESULTS/dataset_manifest.json" \
   --fault-manifest "$ONBOARD_RESULTS/fault_manifest.json" \
-  --config "$FORECAST_REPO/configs/experiment.json" \
+  --config "$FORECAST_REPO/configs/experiment_v3.json" \
   --output-dir "$FORECAST_RESULTS"
 
 "$VENV_DIR/bin/energy-forecast" verify-results \
