@@ -2,7 +2,7 @@
 
 This is a reproducible public-data research pipeline for building-energy data onboarding and forecasting preparation.
 
-Created: `2026-09-28T21:17:07Z`
+Created: `2026-09-28T21:49:21Z`
 
 ## Run scope
 
@@ -34,10 +34,10 @@ as seeded ground truth.
 
 The downstream suite injected `108`
 value-level fault records before `2017-01-01T00:00:00+00:00`. It did not add,
-remove, or move keys. Past-only remediation logged `4945`
-actions, including `1494` repaired rows and
-`3451` unresolved actions. The quarantine artifact
-contains `3451` rows. A suspected unit scale is never silently
+remove, or move keys. Past-only remediation logged `9098`
+actions, including `1668` repaired rows and
+`7430` unresolved actions. The quarantine artifact
+contains `7430` rows. A suspected unit scale is never silently
 corrected by dividing by an inferred factor.
 
 ## Detector and remediation policy
@@ -90,7 +90,7 @@ transmitted.
     &quot;timestamp_max&quot;: &quot;2017-12-31T23:00:00+00:00&quot;,
     &quot;timestamp_min&quot;: &quot;2016-01-01T00:00:00+00:00&quot;
   },
-  &quot;created_at_utc&quot;: &quot;2026-09-28T21:17:07Z&quot;,
+  &quot;created_at_utc&quot;: &quot;2026-09-28T21:49:21Z&quot;,
   &quot;dataset&quot;: {
     &quot;doi&quot;: &quot;10.5281/zenodo.3887306&quot;,
     &quot;title&quot;: &quot;Building Data Genome Project 2&quot;,
@@ -123,7 +123,7 @@ transmitted.
   },
   &quot;quality_gates&quot;: {
     &quot;corrupted&quot;: {
-      &quot;affected_observations_sum&quot;: 13308,
+      &quot;affected_observations_sum&quot;: 17522,
       &quot;check_results&quot;: [
         {
           &quot;count&quot;: 0,
@@ -224,11 +224,11 @@ transmitted.
           }
         },
         {
-          &quot;count&quot;: 8174,
+          &quot;count&quot;: 12388,
           &quot;denominator&quot;: 210528,
           &quot;enforcement&quot;: &quot;configurable_or_detector_default&quot;,
           &quot;issue_code&quot;: &quot;LONG_ZERO_RUN&quot;,
-          &quot;rate&quot;: 0.03882618939048488,
+          &quot;rate&quot;: 0.05884252925976592,
           &quot;status&quot;: &quot;warn&quot;,
           &quot;threshold&quot;: {
             &quot;basis&quot;: &quot;rate&quot;,
@@ -346,7 +346,7 @@ transmitted.
       }
     },
     &quot;detector_validation&quot;: {
-      &quot;affected_observations_sum&quot;: 13327,
+      &quot;affected_observations_sum&quot;: 16939,
       &quot;check_results&quot;: [
         {
           &quot;count&quot;: 0,
@@ -447,11 +447,11 @@ transmitted.
           }
         },
         {
-          &quot;count&quot;: 8173,
+          &quot;count&quot;: 11785,
           &quot;denominator&quot;: 210528,
           &quot;enforcement&quot;: &quot;configurable_or_detector_default&quot;,
           &quot;issue_code&quot;: &quot;LONG_ZERO_RUN&quot;,
-          &quot;rate&quot;: 0.03882143942848457,
+          &quot;rate&quot;: 0.055978302173582614,
           &quot;status&quot;: &quot;warn&quot;,
           &quot;threshold&quot;: {
             &quot;basis&quot;: &quot;rate&quot;,
@@ -572,7 +572,7 @@ transmitted.
       }
     },
     &quot;reference&quot;: {
-      &quot;affected_observations_sum&quot;: 14488,
+      &quot;affected_observations_sum&quot;: 20320,
       &quot;check_results&quot;: [
         {
           &quot;count&quot;: 0,
@@ -673,11 +673,11 @@ transmitted.
           }
         },
         {
-          &quot;count&quot;: 8142,
+          &quot;count&quot;: 13974,
           &quot;denominator&quot;: 210528,
           &quot;enforcement&quot;: &quot;configurable_or_detector_default&quot;,
           &quot;issue_code&quot;: &quot;LONG_ZERO_RUN&quot;,
-          &quot;rate&quot;: 0.038674190606475145,
+          &quot;rate&quot;: 0.06637596899224807,
           &quot;status&quot;: &quot;warn&quot;,
           &quot;threshold&quot;: {
             &quot;basis&quot;: &quot;rate&quot;,
@@ -865,7 +865,7 @@ transmitted.
       }
     },
     &quot;remediated&quot;: {
-      &quot;affected_observations_sum&quot;: 11674,
+      &quot;affected_observations_sum&quot;: 19919,
       &quot;check_results&quot;: [
         {
           &quot;count&quot;: 0,
@@ -910,11 +910,11 @@ transmitted.
           }
         },
         {
-          &quot;count&quot;: 3497,
+          &quot;count&quot;: 7476,
           &quot;denominator&quot;: 210528,
           &quot;enforcement&quot;: &quot;configurable_or_detector_default&quot;,
           &quot;issue_code&quot;: &quot;LOAD_MISSING&quot;,
-          &quot;rate&quot;: 0.016610617115063078,
+          &quot;rate&quot;: 0.035510715914272684,
           &quot;status&quot;: &quot;warn&quot;,
           &quot;threshold&quot;: {
             &quot;basis&quot;: &quot;rate&quot;,
@@ -952,11 +952,11 @@ transmitted.
           }
         },
         {
-          &quot;count&quot;: 2036,
+          &quot;count&quot;: 2077,
           &quot;denominator&quot;: 210528,
           &quot;enforcement&quot;: &quot;configurable_or_detector_default&quot;,
           &quot;issue_code&quot;: &quot;ROBUST_OUTLIER&quot;,
-          &quot;rate&quot;: 0.009670922632618938,
+          &quot;rate&quot;: 0.009865671074631403,
           &quot;status&quot;: &quot;pass&quot;,
           &quot;threshold&quot;: {
             &quot;basis&quot;: &quot;rate&quot;,
@@ -966,11 +966,11 @@ transmitted.
           }
         },
         {
-          &quot;count&quot;: 5332,
+          &quot;count&quot;: 9511,
           &quot;denominator&quot;: 210528,
           &quot;enforcement&quot;: &quot;configurable_or_detector_default&quot;,
           &quot;issue_code&quot;: &quot;LONG_ZERO_RUN&quot;,
-          &quot;rate&quot;: 0.025326797385620915,
+          &quot;rate&quot;: 0.04517688858489132,
           &quot;status&quot;: &quot;warn&quot;,
           &quot;threshold&quot;: {
             &quot;basis&quot;: &quot;rate&quot;,
@@ -994,11 +994,11 @@ transmitted.
           }
         },
         {
-          &quot;count&quot;: 672,
+          &quot;count&quot;: 718,
           &quot;denominator&quot;: 210528,
           &quot;enforcement&quot;: &quot;configurable_or_detector_default&quot;,
           &quot;issue_code&quot;: &quot;LEVEL_OR_UNIT_SHIFT&quot;,
-          &quot;rate&quot;: 0.0031919744642042863,
+          &quot;rate&quot;: 0.0034104727162182704,
           &quot;status&quot;: &quot;pass&quot;,
           &quot;threshold&quot;: {
             &quot;basis&quot;: &quot;rate&quot;,
@@ -1089,12 +1089,12 @@ transmitted.
     }
   },
   &quot;quarantine&quot;: {
-    &quot;rows&quot;: 3451
+    &quot;rows&quot;: 7430
   },
   &quot;remediation&quot;: {
-    &quot;log_rows&quot;: 4945,
-    &quot;quarantined_rows&quot;: 3451,
-    &quot;repaired_rows&quot;: 1494
+    &quot;log_rows&quot;: 9098,
+    &quot;quarantined_rows&quot;: 7430,
+    &quot;repaired_rows&quot;: 1668
   },
   &quot;remediation_policy&quot;: {
     &quot;backward_fill_or_interpolation&quot;: false,

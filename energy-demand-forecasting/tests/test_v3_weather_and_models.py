@@ -244,3 +244,29 @@ def test_direct_weather_never_reads_after_the_origin(hourly_frame: pd.DataFrame)
         altered.loc[rows, columns].to_numpy(dtype=float),
         equal_nan=True,
     )
+
+
+def test_verifier_rejects_a_bundle_whose_models_were_stripped(
+    input_bundle: dict[str, Path], hourly_frame: pd.DataFrame, tmp_path: Path
+) -> None:
+    import json as _json
+    from energy_forecasting.dataset import sha256_file as _sha
+
+    _register_weather(input_bundle["input_dir"], _weather_frame(hourly_frame))
+    config_path = _v3_config(input_bundle, tmp_path, models=["seasonal_naive", "ridge", "hist_gradient_boosting"])
+    output = tmp_path / "results_strip"
+    run_experiment(
+        input_bundle["reference"], input_bundle["corrupted"], input_bundle["remediated"], config_path, output,
+        producer_manifest_path=input_bundle["producer_manifest"], fault_manifest_path=input_bundle["fault_manifest"],
+    )
+    # A caller that knows the experiment pins the model set; a bundle declaring fewer models fails.
+    with pytest.raises(ValueError, match="were required"):
+        verify_result_directory(output, expected_model_names=["seasonal_naive", "ridge", "random_forest", "hist_gradient_boosting"])
+    assert verify_result_directory(output, expected_model_names=["seasonal_naive", "ridge", "hist_gradient_boosting"])
+    # Internal inconsistency between the manifest's model declarations is rejected too.
+    manifest_path = output / "run_manifest.json"
+    manifest = _json.loads(manifest_path.read_text())
+    manifest["model_order"] = ["seasonal_naive", "ridge"]
+    manifest_path.write_text(_json.dumps(manifest, indent=2, sort_keys=True))
+    with pytest.raises(ValueError, match="does not match its models map"):
+        verify_result_directory(output)

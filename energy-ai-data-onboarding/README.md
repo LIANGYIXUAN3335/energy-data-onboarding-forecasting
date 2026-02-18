@@ -79,7 +79,7 @@ published artifacts.
 
 Two committed bundles exist:
 
-- `results/bdg2_mvp_v2_hardened`: the pre-registered v2 baseline (fixed
+- `results/bdg2_mvp_v2_hardened`: the pre-specified v2 baseline (fixed
   run-detector thresholds, forward-fill-only remediation, one seeded event per
   fault family, no weather).
 - `results/bdg2_v3`: the v3 amendment dated 2026-09-28

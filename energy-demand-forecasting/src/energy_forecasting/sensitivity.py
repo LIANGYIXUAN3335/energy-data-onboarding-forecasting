@@ -6,7 +6,7 @@ import sys
 from dataclasses import asdict
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any
+from typing import Any, Iterable
 
 import numpy as np
 import pandas as pd
@@ -1046,6 +1046,7 @@ def _validated_horizons(frame: pd.DataFrame, label: str) -> pd.Series:
 def verify_sensitivity_result_directory(
     result_dir: str | Path,
     input_dir: str | Path | None = None,
+    expected_model_names: Iterable[str] | None = None,
 ) -> dict[str, Any]:
     directory = Path(result_dir)
     missing = sorted(
@@ -1136,7 +1137,7 @@ def verify_sensitivity_result_directory(
     manifest_pairs = {
         (condition, model)
         for condition in ("reference", "corrupted", "remediated")
-        for model in expected_models(manifest)
+        for model in expected_models(manifest, expected_model_names)
     }
     if pairs != manifest_pairs or metrics.duplicated(["condition", "model"]).any():
         raise ValueError(
@@ -1238,7 +1239,7 @@ def verify_sensitivity_result_directory(
         repetitions,
         seed,
     )
-    manifest_models = expected_models(manifest)
+    manifest_models = expected_models(manifest, expected_model_names)
     observed_paired = pd.read_csv(directory / "paired_differences.csv")
     if (
         len(observed_paired) != len(manifest_models)

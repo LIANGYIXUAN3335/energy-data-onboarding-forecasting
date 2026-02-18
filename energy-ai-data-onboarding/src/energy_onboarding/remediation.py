@@ -172,10 +172,16 @@ def remediate(
             is_ambiguous = bool(ambiguous_scale.loc[index])
             # Structural problems are never auto-repaired. Ambiguous scale is
             # forward-filled never, and profile-filled only when explicitly allowed.
+            # A flagged zero run is never repaired with a zero: if the last valid
+            # reading is itself zero the forward fill would reproduce the defect.
+            zero_fill_of_zero = (
+                bool(masks["long_zero"].loc[index]) and last_valid is not None and last_valid == 0.0
+            )
             can_forward_fill = (
                 was_invalid
                 and not invalid_structural
                 and not is_ambiguous
+                and not zero_fill_of_zero
                 and last_valid is not None
                 and gap_length <= maximum_forward_fill_hours
             )

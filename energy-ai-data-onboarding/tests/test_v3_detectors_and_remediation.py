@@ -98,10 +98,12 @@ def test_zero_runs_during_normally_idle_hours_are_not_flagged() -> None:
     hours = 24 * 7 * weeks
     timestamps = pd.date_range("2016-01-04", periods=hours, freq="h", tz="UTC")
     active = (timestamps.hour >= 8) & (timestamps.hour < 18) & (timestamps.dayofweek < 5)
-    loads = np.where(active, 100.0, 0.0)
+    # Varying daytime load so the synthetic meter is not itself a stuck sensor.
+    loads = np.where(active, 100.0 + (timestamps.hour.to_numpy() % 10), 0.0)
     frame = _building("school", loads)
-    # An unexpected 8-hour outage during a working day of the last week.
-    outage = frame.index[(frame["timestamp"] >= timestamps[-24 * 3]) & active][:8]
+    # An unexpected outage covering the whole working day in the last week.
+    day = timestamps[-24 * 3]
+    outage = frame.index[(frame["timestamp"] >= day.replace(hour=8)) & (frame["timestamp"] < day.replace(hour=18))]
     frame.loc[outage, "load"] = 0.0
     config = QualityConfig(
         long_zero_threshold=6,
@@ -111,11 +113,17 @@ def test_zero_runs_during_normally_idle_hours_are_not_flagged() -> None:
     )
     masks = causal_anomaly_masks(frame, config)
     flagged = frame.loc[masks["long_zero"]]
-    # Nights and weekends are zero by design and must not be flagged once a
-    # profile exists; the working-day outage must be flagged.
+    # The working-day outage must be flagged. Nights and weekends are zero by
+    # design and must not be flagged once a profile exists, except the night
+    # hours that are contiguous with the outage: a zero run is judged and
+    # flagged as one unit.
     assert set(outage).issubset(set(flagged.index))
     late = flagged.loc[flagged["timestamp"] >= timestamps[24 * 7 * 5]]
-    assert late.index.isin(outage).all()
+    # The Friday outage joins Thursday night and the weekend into one zero run
+    # that ends when the building comes back on Monday morning.
+    run_start = (day - pd.Timedelta(days=1)).replace(hour=18)
+    run_end = (day + pd.Timedelta(days=3)).replace(hour=8)
+    assert ((late["timestamp"] >= run_start) & (late["timestamp"] < run_end)).all()
 
 
 def test_hour_of_week_profile_is_strictly_causal() -> None:
@@ -260,3 +268,30 @@ def test_pipeline_publishes_weather_and_calibration_artifacts(
     # Tampering with the weather artifact is caught.
     (output / "weather.csv.gz").write_bytes(b"not a gzip")
     assert any("hash mismatch: weather.csv.gz" in error for error in verify_result_dir(output))
+
+
+def test_zero_run_exemption_is_decided_per_run_and_never_zero_filled() -> None:
+    """A zero run spanning idle and active hours is flagged in full and is not
+    forward-filled with its own zero."""
+
+    weeks = 10
+    hours = 24 * 7 * weeks
+    timestamps = pd.date_range("2016-01-04", periods=hours, freq="h", tz="UTC")
+    active = (timestamps.hour >= 8) & (timestamps.hour < 18) & (timestamps.dayofweek < 5)
+    loads = np.where(active, 100.0 + (timestamps.hour.to_numpy() % 10), 0.0)
+    frame = _building("school", loads)
+    # An outage that starts in the idle early morning and runs into the working day.
+    day = timestamps[-24 * 3]
+    start = frame.index[(frame["timestamp"] >= day.replace(hour=4)) & (frame["timestamp"] < day.replace(hour=12))]
+    frame.loc[start, "load"] = 0.0
+    config = QualityConfig(long_zero_threshold=6, run_flagging="whole_run", zero_profile_min_ratio=0.25, profile_weeks=4)
+    masks = causal_anomaly_masks(frame, config)
+    run = frame.index[(frame["timestamp"] >= day.replace(hour=0)) & (frame["timestamp"] < day.replace(hour=12))]
+    # The whole natural-night-plus-outage zero run is flagged, not only its working hours.
+    assert masks["long_zero"].loc[run].all()
+    result = remediate(frame, quality=config, maximum_forward_fill_hours=3, repair_strategy="forward_then_profile", profile_weeks=4)
+    repaired = result.log[result.log["status"] == "repaired"]
+    assert not ((repaired["rule"].str.startswith("past_only_forward_fill")) & (repaired["remediated_value"] == 0.0)).any()
+    # Working-day hours of the outage received the profile value (100), not zero.
+    working = [index for index in start if bool(active[index])]
+    assert (result.frame.loc[working, "load"] > 0).all()

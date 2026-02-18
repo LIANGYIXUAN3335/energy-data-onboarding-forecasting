@@ -5,7 +5,7 @@ import math
 from dataclasses import dataclass
 from numbers import Integral
 from pathlib import Path
-from typing import Any
+from typing import Any, Iterable
 
 import numpy as np
 import pandas as pd
@@ -41,25 +41,51 @@ KNOWN_MODELS = frozenset(
 )
 
 
-def expected_models(manifest: dict[str, Any]) -> frozenset[str]:
-    """Models a bundle must contain: declared in the manifest, else the v2 pair."""
+def expected_models(
+    manifest: dict[str, Any], required: Iterable[str] | None = None
+) -> frozenset[str]:
+    """Models a bundle must contain.
+
+    Legacy bundles without a ``models`` map are held to the v2 pair. Newer
+    bundles must declare the same set consistently in ``models``,
+    ``model_order`` and ``config.values.models``. Because the run manifest is
+    not signed, a caller that knows which experiment it is checking should
+    pass ``required`` (the CLI flag ``--expected-models``); the bundle is then
+    rejected unless its declared set equals exactly that set.
+    """
 
     declared = manifest.get("models")
     if not isinstance(declared, dict) or not declared:
-        return EXPECTED_MODELS
-    models = frozenset(str(name) for name in declared)
-    if "seasonal_naive" not in models or len(models) < 2:
-        raise ValueError("Run manifest models must include seasonal_naive and a learned model")
-    if unknown := models - KNOWN_MODELS:
-        raise ValueError(f"Run manifest declares unknown models: {sorted(unknown)}")
+        models = EXPECTED_MODELS
+    else:
+        models = frozenset(str(name) for name in declared)
+        order = manifest.get("model_order")
+        config_models = (manifest.get("config", {}) or {}).get("values", {}).get("models")
+        for label, other in (("model_order", order), ("config.values.models", config_models)):
+            if other is None:
+                continue
+            if not isinstance(other, list) or frozenset(map(str, other)) != models:
+                raise ValueError(f"Run manifest {label} does not match its models map")
+        if "seasonal_naive" not in models or len(models) < 2:
+            raise ValueError("Run manifest models must include seasonal_naive and a learned model")
+        if unknown := models - KNOWN_MODELS:
+            raise ValueError(f"Run manifest declares unknown models: {sorted(unknown)}")
+    if required is not None:
+        wanted = frozenset(str(name) for name in required)
+        if wanted != models:
+            raise ValueError(
+                f"Bundle declares models {sorted(models)} but {sorted(wanted)} were required"
+            )
     return models
 
 
-def expected_condition_model_pairs(manifest: dict[str, Any]) -> frozenset[tuple[str, str]]:
+def expected_condition_model_pairs(
+    manifest: dict[str, Any], required: Iterable[str] | None = None
+) -> frozenset[tuple[str, str]]:
     return frozenset(
         (condition, model)
         for condition in EXPECTED_CONDITIONS
-        for model in expected_models(manifest)
+        for model in expected_models(manifest, required)
     )
 
 LEGACY_REQUIRED_RESULT_FILES = {
@@ -656,6 +682,7 @@ def verify_result_source_binding(
 def verify_result_directory(
     result_dir: str | Path,
     input_dir: str | Path | None = None,
+    expected_model_names: Iterable[str] | None = None,
 ) -> dict[str, Any]:
     """Validate that a result directory is internally complete and consistent."""
     directory = Path(result_dir)
@@ -727,8 +754,8 @@ def verify_result_directory(
     )
     if pairs != prediction_pairs:
         raise ValueError("Metric and prediction condition/model pairs do not match")
-    manifest_models = expected_models(manifest)
-    if pairs != expected_condition_model_pairs(manifest):
+    manifest_models = expected_models(manifest, expected_model_names)
+    if pairs != expected_condition_model_pairs(manifest, expected_model_names):
         raise ValueError(
             "Results must contain exactly the expected condition/model pairs "
             f"({len(EXPECTED_CONDITIONS) * len(manifest_models)} pairs for "
