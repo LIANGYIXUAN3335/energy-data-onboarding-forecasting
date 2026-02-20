@@ -2,6 +2,8 @@
 
 ## Data flow
 
+Rendered copy: [`architecture_onboarding.png`](../../docs/figures/architecture_onboarding.png) (source below).
+
 ```mermaid
 sequenceDiagram
     participant S as Public source
@@ -89,7 +91,7 @@ falling back to a detector default.
 
 ## Fault-boundary rationale
 
-The downstream repository may train on observations before `fault_cutoff` and
+The downstream forecasting package may train on observations before `fault_cutoff` and
 evaluate on observations at or after it. Enforcing the cutoff inside the fault
 injector—not merely documenting it—prevents accidental changes to evaluation
 targets and makes the three-condition comparison auditable.

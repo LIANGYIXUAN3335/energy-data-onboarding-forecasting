@@ -23,3 +23,5 @@ energy-demand-forecasting/results/*
 !energy-ai-data-onboarding/results/bdg2_v3/
 !energy-demand-forecasting/results/canonical_24h_v3/
 !energy-demand-forecasting/results/direct_1_to_24_sensitivity_v3/
+!energy-ai-data-onboarding/results/bdg2_v3_dense/
+!energy-demand-forecasting/results/canonical_24h_v3_dense/

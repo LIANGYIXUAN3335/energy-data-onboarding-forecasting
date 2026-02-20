@@ -3839,7 +3839,7 @@
   "seed": 20251206,
   "severity_level": "medium",
   "suite": "downstream_forecasting",
-  "test_target_policy": "at/after cutoff values equal reference; Repo B uses reference targets",
+  "test_target_policy": "at/after cutoff values equal reference; the forecasting package uses reference targets",
   "timestamp_semantics_machine": {
     "basis": "source_local_wall_clock",
     "canonical_marker": "UTC",

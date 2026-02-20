@@ -183,11 +183,15 @@ def fig_v2_vs_v3():
     """The remediation effect before and after the detector recalibration."""
 
     rows = []
-    for label, path in (("v2 baseline\n(fixed thresholds,\nforward fill only)", FC_V2), ("v3 amendment\n(calibrated detectors,\nprofile repair, weather)", FC)):
+    FC_DENSE = ROOT / "energy-demand-forecasting" / "results" / "canonical_24h_v3_dense"
+    groups = [("v2 baseline\n(fixed thresholds,\nforward fill only;\n27 seeded rows)", FC_V2), ("v3 amendment\n(calibrated detectors,\nprofile repair, weather;\n108 seeded rows)", FC)]
+    if (FC_DENSE / "metrics.csv").exists():
+        groups.append(("v3 at literature\nprevalence\n(1,660 seeded rows,\n1.6% of training)", FC_DENSE))
+    for label, path in groups:
         m = pd.read_csv(path / "metrics.csv")
         sub = m[m.model == "hist_gradient_boosting"].set_index("condition")
         rows.append((label, sub.loc["reference", "mase"], sub.loc["corrupted", "mase"], sub.loc["remediated", "mase"], sub.loc["remediated", "data_retained"]))
-    fig, ax = plt.subplots(figsize=(8.5, 4))
+    fig, ax = plt.subplots(figsize=(10, 4.4))
     x = np.arange(len(rows))
     for j, (c, key) in enumerate((("reference", 1), ("corrupted", 2), ("remediated", 3))):
         vals = [r[key] for r in rows]
@@ -195,9 +199,9 @@ def fig_v2_vs_v3():
         for b, v in zip(bars, vals):
             ax.text(b.get_x() + b.get_width() / 2, v + 0.01, f"{v:.3f}", ha="center", fontsize=9)
     ax.set_xticks(x)
-    ax.set_xticklabels([f"{r[0]}\ntraining targets kept: {r[4]:.1%}" for r in rows], fontsize=9)
+    ax.set_xticklabels([f"{r[0]}\ntraining targets kept: {r[4]:.1%}" for r in rows], fontsize=8.5)
     ax.set_ylabel("pooled MASE, gradient boosting\n(lower is better; 1.0 = seasonal naive scale)")
-    ax.set_title("Same model, same split: remediation effect before and after recalibration", fontsize=11)
+    ax.set_title("Same model and split; corrupted bars use different fault suites and are not comparable across groups", fontsize=10)
     ax.legend(frameon=False, fontsize=9, loc="upper right")
     fig.tight_layout(); fig.savefig(OUT / "v2_vs_v3.png", dpi=170, bbox_inches="tight", facecolor="white"); plt.close(fig)
 

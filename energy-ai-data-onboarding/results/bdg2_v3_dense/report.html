@@ -1,0 +1,1191 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Energy-data onboarding audit</title><style>body{max-width:960px;margin:2rem auto;font:16px/1.5 system-ui;}pre{white-space:pre-wrap;background:#f5f5f5;padding:1rem}</style></head><body><h1>Energy-data onboarding audit</h1><pre># Energy-data onboarding audit report
+
+This is a reproducible public-data research pipeline for building-energy data onboarding and forecasting preparation.
+
+Created: `2026-09-29T02:19:11Z`
+
+## Findings in brief
+
+The reference data (210,528 hourly rows, 12 buildings) passed publication with gate status `warn`. 855 seeded events, 1660 value-level fault rows (1.57% of the 105,408 training rows) were written before the cutoff; seeded faults were fully detected except long_zero_block (recall 0.98), positive_spike (recall 0.93), stuck_segment (recall 0.68). Remediation repaired 3,015 rows and quarantined 4,418; the gate on the remediated condition is `warn`. Every count here is recomputed from the committed artifacts, and adverse outcomes are kept.
+
+## Run scope
+
+The pipeline processed `210528` long-form observations
+from `12` selected buildings. The source is
+`Building Data Genome Project 2` `v1.0`. This run is
+classified as `verified_bdg2_subset`.
+
+## Source and time handling
+
+BDG2 raw meter timestamps are source-local wall-clock readings. For this prototype they are represented with a UTC marker for stable parsing without performing an offset conversion. The committed subset is restricted to sites with the same source timezone (US/Eastern). This must not be described as cross-timezone UTC harmonization; DST interpretation remains a limitation.
+
+The source bytes, configuration, condition datasets, logs, and reports are
+identified by SHA-256 in `dataset_manifest.json`.
+
+## Quality gates
+
+Generated outcomes: corrupted=fail, detector_validation=fail, reference=warn, remediated=warn. A fail or warning remains in the
+machine-readable issue log; it is not suppressed to create a preferred result.
+
+## Seeded detector validation
+
+The isolated detector-validation suite injected `1664`
+key-level fault records. Precision, recall, false-positive rate, and counts by
+fault family are in `detector_metrics.csv`. Natural anomalies were not treated
+as seeded ground truth.
+
+## Downstream condition preparation
+
+The downstream suite injected `1660`
+value-level fault records before `2017-01-01T00:00:00+00:00`. It did not add,
+remove, or move keys. Past-only remediation logged `7433`
+actions, including `3015` repaired rows and
+`4418` unresolved actions. The quarantine artifact
+contains `4418` rows. A suspected unit scale is never silently
+corrected by dividing by an inferred factor.
+
+## Detector and remediation policy
+
+Run detectors flag every reading of a run once it reaches its threshold. The stuck-sensor threshold (8 h) is raised per building to just above the 0.999 quantile of that building&#x27;s natural constant-run lengths (`detector_calibration.csv`), so coarsely quantized meters are not mistaken for stuck sensors. A zero run of at least 6 h counts only during hours when the building is normally active (causal hour-of-week median over the previous 8 weeks above 0.25 times the trailing 168-hour median). Calibration uses the reference condition strictly before the fault cutoff, so seeded faults never shape their own thresholds.
+
+Remediation first forward-fills gaps of at most 3 h from the last valid reading, then fills gaps of at most 48 h with the median of the same weekday and hour over the previous 8 weeks, using only earlier, originally valid readings. Longer gaps are quarantined as null. Suspected unit or level shifts are replaced by that profile value rather than divided by an inferred factor.
+
+Site weather (`weather.csv.gz`, 52632 rows for Eagle, Panther, Rat) is published on the same hourly grid as the meters. 6 duplicate source keys were averaged and 19 missing grid hours were materialized as null; the highest per-variable missing rate is 43.0% (cloud cover). Weather is never modified by the fault suites and is imputed downstream only inside training-fitted preprocessing.
+
+## Limitations
+
+- This is a local batch research prototype, not real-time or production-grade.
+- The code does not evaluate operational utility deployment, grid control,
+  production reliability, or economic impact.
+- Faults are synthetic stress tests and are not estimates of real-world fault
+  prevalence.
+- Detector thresholds and simple causal remediation are transparent baselines,
+  not an assertion of domain-optimal cleaning.
+- Raw BDG2 timestamps require the source-timezone caveat stated above.
+
+## Privacy and data boundary
+
+Only public dataset content, public site weather and reproducibility
+metadata are processed. No personal information is retained and nothing is
+transmitted.
+</pre><details><summary>Machine-readable summary</summary><pre>{
+  &quot;coverage&quot;: {
+    &quot;buildings&quot;: 12,
+    &quot;by_primary_use&quot;: {
+      &quot;Education&quot;: 105264,
+      &quot;Office&quot;: 105264
+    },
+    &quot;by_season&quot;: {
+      &quot;autumn&quot;: 52416,
+      &quot;spring&quot;: 52992,
+      &quot;summer&quot;: 52992,
+      &quot;winter&quot;: 52128
+    },
+    &quot;by_site&quot;: {
+      &quot;Eagle&quot;: 70176,
+      &quot;Panther&quot;: 70176,
+      &quot;Rat&quot;: 70176
+    },
+    &quot;by_timezone&quot;: {
+      &quot;US/Eastern&quot;: 210528
+    },
+    &quot;load_missing&quot;: 54,
+    &quot;rows&quot;: 210528,
+    &quot;timestamp_max&quot;: &quot;2017-12-31T23:00:00+00:00&quot;,
+    &quot;timestamp_min&quot;: &quot;2016-01-01T00:00:00+00:00&quot;
+  },
+  &quot;created_at_utc&quot;: &quot;2026-09-29T02:19:11Z&quot;,
+  &quot;dataset&quot;: {
+    &quot;doi&quot;: &quot;10.5281/zenodo.3887306&quot;,
+    &quot;title&quot;: &quot;Building Data Genome Project 2&quot;,
+    &quot;version&quot;: &quot;v1.0&quot;
+  },
+  &quot;detector_policy&quot;: {
+    &quot;calibration_artifact&quot;: &quot;detector_calibration.csv&quot;,
+    &quot;calibration_source&quot;: &quot;reference condition, strictly before the fault cutoff&quot;,
+    &quot;long_zero_threshold&quot;: 6,
+    &quot;profile_weeks&quot;: 8,
+    &quot;run_flagging&quot;: &quot;whole_run&quot;,
+    &quot;stuck_calibration_quantile&quot;: 0.999,
+    &quot;stuck_threshold_configured&quot;: 8,
+    &quot;zero_profile_min_ratio&quot;: 0.25
+  },
+  &quot;detector_validation&quot;: {
+    &quot;fault_records&quot;: 1664,
+    &quot;recall_by_type&quot;: {
+      &quot;duplicate_key&quot;: 1.0,
+      &quot;long_zero_block&quot;: 0.9833333333333333,
+      &quot;metadata_mismatch&quot;: 1.0,
+      &quot;missing_interval&quot;: 1.0,
+      &quot;missing_value&quot;: 1.0,
+      &quot;negative_value&quot;: 1.0,
+      &quot;positive_spike&quot;: 0.925,
+      &quot;stuck_segment&quot;: 0.68,
+      &quot;timestamp_shift&quot;: 1.0,
+      &quot;unit_scale_segment&quot;: 1.0
+    }
+  },
+  &quot;downstream_faults&quot;: {
+    &quot;fault_events&quot;: 855,
+    &quot;fault_records&quot;: 1660,
+    &quot;training_rows_before_cutoff&quot;: 105408
+  },
+  &quot;execution_scope&quot;: &quot;verified_bdg2_subset&quot;,
+  &quot;fault_cutoff&quot;: &quot;2017-01-01T00:00:00+00:00&quot;,
+  &quot;fault_events_per_type&quot;: {
+    &quot;long_zero_block&quot;: 60,
+    &quot;missing_value&quot;: 600,
+    &quot;negative_value&quot;: 100,
+    &quot;positive_spike&quot;: 40,
+    &quot;stuck_segment&quot;: 25,
+    &quot;unit_scale_segment&quot;: 30
+  },
+  &quot;privacy&quot;: {
+    &quot;analytics&quot;: false,
+    &quot;data_scope&quot;: &quot;public building-energy observations and reproducibility metadata only&quot;,
+    &quot;external_transmission&quot;: false,
+    &quot;mode&quot;: &quot;stateless&quot;
+  },
+  &quot;quality_gates&quot;: {
+    &quot;corrupted&quot;: {
+      &quot;affected_observations_sum&quot;: 17093,
+      &quot;check_results&quot;: [
+        {
+          &quot;count&quot;: 0,
+          &quot;denominator&quot;: 210528,
+          &quot;enforcement&quot;: &quot;hard_structural_count_greater_than_zero&quot;,
+          &quot;issue_code&quot;: &quot;TIMESTAMP_PARSE_ERROR&quot;,
+          &quot;rate&quot;: 0.0,
+          &quot;status&quot;: &quot;pass&quot;,
+          &quot;threshold&quot;: {
+            &quot;basis&quot;: &quot;count&quot;,
+            &quot;comparison&quot;: &quot;strictly_greater_than&quot;,
+            &quot;fail_above&quot;: 0.0,
+            &quot;warn_above&quot;: null
+          }
+        },
+        {
+          &quot;count&quot;: 0,
+          &quot;denominator&quot;: 210528,
+          &quot;enforcement&quot;: &quot;configurable_or_detector_default&quot;,
+          &quot;issue_code&quot;: &quot;TIMESTAMP_ORDER_ERROR&quot;,
+          &quot;rate&quot;: 0.0,
+          &quot;status&quot;: &quot;pass&quot;,
+          &quot;threshold&quot;: {
+            &quot;basis&quot;: &quot;count&quot;,
+            &quot;comparison&quot;: &quot;strictly_greater_than&quot;,
+            &quot;fail_above&quot;: 0.0,
+            &quot;warn_above&quot;: null
+          }
+        },
+        {
+          &quot;count&quot;: 0,
+          &quot;denominator&quot;: 210528,
+          &quot;enforcement&quot;: &quot;hard_structural_count_greater_than_zero&quot;,
+          &quot;issue_code&quot;: &quot;DUPLICATE_OBSERVATION_KEY&quot;,
+          &quot;rate&quot;: 0.0,
+          &quot;status&quot;: &quot;pass&quot;,
+          &quot;threshold&quot;: {
+            &quot;basis&quot;: &quot;count&quot;,
+            &quot;comparison&quot;: &quot;strictly_greater_than&quot;,
+            &quot;fail_above&quot;: 0.0,
+            &quot;warn_above&quot;: null
+          }
+        },
+        {
+          &quot;count&quot;: 654,
+          &quot;denominator&quot;: 210528,
+          &quot;enforcement&quot;: &quot;configurable_or_detector_default&quot;,
+          &quot;issue_code&quot;: &quot;LOAD_MISSING&quot;,
+          &quot;rate&quot;: 0.0031064751481988144,
+          &quot;status&quot;: &quot;warn&quot;,
+          &quot;threshold&quot;: {
+            &quot;basis&quot;: &quot;rate&quot;,
+            &quot;comparison&quot;: &quot;strictly_greater_than&quot;,
+            &quot;fail_above&quot;: 0.05,
+            &quot;warn_above&quot;: 0.0
+          }
+        },
+        {
+          &quot;count&quot;: 0,
+          &quot;denominator&quot;: 210528,
+          &quot;enforcement&quot;: &quot;configurable_or_detector_default&quot;,
+          &quot;issue_code&quot;: &quot;LOAD_INFINITE&quot;,
+          &quot;rate&quot;: 0.0,
+          &quot;status&quot;: &quot;pass&quot;,
+          &quot;threshold&quot;: {
+            &quot;basis&quot;: &quot;count&quot;,
+            &quot;comparison&quot;: &quot;strictly_greater_than&quot;,
+            &quot;fail_above&quot;: 0.0,
+            &quot;warn_above&quot;: null
+          }
+        },
+        {
+          &quot;count&quot;: 100,
+          &quot;denominator&quot;: 210528,
+          &quot;enforcement&quot;: &quot;configurable_or_detector_default&quot;,
+          &quot;issue_code&quot;: &quot;NEGATIVE_LOAD&quot;,
+          &quot;rate&quot;: 0.00047499620003039973,
+          &quot;status&quot;: &quot;fail&quot;,
+          &quot;threshold&quot;: {
+            &quot;basis&quot;: &quot;count&quot;,
+            &quot;comparison&quot;: &quot;strictly_greater_than&quot;,
+            &quot;fail_above&quot;: 0.0,
+            &quot;warn_above&quot;: null
+          }
+        },
+        {
+          &quot;count&quot;: 4304,
+          &quot;denominator&quot;: 210528,
+          &quot;enforcement&quot;: &quot;configurable_or_detector_default&quot;,
+          &quot;issue_code&quot;: &quot;ROBUST_OUTLIER&quot;,
+          &quot;rate&quot;: 0.020443836449308406,
+          &quot;status&quot;: &quot;warn&quot;,
+          &quot;threshold&quot;: {
+            &quot;basis&quot;: &quot;rate&quot;,
+            &quot;comparison&quot;: &quot;strictly_greater_than&quot;,
+            &quot;fail_above&quot;: 0.2,
+            &quot;warn_above&quot;: 0.01
+          }
+        },
+        {
+          &quot;count&quot;: 9801,
+          &quot;denominator&quot;: 210528,
+          &quot;enforcement&quot;: &quot;configurable_or_detector_default&quot;,
+          &quot;issue_code&quot;: &quot;LONG_ZERO_RUN&quot;,
+          &quot;rate&quot;: 0.04655437756497948,
+          &quot;status&quot;: &quot;warn&quot;,
+          &quot;threshold&quot;: {
+            &quot;basis&quot;: &quot;rate&quot;,
+            &quot;comparison&quot;: &quot;strictly_greater_than&quot;,
+            &quot;fail_above&quot;: 0.5,
+            &quot;warn_above&quot;: 0.01
+          }
+        },
+        {
+          &quot;count&quot;: 303,
+          &quot;denominator&quot;: 210528,
+          &quot;enforcement&quot;: &quot;configurable_or_detector_default&quot;,
+          &quot;issue_code&quot;: &quot;STUCK_SENSOR&quot;,
+          &quot;rate&quot;: 0.0014392384860921112,
+          &quot;status&quot;: &quot;pass&quot;,
+          &quot;threshold&quot;: {
+            &quot;basis&quot;: &quot;rate&quot;,
+            &quot;comparison&quot;: &quot;strictly_greater_than&quot;,
+            &quot;fail_above&quot;: 0.5,
+            &quot;warn_above&quot;: 0.01
+          }
+        },
+        {
+          &quot;count&quot;: 1931,
+          &quot;denominator&quot;: 210528,
+          &quot;enforcement&quot;: &quot;configurable_or_detector_default&quot;,
+          &quot;issue_code&quot;: &quot;LEVEL_OR_UNIT_SHIFT&quot;,
+          &quot;rate&quot;: 0.009172176622587019,
+          &quot;status&quot;: &quot;warn&quot;,
+          &quot;threshold&quot;: {
+            &quot;basis&quot;: &quot;rate&quot;,
+            &quot;comparison&quot;: &quot;strictly_greater_than&quot;,
+            &quot;fail_above&quot;: 0.1,
+            &quot;warn_above&quot;: 0.005
+          }
+        },
+        {
+          &quot;count&quot;: 0,
+          &quot;denominator&quot;: 210528,
+          &quot;enforcement&quot;: &quot;hard_structural_count_greater_than_zero&quot;,
+          &quot;issue_code&quot;: &quot;METADATA_JOIN_MISSING&quot;,
+          &quot;rate&quot;: 0.0,
+          &quot;status&quot;: &quot;pass&quot;,
+          &quot;threshold&quot;: {
+            &quot;basis&quot;: &quot;count&quot;,
+            &quot;comparison&quot;: &quot;strictly_greater_than&quot;,
+            &quot;fail_above&quot;: 0.0,
+            &quot;warn_above&quot;: null
+          }
+        },
+        {
+          &quot;count&quot;: 0,
+          &quot;denominator&quot;: 210528,
+          &quot;enforcement&quot;: &quot;configurable_or_detector_default&quot;,
+          &quot;issue_code&quot;: &quot;TIMEZONE_MISSING&quot;,
+          &quot;rate&quot;: 0.0,
+          &quot;status&quot;: &quot;pass&quot;,
+          &quot;threshold&quot;: {
+            &quot;basis&quot;: &quot;rate&quot;,
+            &quot;comparison&quot;: &quot;strictly_greater_than&quot;,
+            &quot;fail_above&quot;: 0.1,
+            &quot;warn_above&quot;: 0.0
+          }
+        },
+        {
+          &quot;count&quot;: 0,
+          &quot;denominator&quot;: 210528,
+          &quot;enforcement&quot;: &quot;configurable_or_detector_default&quot;,
+          &quot;issue_code&quot;: &quot;INTERVAL_CONTINUITY_GAP&quot;,
+          &quot;rate&quot;: 0.0,
+          &quot;status&quot;: &quot;pass&quot;,
+          &quot;threshold&quot;: {
+            &quot;basis&quot;: &quot;rate&quot;,
+            &quot;comparison&quot;: &quot;strictly_greater_than&quot;,
+            &quot;fail_above&quot;: 0.05,
+            &quot;warn_above&quot;: 0.0
+          }
+        },
+        {
+          &quot;count&quot;: 0,
+          &quot;denominator&quot;: 210528,
+          &quot;enforcement&quot;: &quot;configurable_or_detector_default&quot;,
+          &quot;issue_code&quot;: &quot;COVERAGE_RARE_GROUP&quot;,
+          &quot;rate&quot;: 0.0,
+          &quot;status&quot;: &quot;pass&quot;,
+          &quot;threshold&quot;: {
+            &quot;basis&quot;: &quot;rate&quot;,
+            &quot;comparison&quot;: &quot;strictly_greater_than&quot;,
+            &quot;fail_above&quot;: null,
+            &quot;warn_above&quot;: 0.0
+          }
+        },
+        {
+          &quot;count&quot;: 0,
+          &quot;denominator&quot;: 12,
+          &quot;enforcement&quot;: &quot;hard_structural_count_greater_than_zero&quot;,
+          &quot;issue_code&quot;: &quot;SUBGROUP_METADATA_INSTABILITY&quot;,
+          &quot;rate&quot;: 0.0,
+          &quot;status&quot;: &quot;pass&quot;,
+          &quot;threshold&quot;: {
+            &quot;basis&quot;: &quot;count&quot;,
+            &quot;comparison&quot;: &quot;strictly_greater_than&quot;,
+            &quot;fail_above&quot;: 0.0,
+            &quot;warn_above&quot;: null
+          }
+        }
+      ],
+      &quot;checks&quot;: 15,
+      &quot;hard_structural_failures&quot;: [],
+      &quot;status&quot;: &quot;fail&quot;,
+      &quot;status_counts&quot;: {
+        &quot;fail&quot;: 1,
+        &quot;pass&quot;: 10,
+        &quot;warn&quot;: 4
+      }
+    },
+    &quot;detector_validation&quot;: {
+      &quot;affected_observations_sum&quot;: 17048,
+      &quot;check_results&quot;: [
+        {
+          &quot;count&quot;: 0,
+          &quot;denominator&quot;: 210528,
+          &quot;enforcement&quot;: &quot;hard_structural_count_greater_than_zero&quot;,
+          &quot;issue_code&quot;: &quot;TIMESTAMP_PARSE_ERROR&quot;,
+          &quot;rate&quot;: 0.0,
+          &quot;status&quot;: &quot;pass&quot;,
+          &quot;threshold&quot;: {
+            &quot;basis&quot;: &quot;count&quot;,
+            &quot;comparison&quot;: &quot;strictly_greater_than&quot;,
+            &quot;fail_above&quot;: 0.0,
+            &quot;warn_above&quot;: null
+          }
+        },
+        {
+          &quot;count&quot;: 2,
+          &quot;denominator&quot;: 210528,
+          &quot;enforcement&quot;: &quot;configurable_or_detector_default&quot;,
+          &quot;issue_code&quot;: &quot;TIMESTAMP_ORDER_ERROR&quot;,
+          &quot;rate&quot;: 9.499924000607994e-06,
+          &quot;status&quot;: &quot;fail&quot;,
+          &quot;threshold&quot;: {
+            &quot;basis&quot;: &quot;count&quot;,
+            &quot;comparison&quot;: &quot;strictly_greater_than&quot;,
+            &quot;fail_above&quot;: 0.0,
+            &quot;warn_above&quot;: null
+          }
+        },
+        {
+          &quot;count&quot;: 4,
+          &quot;denominator&quot;: 210528,
+          &quot;enforcement&quot;: &quot;hard_structural_count_greater_than_zero&quot;,
+          &quot;issue_code&quot;: &quot;DUPLICATE_OBSERVATION_KEY&quot;,
+          &quot;rate&quot;: 1.899984800121599e-05,
+          &quot;status&quot;: &quot;fail&quot;,
+          &quot;threshold&quot;: {
+            &quot;basis&quot;: &quot;count&quot;,
+            &quot;comparison&quot;: &quot;hard_structural_count_greater_than_zero&quot;,
+            &quot;fail_above&quot;: 0.0,
+            &quot;warn_above&quot;: null
+          }
+        },
+        {
+          &quot;count&quot;: 654,
+          &quot;denominator&quot;: 210528,
+          &quot;enforcement&quot;: &quot;configurable_or_detector_default&quot;,
+          &quot;issue_code&quot;: &quot;LOAD_MISSING&quot;,
+          &quot;rate&quot;: 0.0031064751481988144,
+          &quot;status&quot;: &quot;warn&quot;,
+          &quot;threshold&quot;: {
+            &quot;basis&quot;: &quot;rate&quot;,
+            &quot;comparison&quot;: &quot;strictly_greater_than&quot;,
+            &quot;fail_above&quot;: 0.05,
+            &quot;warn_above&quot;: 0.0
+          }
+        },
+        {
+          &quot;count&quot;: 0,
+          &quot;denominator&quot;: 210528,
+          &quot;enforcement&quot;: &quot;configurable_or_detector_default&quot;,
+          &quot;issue_code&quot;: &quot;LOAD_INFINITE&quot;,
+          &quot;rate&quot;: 0.0,
+          &quot;status&quot;: &quot;pass&quot;,
+          &quot;threshold&quot;: {
+            &quot;basis&quot;: &quot;count&quot;,
+            &quot;comparison&quot;: &quot;strictly_greater_than&quot;,
+            &quot;fail_above&quot;: 0.0,
+            &quot;warn_above&quot;: null
+          }
+        },
+        {
+          &quot;count&quot;: 100,
+          &quot;denominator&quot;: 210528,
+          &quot;enforcement&quot;: &quot;configurable_or_detector_default&quot;,
+          &quot;issue_code&quot;: &quot;NEGATIVE_LOAD&quot;,
+          &quot;rate&quot;: 0.00047499620003039973,
+          &quot;status&quot;: &quot;fail&quot;,
+          &quot;threshold&quot;: {
+            &quot;basis&quot;: &quot;count&quot;,
+            &quot;comparison&quot;: &quot;strictly_greater_than&quot;,
+            &quot;fail_above&quot;: 0.0,
+            &quot;warn_above&quot;: null
+          }
+        },
+        {
+          &quot;count&quot;: 4326,
+          &quot;denominator&quot;: 210528,
+          &quot;enforcement&quot;: &quot;configurable_or_detector_default&quot;,
+          &quot;issue_code&quot;: &quot;ROBUST_OUTLIER&quot;,
+          &quot;rate&quot;: 0.020548335613315094,
+          &quot;status&quot;: &quot;warn&quot;,
+          &quot;threshold&quot;: {
+            &quot;basis&quot;: &quot;rate&quot;,
+            &quot;comparison&quot;: &quot;strictly_greater_than&quot;,
+            &quot;fail_above&quot;: 0.2,
+            &quot;warn_above&quot;: 0.01
+          }
+        },
+        {
+          &quot;count&quot;: 9603,
+          &quot;denominator&quot;: 210528,
+          &quot;enforcement&quot;: &quot;configurable_or_detector_default&quot;,
+          &quot;issue_code&quot;: &quot;LONG_ZERO_RUN&quot;,
+          &quot;rate&quot;: 0.04561388508891929,
+          &quot;status&quot;: &quot;warn&quot;,
+          &quot;threshold&quot;: {
+            &quot;basis&quot;: &quot;rate&quot;,
+            &quot;comparison&quot;: &quot;strictly_greater_than&quot;,
+            &quot;fail_above&quot;: 0.5,
+            &quot;warn_above&quot;: 0.01
+          }
+        },
+        {
+          &quot;count&quot;: 413,
+          &quot;denominator&quot;: 210528,
+          &quot;enforcement&quot;: &quot;configurable_or_detector_default&quot;,
+          &quot;issue_code&quot;: &quot;STUCK_SENSOR&quot;,
+          &quot;rate&quot;: 0.001961734306125551,
+          &quot;status&quot;: &quot;pass&quot;,
+          &quot;threshold&quot;: {
+            &quot;basis&quot;: &quot;rate&quot;,
+            &quot;comparison&quot;: &quot;strictly_greater_than&quot;,
+            &quot;fail_above&quot;: 0.5,
+            &quot;warn_above&quot;: 0.01
+          }
+        },
+        {
+          &quot;count&quot;: 1943,
+          &quot;denominator&quot;: 210528,
+          &quot;enforcement&quot;: &quot;configurable_or_detector_default&quot;,
+          &quot;issue_code&quot;: &quot;LEVEL_OR_UNIT_SHIFT&quot;,
+          &quot;rate&quot;: 0.009229176166590667,
+          &quot;status&quot;: &quot;warn&quot;,
+          &quot;threshold&quot;: {
+            &quot;basis&quot;: &quot;rate&quot;,
+            &quot;comparison&quot;: &quot;strictly_greater_than&quot;,
+            &quot;fail_above&quot;: 0.1,
+            &quot;warn_above&quot;: 0.005
+          }
+        },
+        {
+          &quot;count&quot;: 1,
+          &quot;denominator&quot;: 210528,
+          &quot;enforcement&quot;: &quot;hard_structural_count_greater_than_zero&quot;,
+          &quot;issue_code&quot;: &quot;METADATA_JOIN_MISSING&quot;,
+          &quot;rate&quot;: 4.749962000303997e-06,
+          &quot;status&quot;: &quot;fail&quot;,
+          &quot;threshold&quot;: {
+            &quot;basis&quot;: &quot;count&quot;,
+            &quot;comparison&quot;: &quot;hard_structural_count_greater_than_zero&quot;,
+            &quot;fail_above&quot;: 0.0,
+            &quot;warn_above&quot;: null
+          }
+        },
+        {
+          &quot;count&quot;: 0,
+          &quot;denominator&quot;: 210528,
+          &quot;enforcement&quot;: &quot;configurable_or_detector_default&quot;,
+          &quot;issue_code&quot;: &quot;TIMEZONE_MISSING&quot;,
+          &quot;rate&quot;: 0.0,
+          &quot;status&quot;: &quot;pass&quot;,
+          &quot;threshold&quot;: {
+            &quot;basis&quot;: &quot;rate&quot;,
+            &quot;comparison&quot;: &quot;strictly_greater_than&quot;,
+            &quot;fail_above&quot;: 0.1,
+            &quot;warn_above&quot;: 0.0
+          }
+        },
+        {
+          &quot;count&quot;: 2,
+          &quot;denominator&quot;: 210530,
+          &quot;enforcement&quot;: &quot;configurable_or_detector_default&quot;,
+          &quot;issue_code&quot;: &quot;INTERVAL_CONTINUITY_GAP&quot;,
+          &quot;rate&quot;: 9.499833752909323e-06,
+          &quot;status&quot;: &quot;warn&quot;,
+          &quot;threshold&quot;: {
+            &quot;basis&quot;: &quot;rate&quot;,
+            &quot;comparison&quot;: &quot;strictly_greater_than&quot;,
+            &quot;fail_above&quot;: 0.05,
+            &quot;warn_above&quot;: 0.0
+          }
+        },
+        {
+          &quot;count&quot;: 0,
+          &quot;denominator&quot;: 210528,
+          &quot;enforcement&quot;: &quot;configurable_or_detector_default&quot;,
+          &quot;issue_code&quot;: &quot;COVERAGE_RARE_GROUP&quot;,
+          &quot;rate&quot;: 0.0,
+          &quot;status&quot;: &quot;pass&quot;,
+          &quot;threshold&quot;: {
+            &quot;basis&quot;: &quot;rate&quot;,
+            &quot;comparison&quot;: &quot;strictly_greater_than&quot;,
+            &quot;fail_above&quot;: null,
+            &quot;warn_above&quot;: 0.0
+          }
+        },
+        {
+          &quot;count&quot;: 0,
+          &quot;denominator&quot;: 12,
+          &quot;enforcement&quot;: &quot;hard_structural_count_greater_than_zero&quot;,
+          &quot;issue_code&quot;: &quot;SUBGROUP_METADATA_INSTABILITY&quot;,
+          &quot;rate&quot;: 0.0,
+          &quot;status&quot;: &quot;pass&quot;,
+          &quot;threshold&quot;: {
+            &quot;basis&quot;: &quot;count&quot;,
+            &quot;comparison&quot;: &quot;strictly_greater_than&quot;,
+            &quot;fail_above&quot;: 0.0,
+            &quot;warn_above&quot;: null
+          }
+        }
+      ],
+      &quot;checks&quot;: 15,
+      &quot;hard_structural_failures&quot;: [
+        &quot;DUPLICATE_OBSERVATION_KEY&quot;,
+        &quot;METADATA_JOIN_MISSING&quot;
+      ],
+      &quot;status&quot;: &quot;fail&quot;,
+      &quot;status_counts&quot;: {
+        &quot;fail&quot;: 4,
+        &quot;pass&quot;: 6,
+        &quot;warn&quot;: 5
+      }
+    },
+    &quot;reference&quot;: {
+      &quot;affected_observations_sum&quot;: 20320,
+      &quot;check_results&quot;: [
+        {
+          &quot;count&quot;: 0,
+          &quot;denominator&quot;: 210528,
+          &quot;enforcement&quot;: &quot;hard_structural_count_greater_than_zero&quot;,
+          &quot;issue_code&quot;: &quot;TIMESTAMP_PARSE_ERROR&quot;,
+          &quot;rate&quot;: 0.0,
+          &quot;status&quot;: &quot;pass&quot;,
+          &quot;threshold&quot;: {
+            &quot;basis&quot;: &quot;count&quot;,
+            &quot;comparison&quot;: &quot;strictly_greater_than&quot;,
+            &quot;fail_above&quot;: 0.0,
+            &quot;warn_above&quot;: null
+          }
+        },
+        {
+          &quot;count&quot;: 0,
+          &quot;denominator&quot;: 210528,
+          &quot;enforcement&quot;: &quot;configurable_or_detector_default&quot;,
+          &quot;issue_code&quot;: &quot;TIMESTAMP_ORDER_ERROR&quot;,
+          &quot;rate&quot;: 0.0,
+          &quot;status&quot;: &quot;pass&quot;,
+          &quot;threshold&quot;: {
+            &quot;basis&quot;: &quot;count&quot;,
+            &quot;comparison&quot;: &quot;strictly_greater_than&quot;,
+            &quot;fail_above&quot;: 0.0,
+            &quot;warn_above&quot;: null
+          }
+        },
+        {
+          &quot;count&quot;: 0,
+          &quot;denominator&quot;: 210528,
+          &quot;enforcement&quot;: &quot;hard_structural_count_greater_than_zero&quot;,
+          &quot;issue_code&quot;: &quot;DUPLICATE_OBSERVATION_KEY&quot;,
+          &quot;rate&quot;: 0.0,
+          &quot;status&quot;: &quot;pass&quot;,
+          &quot;threshold&quot;: {
+            &quot;basis&quot;: &quot;count&quot;,
+            &quot;comparison&quot;: &quot;strictly_greater_than&quot;,
+            &quot;fail_above&quot;: 0.0,
+            &quot;warn_above&quot;: null
+          }
+        },
+        {
+          &quot;count&quot;: 54,
+          &quot;denominator&quot;: 210528,
+          &quot;enforcement&quot;: &quot;configurable_or_detector_default&quot;,
+          &quot;issue_code&quot;: &quot;LOAD_MISSING&quot;,
+          &quot;rate&quot;: 0.00025649794801641587,
+          &quot;status&quot;: &quot;warn&quot;,
+          &quot;threshold&quot;: {
+            &quot;basis&quot;: &quot;rate&quot;,
+            &quot;comparison&quot;: &quot;strictly_greater_than&quot;,
+            &quot;fail_above&quot;: 0.05,
+            &quot;warn_above&quot;: 0.0
+          }
+        },
+        {
+          &quot;count&quot;: 0,
+          &quot;denominator&quot;: 210528,
+          &quot;enforcement&quot;: &quot;configurable_or_detector_default&quot;,
+          &quot;issue_code&quot;: &quot;LOAD_INFINITE&quot;,
+          &quot;rate&quot;: 0.0,
+          &quot;status&quot;: &quot;pass&quot;,
+          &quot;threshold&quot;: {
+            &quot;basis&quot;: &quot;count&quot;,
+            &quot;comparison&quot;: &quot;strictly_greater_than&quot;,
+            &quot;fail_above&quot;: 0.0,
+            &quot;warn_above&quot;: null
+          }
+        },
+        {
+          &quot;count&quot;: 0,
+          &quot;denominator&quot;: 210528,
+          &quot;enforcement&quot;: &quot;configurable_or_detector_default&quot;,
+          &quot;issue_code&quot;: &quot;NEGATIVE_LOAD&quot;,
+          &quot;rate&quot;: 0.0,
+          &quot;status&quot;: &quot;pass&quot;,
+          &quot;threshold&quot;: {
+            &quot;basis&quot;: &quot;count&quot;,
+            &quot;comparison&quot;: &quot;strictly_greater_than&quot;,
+            &quot;fail_above&quot;: 0.0,
+            &quot;warn_above&quot;: null
+          }
+        },
+        {
+          &quot;count&quot;: 3525,
+          &quot;denominator&quot;: 210528,
+          &quot;enforcement&quot;: &quot;configurable_or_detector_default&quot;,
+          &quot;issue_code&quot;: &quot;ROBUST_OUTLIER&quot;,
+          &quot;rate&quot;: 0.01674361605107159,
+          &quot;status&quot;: &quot;warn&quot;,
+          &quot;threshold&quot;: {
+            &quot;basis&quot;: &quot;rate&quot;,
+            &quot;comparison&quot;: &quot;strictly_greater_than&quot;,
+            &quot;fail_above&quot;: 0.2,
+            &quot;warn_above&quot;: 0.01
+          }
+        },
+        {
+          &quot;count&quot;: 13974,
+          &quot;denominator&quot;: 210528,
+          &quot;enforcement&quot;: &quot;configurable_or_detector_default&quot;,
+          &quot;issue_code&quot;: &quot;LONG_ZERO_RUN&quot;,
+          &quot;rate&quot;: 0.06637596899224807,
+          &quot;status&quot;: &quot;warn&quot;,
+          &quot;threshold&quot;: {
+            &quot;basis&quot;: &quot;rate&quot;,
+            &quot;comparison&quot;: &quot;strictly_greater_than&quot;,
+            &quot;fail_above&quot;: 0.5,
+            &quot;warn_above&quot;: 0.01
+          }
+        },
+        {
+          &quot;count&quot;: 1657,
+          &quot;denominator&quot;: 210528,
+          &quot;enforcement&quot;: &quot;configurable_or_detector_default&quot;,
+          &quot;issue_code&quot;: &quot;STUCK_SENSOR&quot;,
+          &quot;rate&quot;: 0.007870687034503724,
+          &quot;status&quot;: &quot;pass&quot;,
+          &quot;threshold&quot;: {
+            &quot;basis&quot;: &quot;rate&quot;,
+            &quot;comparison&quot;: &quot;strictly_greater_than&quot;,
+            &quot;fail_above&quot;: 0.5,
+            &quot;warn_above&quot;: 0.01
+          }
+        },
+        {
+          &quot;count&quot;: 1110,
+          &quot;denominator&quot;: 210528,
+          &quot;enforcement&quot;: &quot;configurable_or_detector_default&quot;,
+          &quot;issue_code&quot;: &quot;LEVEL_OR_UNIT_SHIFT&quot;,
+          &quot;rate&quot;: 0.005272457820337437,
+          &quot;status&quot;: &quot;warn&quot;,
+          &quot;threshold&quot;: {
+            &quot;basis&quot;: &quot;rate&quot;,
+            &quot;comparison&quot;: &quot;strictly_greater_than&quot;,
+            &quot;fail_above&quot;: 0.1,
+            &quot;warn_above&quot;: 0.005
+          }
+        },
+        {
+          &quot;count&quot;: 0,
+          &quot;denominator&quot;: 210528,
+          &quot;enforcement&quot;: &quot;hard_structural_count_greater_than_zero&quot;,
+          &quot;issue_code&quot;: &quot;METADATA_JOIN_MISSING&quot;,
+          &quot;rate&quot;: 0.0,
+          &quot;status&quot;: &quot;pass&quot;,
+          &quot;threshold&quot;: {
+            &quot;basis&quot;: &quot;count&quot;,
+            &quot;comparison&quot;: &quot;strictly_greater_than&quot;,
+            &quot;fail_above&quot;: 0.0,
+            &quot;warn_above&quot;: null
+          }
+        },
+        {
+          &quot;count&quot;: 0,
+          &quot;denominator&quot;: 210528,
+          &quot;enforcement&quot;: &quot;configurable_or_detector_default&quot;,
+          &quot;issue_code&quot;: &quot;TIMEZONE_MISSING&quot;,
+          &quot;rate&quot;: 0.0,
+          &quot;status&quot;: &quot;pass&quot;,
+          &quot;threshold&quot;: {
+            &quot;basis&quot;: &quot;rate&quot;,
+            &quot;comparison&quot;: &quot;strictly_greater_than&quot;,
+            &quot;fail_above&quot;: 0.1,
+            &quot;warn_above&quot;: 0.0
+          }
+        },
+        {
+          &quot;count&quot;: 0,
+          &quot;denominator&quot;: 210528,
+          &quot;enforcement&quot;: &quot;configurable_or_detector_default&quot;,
+          &quot;issue_code&quot;: &quot;INTERVAL_CONTINUITY_GAP&quot;,
+          &quot;rate&quot;: 0.0,
+          &quot;status&quot;: &quot;pass&quot;,
+          &quot;threshold&quot;: {
+            &quot;basis&quot;: &quot;rate&quot;,
+            &quot;comparison&quot;: &quot;strictly_greater_than&quot;,
+            &quot;fail_above&quot;: 0.05,
+            &quot;warn_above&quot;: 0.0
+          }
+        },
+        {
+          &quot;count&quot;: 0,
+          &quot;denominator&quot;: 210528,
+          &quot;enforcement&quot;: &quot;configurable_or_detector_default&quot;,
+          &quot;issue_code&quot;: &quot;COVERAGE_RARE_GROUP&quot;,
+          &quot;rate&quot;: 0.0,
+          &quot;status&quot;: &quot;pass&quot;,
+          &quot;threshold&quot;: {
+            &quot;basis&quot;: &quot;rate&quot;,
+            &quot;comparison&quot;: &quot;strictly_greater_than&quot;,
+            &quot;fail_above&quot;: null,
+            &quot;warn_above&quot;: 0.0
+          }
+        },
+        {
+          &quot;count&quot;: 0,
+          &quot;denominator&quot;: 12,
+          &quot;enforcement&quot;: &quot;hard_structural_count_greater_than_zero&quot;,
+          &quot;issue_code&quot;: &quot;SUBGROUP_METADATA_INSTABILITY&quot;,
+          &quot;rate&quot;: 0.0,
+          &quot;status&quot;: &quot;pass&quot;,
+          &quot;threshold&quot;: {
+            &quot;basis&quot;: &quot;count&quot;,
+            &quot;comparison&quot;: &quot;strictly_greater_than&quot;,
+            &quot;fail_above&quot;: 0.0,
+            &quot;warn_above&quot;: null
+          }
+        },
+        {
+          &quot;count&quot;: 0,
+          &quot;denominator&quot;: 12,
+          &quot;enforcement&quot;: &quot;hard_structural_count_greater_than_zero&quot;,
+          &quot;issue_code&quot;: &quot;SPLIT_BUILDING_COVERAGE&quot;,
+          &quot;rate&quot;: 0.0,
+          &quot;status&quot;: &quot;pass&quot;,
+          &quot;threshold&quot;: {
+            &quot;basis&quot;: &quot;count&quot;,
+            &quot;comparison&quot;: &quot;strictly_greater_than&quot;,
+            &quot;fail_above&quot;: 0.0,
+            &quot;warn_above&quot;: null
+          }
+        },
+        {
+          &quot;count&quot;: 0,
+          &quot;denominator&quot;: 6,
+          &quot;enforcement&quot;: &quot;configurable_or_detector_default&quot;,
+          &quot;issue_code&quot;: &quot;SUBGROUP_SPLIT_COVERAGE&quot;,
+          &quot;rate&quot;: 0.0,
+          &quot;status&quot;: &quot;pass&quot;,
+          &quot;threshold&quot;: {
+            &quot;basis&quot;: &quot;rate&quot;,
+            &quot;comparison&quot;: &quot;strictly_greater_than&quot;,
+            &quot;fail_above&quot;: 0.25,
+            &quot;warn_above&quot;: 0.0
+          }
+        },
+        {
+          &quot;count&quot;: 0,
+          &quot;denominator&quot;: 12,
+          &quot;enforcement&quot;: &quot;hard_structural_count_greater_than_zero&quot;,
+          &quot;issue_code&quot;: &quot;METADATA_DUPLICATE_KEY&quot;,
+          &quot;rate&quot;: 0.0,
+          &quot;status&quot;: &quot;pass&quot;,
+          &quot;threshold&quot;: {
+            &quot;basis&quot;: &quot;count&quot;,
+            &quot;comparison&quot;: &quot;strictly_greater_than&quot;,
+            &quot;fail_above&quot;: 0.0,
+            &quot;warn_above&quot;: null
+          }
+        },
+        {
+          &quot;count&quot;: 0,
+          &quot;denominator&quot;: 12,
+          &quot;enforcement&quot;: &quot;hard_structural_count_greater_than_zero&quot;,
+          &quot;issue_code&quot;: &quot;METADATA_MISSING_KEY&quot;,
+          &quot;rate&quot;: 0.0,
+          &quot;status&quot;: &quot;pass&quot;,
+          &quot;threshold&quot;: {
+            &quot;basis&quot;: &quot;count&quot;,
+            &quot;comparison&quot;: &quot;strictly_greater_than&quot;,
+            &quot;fail_above&quot;: 0.0,
+            &quot;warn_above&quot;: null
+          }
+        },
+        {
+          &quot;count&quot;: 0,
+          &quot;denominator&quot;: 12,
+          &quot;enforcement&quot;: &quot;configurable_or_detector_default&quot;,
+          &quot;issue_code&quot;: &quot;METADATA_REQUIRED_VALUE_MISSING&quot;,
+          &quot;rate&quot;: 0.0,
+          &quot;status&quot;: &quot;pass&quot;,
+          &quot;threshold&quot;: {
+            &quot;basis&quot;: &quot;rate&quot;,
+            &quot;comparison&quot;: &quot;strictly_greater_than&quot;,
+            &quot;fail_above&quot;: 0.1,
+            &quot;warn_above&quot;: 0.0
+          }
+        }
+      ],
+      &quot;checks&quot;: 20,
+      &quot;hard_structural_failures&quot;: [],
+      &quot;status&quot;: &quot;warn&quot;,
+      &quot;status_counts&quot;: {
+        &quot;fail&quot;: 0,
+        &quot;pass&quot;: 16,
+        &quot;warn&quot;: 4
+      }
+    },
+    &quot;remediated&quot;: {
+      &quot;affected_observations_sum&quot;: 18371,
+      &quot;check_results&quot;: [
+        {
+          &quot;count&quot;: 0,
+          &quot;denominator&quot;: 210528,
+          &quot;enforcement&quot;: &quot;hard_structural_count_greater_than_zero&quot;,
+          &quot;issue_code&quot;: &quot;TIMESTAMP_PARSE_ERROR&quot;,
+          &quot;rate&quot;: 0.0,
+          &quot;status&quot;: &quot;pass&quot;,
+          &quot;threshold&quot;: {
+            &quot;basis&quot;: &quot;count&quot;,
+            &quot;comparison&quot;: &quot;strictly_greater_than&quot;,
+            &quot;fail_above&quot;: 0.0,
+            &quot;warn_above&quot;: null
+          }
+        },
+        {
+          &quot;count&quot;: 0,
+          &quot;denominator&quot;: 210528,
+          &quot;enforcement&quot;: &quot;configurable_or_detector_default&quot;,
+          &quot;issue_code&quot;: &quot;TIMESTAMP_ORDER_ERROR&quot;,
+          &quot;rate&quot;: 0.0,
+          &quot;status&quot;: &quot;pass&quot;,
+          &quot;threshold&quot;: {
+            &quot;basis&quot;: &quot;count&quot;,
+            &quot;comparison&quot;: &quot;strictly_greater_than&quot;,
+            &quot;fail_above&quot;: 0.0,
+            &quot;warn_above&quot;: null
+          }
+        },
+        {
+          &quot;count&quot;: 0,
+          &quot;denominator&quot;: 210528,
+          &quot;enforcement&quot;: &quot;hard_structural_count_greater_than_zero&quot;,
+          &quot;issue_code&quot;: &quot;DUPLICATE_OBSERVATION_KEY&quot;,
+          &quot;rate&quot;: 0.0,
+          &quot;status&quot;: &quot;pass&quot;,
+          &quot;threshold&quot;: {
+            &quot;basis&quot;: &quot;count&quot;,
+            &quot;comparison&quot;: &quot;strictly_greater_than&quot;,
+            &quot;fail_above&quot;: 0.0,
+            &quot;warn_above&quot;: null
+          }
+        },
+        {
+          &quot;count&quot;: 4464,
+          &quot;denominator&quot;: 210528,
+          &quot;enforcement&quot;: &quot;configurable_or_detector_default&quot;,
+          &quot;issue_code&quot;: &quot;LOAD_MISSING&quot;,
+          &quot;rate&quot;: 0.021203830369357045,
+          &quot;status&quot;: &quot;warn&quot;,
+          &quot;threshold&quot;: {
+            &quot;basis&quot;: &quot;rate&quot;,
+            &quot;comparison&quot;: &quot;strictly_greater_than&quot;,
+            &quot;fail_above&quot;: 0.05,
+            &quot;warn_above&quot;: 0.0
+          }
+        },
+        {
+          &quot;count&quot;: 0,
+          &quot;denominator&quot;: 210528,
+          &quot;enforcement&quot;: &quot;configurable_or_detector_default&quot;,
+          &quot;issue_code&quot;: &quot;LOAD_INFINITE&quot;,
+          &quot;rate&quot;: 0.0,
+          &quot;status&quot;: &quot;pass&quot;,
+          &quot;threshold&quot;: {
+            &quot;basis&quot;: &quot;count&quot;,
+            &quot;comparison&quot;: &quot;strictly_greater_than&quot;,
+            &quot;fail_above&quot;: 0.0,
+            &quot;warn_above&quot;: null
+          }
+        },
+        {
+          &quot;count&quot;: 0,
+          &quot;denominator&quot;: 210528,
+          &quot;enforcement&quot;: &quot;configurable_or_detector_default&quot;,
+          &quot;issue_code&quot;: &quot;NEGATIVE_LOAD&quot;,
+          &quot;rate&quot;: 0.0,
+          &quot;status&quot;: &quot;pass&quot;,
+          &quot;threshold&quot;: {
+            &quot;basis&quot;: &quot;count&quot;,
+            &quot;comparison&quot;: &quot;strictly_greater_than&quot;,
+            &quot;fail_above&quot;: 0.0,
+            &quot;warn_above&quot;: null
+          }
+        },
+        {
+          &quot;count&quot;: 2069,
+          &quot;denominator&quot;: 210528,
+          &quot;enforcement&quot;: &quot;configurable_or_detector_default&quot;,
+          &quot;issue_code&quot;: &quot;ROBUST_OUTLIER&quot;,
+          &quot;rate&quot;: 0.009827671378628972,
+          &quot;status&quot;: &quot;pass&quot;,
+          &quot;threshold&quot;: {
+            &quot;basis&quot;: &quot;rate&quot;,
+            &quot;comparison&quot;: &quot;strictly_greater_than&quot;,
+            &quot;fail_above&quot;: 0.2,
+            &quot;warn_above&quot;: 0.01
+          }
+        },
+        {
+          &quot;count&quot;: 10978,
+          &quot;denominator&quot;: 210528,
+          &quot;enforcement&quot;: &quot;configurable_or_detector_default&quot;,
+          &quot;issue_code&quot;: &quot;LONG_ZERO_RUN&quot;,
+          &quot;rate&quot;: 0.05214508283933728,
+          &quot;status&quot;: &quot;warn&quot;,
+          &quot;threshold&quot;: {
+            &quot;basis&quot;: &quot;rate&quot;,
+            &quot;comparison&quot;: &quot;strictly_greater_than&quot;,
+            &quot;fail_above&quot;: 0.5,
+            &quot;warn_above&quot;: 0.01
+          }
+        },
+        {
+          &quot;count&quot;: 137,
+          &quot;denominator&quot;: 210528,
+          &quot;enforcement&quot;: &quot;configurable_or_detector_default&quot;,
+          &quot;issue_code&quot;: &quot;STUCK_SENSOR&quot;,
+          &quot;rate&quot;: 0.0006507447940416476,
+          &quot;status&quot;: &quot;pass&quot;,
+          &quot;threshold&quot;: {
+            &quot;basis&quot;: &quot;rate&quot;,
+            &quot;comparison&quot;: &quot;strictly_greater_than&quot;,
+            &quot;fail_above&quot;: 0.5,
+            &quot;warn_above&quot;: 0.01
+          }
+        },
+        {
+          &quot;count&quot;: 723,
+          &quot;denominator&quot;: 210528,
+          &quot;enforcement&quot;: &quot;configurable_or_detector_default&quot;,
+          &quot;issue_code&quot;: &quot;LEVEL_OR_UNIT_SHIFT&quot;,
+          &quot;rate&quot;: 0.00343422252621979,
+          &quot;status&quot;: &quot;pass&quot;,
+          &quot;threshold&quot;: {
+            &quot;basis&quot;: &quot;rate&quot;,
+            &quot;comparison&quot;: &quot;strictly_greater_than&quot;,
+            &quot;fail_above&quot;: 0.1,
+            &quot;warn_above&quot;: 0.005
+          }
+        },
+        {
+          &quot;count&quot;: 0,
+          &quot;denominator&quot;: 210528,
+          &quot;enforcement&quot;: &quot;hard_structural_count_greater_than_zero&quot;,
+          &quot;issue_code&quot;: &quot;METADATA_JOIN_MISSING&quot;,
+          &quot;rate&quot;: 0.0,
+          &quot;status&quot;: &quot;pass&quot;,
+          &quot;threshold&quot;: {
+            &quot;basis&quot;: &quot;count&quot;,
+            &quot;comparison&quot;: &quot;strictly_greater_than&quot;,
+            &quot;fail_above&quot;: 0.0,
+            &quot;warn_above&quot;: null
+          }
+        },
+        {
+          &quot;count&quot;: 0,
+          &quot;denominator&quot;: 210528,
+          &quot;enforcement&quot;: &quot;configurable_or_detector_default&quot;,
+          &quot;issue_code&quot;: &quot;TIMEZONE_MISSING&quot;,
+          &quot;rate&quot;: 0.0,
+          &quot;status&quot;: &quot;pass&quot;,
+          &quot;threshold&quot;: {
+            &quot;basis&quot;: &quot;rate&quot;,
+            &quot;comparison&quot;: &quot;strictly_greater_than&quot;,
+            &quot;fail_above&quot;: 0.1,
+            &quot;warn_above&quot;: 0.0
+          }
+        },
+        {
+          &quot;count&quot;: 0,
+          &quot;denominator&quot;: 210528,
+          &quot;enforcement&quot;: &quot;configurable_or_detector_default&quot;,
+          &quot;issue_code&quot;: &quot;INTERVAL_CONTINUITY_GAP&quot;,
+          &quot;rate&quot;: 0.0,
+          &quot;status&quot;: &quot;pass&quot;,
+          &quot;threshold&quot;: {
+            &quot;basis&quot;: &quot;rate&quot;,
+            &quot;comparison&quot;: &quot;strictly_greater_than&quot;,
+            &quot;fail_above&quot;: 0.05,
+            &quot;warn_above&quot;: 0.0
+          }
+        },
+        {
+          &quot;count&quot;: 0,
+          &quot;denominator&quot;: 210528,
+          &quot;enforcement&quot;: &quot;configurable_or_detector_default&quot;,
+          &quot;issue_code&quot;: &quot;COVERAGE_RARE_GROUP&quot;,
+          &quot;rate&quot;: 0.0,
+          &quot;status&quot;: &quot;pass&quot;,
+          &quot;threshold&quot;: {
+            &quot;basis&quot;: &quot;rate&quot;,
+            &quot;comparison&quot;: &quot;strictly_greater_than&quot;,
+            &quot;fail_above&quot;: null,
+            &quot;warn_above&quot;: 0.0
+          }
+        },
+        {
+          &quot;count&quot;: 0,
+          &quot;denominator&quot;: 12,
+          &quot;enforcement&quot;: &quot;hard_structural_count_greater_than_zero&quot;,
+          &quot;issue_code&quot;: &quot;SUBGROUP_METADATA_INSTABILITY&quot;,
+          &quot;rate&quot;: 0.0,
+          &quot;status&quot;: &quot;pass&quot;,
+          &quot;threshold&quot;: {
+            &quot;basis&quot;: &quot;count&quot;,
+            &quot;comparison&quot;: &quot;strictly_greater_than&quot;,
+            &quot;fail_above&quot;: 0.0,
+            &quot;warn_above&quot;: null
+          }
+        }
+      ],
+      &quot;checks&quot;: 15,
+      &quot;hard_structural_failures&quot;: [],
+      &quot;status&quot;: &quot;warn&quot;,
+      &quot;status_counts&quot;: {
+        &quot;fail&quot;: 0,
+        &quot;pass&quot;: 13,
+        &quot;warn&quot;: 2
+      }
+    }
+  },
+  &quot;quarantine&quot;: {
+    &quot;rows&quot;: 4418
+  },
+  &quot;remediation&quot;: {
+    &quot;log_rows&quot;: 7433,
+    &quot;quarantined_rows&quot;: 4418,
+    &quot;repaired_rows&quot;: 3015
+  },
+  &quot;remediation_policy&quot;: {
+    &quot;backward_fill_or_interpolation&quot;: false,
+    &quot;future_values_used&quot;: false,
+    &quot;maximum_forward_fill_hours&quot;: 3,
+    &quot;maximum_profile_fill_hours&quot;: 48,
+    &quot;profile_fill_ambiguous_scale&quot;: true,
+    &quot;profile_weeks&quot;: 8,
+    &quot;repair_strategy&quot;: &quot;forward_then_profile&quot;,
+    &quot;unit_scale_division&quot;: false
+  },
+  &quot;schema_version&quot;: &quot;1.0&quot;,
+  &quot;timestamp_semantics&quot;: &quot;BDG2 raw meter timestamps are source-local wall-clock readings. For this prototype they are represented with a UTC marker for stable parsing without performing an offset conversion. The committed subset is restricted to sites with the same source timezone (US/Eastern). This must not be described as cross-timezone UTC harmonization; DST interpretation remains a limitation.&quot;,
+  &quot;timestamp_semantics_machine&quot;: {
+    &quot;basis&quot;: &quot;source_local_wall_clock&quot;,
+    &quot;canonical_marker&quot;: &quot;UTC&quot;,
+    &quot;dst_disambiguated&quot;: false,
+    &quot;offset_conversion_applied&quot;: false
+  },
+  &quot;weather&quot;: {
+    &quot;duplicate_keys_averaged&quot;: 6,
+    &quot;grid_end&quot;: &quot;2017-12-31T23:00:00+00:00&quot;,
+    &quot;grid_hours_materialized_as_null&quot;: 19,
+    &quot;grid_start&quot;: &quot;2016-01-01T00:00:00+00:00&quot;,
+    &quot;missing_rate_by_site&quot;: {
+      &quot;Eagle&quot;: {
+        &quot;air_temperature&quot;: 0.0007409940720474236,
+        &quot;cloud_coverage&quot;: 0.3999658002735978,
+        &quot;dew_temperature&quot;: 0.0007409940720474236,
+        &quot;precip_depth_1hr&quot;: 0.006041951664386685,
+        &quot;sea_lvl_pressure&quot;: 0.01236890104879161,
+        &quot;wind_speed&quot;: 0.0027359781121751026
+      },
+      &quot;Panther&quot;: {
+        &quot;air_temperature&quot;: 0.00028499772001823985,
+        &quot;cloud_coverage&quot;: 0.42994756041951665,
+        &quot;dew_temperature&quot;: 0.00028499772001823985,
+        &quot;precip_depth_1hr&quot;: 0.0006269949840401277,
+        &quot;sea_lvl_pressure&quot;: 0.018524851801185592,
+        &quot;wind_speed&quot;: 0.00011399908800729594
+      },
+      &quot;Rat&quot;: {
+        &quot;air_temperature&quot;: 0.0007409940720474236,
+        &quot;cloud_coverage&quot;: 0.4276675786593707,
+        &quot;dew_temperature&quot;: 0.0009119927040583675,
+        &quot;precip_depth_1hr&quot;: 0.0031919744642042863,
+        &quot;sea_lvl_pressure&quot;: 0.01749886000911993,
+        &quot;wind_speed&quot;: 0.0010259917920656635
+      }
+    },
+    &quot;policy&quot;: &quot;condition-independent; not touched by fault suites; nulls preserved; downstream imputation is fitted on the training partition only&quot;,
+    &quot;rows&quot;: 52632,
+    &quot;sites&quot;: [
+      &quot;Eagle&quot;,
+      &quot;Panther&quot;,
+      &quot;Rat&quot;
+    ],
+    &quot;source_rows_for_selected_sites&quot;: 52619,
+    &quot;unparseable_timestamps_in_source&quot;: 0,
+    &quot;variables&quot;: [
+      &quot;air_temperature&quot;,
+      &quot;dew_temperature&quot;,
+      &quot;wind_speed&quot;,
+      &quot;cloud_coverage&quot;,
+      &quot;precip_depth_1hr&quot;,
+      &quot;sea_lvl_pressure&quot;
+    ]
+  }
+}</pre></details></body></html>

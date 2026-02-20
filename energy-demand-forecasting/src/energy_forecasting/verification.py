@@ -272,7 +272,7 @@ def verify_input_bundle(
     producer_manifest_path: str | Path,
     fault_manifest_path: str | Path,
 ) -> VerifiedInputs:
-    """Verify Repo A's complete cross-repository contract and fail closed."""
+    """Verify the onboarding package's complete producer contract and fail closed."""
     paths = {
         "reference": Path(reference_path),
         "corrupted": Path(corrupted_path),
@@ -502,7 +502,7 @@ def verify_result_source_binding(
     *,
     target_timestamp_column: str,
 ) -> dict[str, Any]:
-    """Bind a result bundle back to one independently verified Repo A bundle.
+    """Bind a result bundle back to one independently verified onboarding bundle.
 
     Internal result hashes can show that a bundle is self-consistent, but they
     cannot establish which producer inputs supplied its targets and reference

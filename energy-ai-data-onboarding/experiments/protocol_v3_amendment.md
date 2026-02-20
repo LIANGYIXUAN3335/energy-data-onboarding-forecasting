@@ -60,6 +60,16 @@ segments, on Eagle_office_Bridgett and Eagle_education_April (16 of 108
 seeded rows), pass through detection and remediation unrepaired into the
 remediated training data. This is reported, not tuned away.
 
+## Literature-calibrated prevalence run (same date)
+
+`configs/bdg2_v3_dense.json` keeps every v3 policy and raises the seeded
+event counts to 855 events on 1,660 training rows (1.6%), calibrated to the
+lower end of published defect rates (see `docs/fault_prevalence.md`).
+Published as `results/bdg2_v3_dense` and consumed by
+`energy-demand-forecasting/results/canonical_24h_v3_dense`. Detector recall
+at this density: missing 1.00, negative 1.00, unit-scale 1.00, zero blocks
+0.98, spikes 0.93, stuck 0.68.
+
 ## Post-review fix (same date)
 
 Independent review of the first v3 run found that the hour-of-week exemption

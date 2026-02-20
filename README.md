@@ -26,6 +26,19 @@ artifacts; see [Why you can trust the numbers](#why-you-can-trust-the-numbers).
 
 ---
 
+## About this project
+
+Independent research by Yixuan Liang (M.S. Computer Science, Illinois
+Institute of Technology, 2022; software engineer working on large-scale data
+onboarding and AI infrastructure at Meta Platforms and ByteDance/TikTok). It
+grew out of a January 2026 capstone on validated data pipelines for energy
+demand forecasting and is the first public release of a longer program:
+data-onboarding and AI infrastructure that lets AI models and agents be
+deployed reliably and verifiably in the U.S. energy sector. Developed
+September 27–28, 2026 (see [Timeline](#timeline-and-relationship-to-earlier-work));
+maintained by the author. Questions and collaboration:
+liangyixuan333@gmail.com.
+
 ## Why this exists
 
 Grid operators and utilities are moving to AI-based forecasting to plan
@@ -139,6 +152,29 @@ What the numbers say:
 
 ![Error by horizon](docs/figures/horizon.png)
 
+### At the defect rates the literature reports
+
+Field studies of utility meter data report defect rates far above the 0.10%
+of training rows seeded in the run above: typically 0.2–4% of readings
+missing, 1–6% zero, and unit or multiplier errors on a subset of meters
+(sources and numbers in [docs/fault_prevalence.md](docs/fault_prevalence.md)).
+A separately labeled run seeds 855 events on 1,660 rows, 1.6% of the training
+period, with every other setting unchanged:
+
+| Model | Clean | Corrupted (1.6% of rows) | Repaired | Average error reduction from repair, kWh per hour (95% range) |
+|---|---|---|---|---|
+| Gradient boosting | 0.760 | 4.545 | **0.729** | 236 (225 to 246) |
+| Random forest | 0.741 | 3.393 | **0.711** | 166 (160 to 173) |
+| Ridge regression | 0.812 | 2.843 | **0.806** | 126 (125 to 127) |
+
+At this density an unprotected forecast is three to six times worse than the
+seasonal-naive rule, and the repaired models land exactly where they did at
+the low density, keeping 95.8% of the training targets. Detector recall at
+this density is 1.0 for missing, negative and unit-scale faults, 0.98 for zero
+blocks, 0.93 for spikes and 0.68 for stuck segments (the coarse-meter
+limitation described below); precision for missing values rises to 0.92
+because the natural false positives are now diluted by true detections.
+
 Read the table with three caveats. The uncertainty ranges resample individual
 test hours and are likely too narrow because hourly errors are correlated
 (the sensitivity run uses building-week blocks and gives wider ranges). One
@@ -164,9 +200,10 @@ hour-of-week profile repair. Both versions are kept and verified.
 
 ![v2 versus v3](docs/figures/v2_vs_v3.png)
 
-*The corrupted bars are not comparable across versions: v2 seeded one event
-per fault family (27 rows), v3 four (108 rows). Compare the clean and
-repaired bars, and the share of training targets kept.*
+*The corrupted bars are not comparable across groups: v2 seeded one event
+per fault family (27 rows), v3 four (108 rows), and the third group 855
+events (1,660 rows). Compare the clean and repaired bars, and the share of
+training targets kept.*
 
 Three honest footnotes:
 
@@ -209,8 +246,8 @@ Three honest footnotes:
   verify-results` recomputes the metrics, intervals and figures from the
   stored predictions, binds the targets back to the producer bundle, and
   checks the declared model set against the one the caller expects.
-- **Tests and CI.** 83 tests (network-free, deterministic fixtures) and the
-  verification of all six committed result bundles run on every push
+- **Tests and CI.** 84 tests (network-free, deterministic fixtures) and the
+  verification of all eight committed result bundles run on every push
   (`scripts/verify_all.sh`, GitHub Actions).
 - **Reproduction.** With CPython 3.12.14 and `constraints.txt` on the author's
   machine (macOS arm64), a fresh run reproduced the onboarding data outputs
@@ -226,7 +263,7 @@ Three honest footnotes:
 |---|---|
 | Jan 2026 | Capstone prototype: a single-notebook onboarding-and-forecasting study on a small daily series (IIT; poster accepted at IMA 2026). Methods only; not reused here. |
 | Sep 27–28, 2026 | This repository developed locally: two installable packages on real hourly BDG2 data, pre-specified v2 protocol, v2 baseline bundles (the negative result, produced 2026-09-28 19:05 UTC). |
-| Sep 28, 2026 | Imported to GitHub (first commit "Initial import", 20:15 UTC); v3 amendment designed after examining v2, bundles produced 21:17 UTC and again after review fixes; public repository and CI. |
+| Sep 28, 2026 | Imported to GitHub (first commit "Initial import", 20:15 UTC); v3 amendment designed after examining v2, bundles produced 21:17 UTC and again after review fixes; literature-calibrated prevalence run; public repository and CI. |
 
 Planned next (in order): an adapter for U.S. grid-level data
 ([EIA-930](https://www.eia.gov/electricity/gridmonitor/) hourly demand by
@@ -239,7 +276,7 @@ a Zenodo DOI for each released bundle.
 
 ```bash
 scripts/bootstrap.sh          # creates .venv (prefers Python 3.12, applies constraints.txt)
-scripts/verify_all.sh         # 83 tests + hash verification of all committed bundles
+scripts/verify_all.sh         # 84 tests + hash verification of all committed bundles
 ```
 
 To reproduce a full run (about 5 minutes; downloads ~200 MB once):
@@ -261,11 +298,14 @@ Each package documents its own commands, contracts and limitations:
 energy-ai-data-onboarding/     source verification, quality checks, faults, remediation, weather
   results/bdg2_mvp_v2_hardened/   v2 baseline bundle
   results/bdg2_v3/                v3 bundle (calibrated checks, weather)
+  results/bdg2_v3_dense/          v3 policy at literature-level fault prevalence
 energy-demand-forecasting/     features, four models, metrics, verification, sensitivity
   results/canonical_24h_v2_final/          v2 baseline (negative result)
   results/canonical_24h_v3/                v3 canonical run
+  results/canonical_24h_v3_dense/          v3 at literature-level prevalence
   results/direct_1_to_24_sensitivity_v*/   1-24 h sensitivity runs (v1 baseline, v3)
-docs/figures/                  README figures and the script that regenerates them
+docs/fault_prevalence.md       published defect rates behind the dense configuration
+docs/figures/                  README figures, rendered architecture diagrams, and the script that regenerates them
 scripts/                       bootstrap, canonical run, verify_all
 constraints.txt                exact package versions behind the committed bundles
 ```

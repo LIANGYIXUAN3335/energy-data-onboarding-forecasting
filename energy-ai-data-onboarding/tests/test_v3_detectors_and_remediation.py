@@ -252,7 +252,7 @@ def test_pipeline_publishes_weather_and_calibration_artifacts(
     assert "detector_calibration.csv" in manifest["files"]
     assert manifest["detector_policy"]["run_flagging"] == "whole_run"
     assert manifest["remediation_policy"]["repair_strategy"] == "forward_then_profile"
-    assert manifest["fault_events_per_type"] == 2
+    assert set(manifest["fault_events_per_type"].values()) == {2}
     assert manifest["weather"]["grid_hours_materialized_as_null"] >= 5
     published = pd.read_csv(output / "weather.csv.gz")
     assert list(published.columns) == [
@@ -295,3 +295,30 @@ def test_zero_run_exemption_is_decided_per_run_and_never_zero_filled() -> None:
     # Working-day hours of the outage received the profile value (100), not zero.
     working = [index for index in start if bool(active[index])]
     assert (result.frame.loc[working, "load"] > 0).all()
+
+
+def test_events_per_type_accepts_a_per_family_mapping(sample_inputs: tuple[Path, Path, Path]) -> None:
+    from energy_onboarding.faults import normalize_event_counts
+    from energy_onboarding.ingest import SelectionConfig, ingest_selected_dataset
+
+    meter, metadata, _ = sample_inputs
+    reference = ingest_selected_dataset(
+        meter, metadata, selection=SelectionConfig(building_ids=("b1", "b2", "b3"))
+    ).frame
+    uniform = inject_downstream_faults(reference, cutoff="2016-01-10T00:00:00Z", seed=3, severity="low", events_per_type=2)
+    mapped = inject_downstream_faults(
+        reference, cutoff="2016-01-10T00:00:00Z", seed=3, severity="low",
+        events_per_type={family: 2 for family in normalize_event_counts(1)},
+    )
+    assert uniform.faults == mapped.faults
+    skewed = inject_downstream_faults(
+        reference, cutoff="2016-01-10T00:00:00Z", seed=3, severity="low",
+        events_per_type={"missing_value": 5, "positive_spike": 3},
+    )
+    by_type = pd.DataFrame(skewed.faults).groupby("fault_type")["fault_id"].nunique().to_dict()
+    assert by_type["missing_value"] == 5 and by_type["positive_spike"] == 3
+    assert by_type["long_zero_block"] == 1 and by_type["negative_value"] == 1
+    with pytest.raises(ValueError, match="unknown fault families"):
+        normalize_event_counts({"typo": 2})
+    with pytest.raises(ValueError, match="at least 1"):
+        normalize_event_counts({"missing_value": 0})

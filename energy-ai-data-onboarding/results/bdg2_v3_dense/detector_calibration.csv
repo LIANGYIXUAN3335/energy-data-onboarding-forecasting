@@ -1,0 +1,13 @@
+building_id,calibration_rows,repeat_rate,zero_rate,constant_run_count,constant_run_length_quantile,stuck_threshold_configured,stuck_threshold_effective,calibration_source,long_zero_threshold,zero_profile_min_ratio,profile_weeks,run_flagging,zero_rows_exempted_by_profile
+Eagle_education_Alberto,8784,0.028119307832422585,0.07137978142076502,37,60.63199999999995,8,62,reference_calibration,6,0.25,8,whole_run,0
+Eagle_education_April,8784,0.7507969034608379,0.247040072859745,18,1369.1880000000003,8,1371,reference_calibration,6,0.25,8,whole_run,0
+Eagle_office_Amanda,8784,0.015938069216757743,0.004553734061930784,28,56.081999999999965,8,58,reference_calibration,6,0.25,8,whole_run,19
+Eagle_office_Bridgett,8784,0.02743624772313297,0.004667577413479053,120,71.45500000000001,8,73,reference_calibration,6,0.25,8,whole_run,0
+Panther_education_Annetta,8784,0.0042122040072859745,0.38444899817850636,37,2.0,8,8,reference_calibration,6,0.25,8,whole_run,454
+Panther_education_Aurora,8784,0.009676684881602914,0.3843351548269581,83,3.0,8,8,reference_calibration,6,0.25,8,whole_run,2867
+Panther_office_Clementine,8784,0.00011384335154826958,0.36099726775956287,1,2.0,8,8,reference_calibration,6,0.25,8,whole_run,2274
+Panther_office_Danica,8784,0.0006830601092896175,0.38456284153005466,6,2.0,8,8,reference_calibration,6,0.25,8,whole_run,454
+Rat_education_Kathryn,8784,0.0014799635701275046,0.0,6,5.995,8,8,reference_calibration,6,0.25,8,whole_run,0
+Rat_education_Lee,8784,0.0009107468123861566,0.0,8,2.0,8,8,reference_calibration,6,0.25,8,whole_run,0
+Rat_office_Avis,8784,0.0006830601092896175,0.009676684881602914,6,2.0,8,8,reference_calibration,6,0.25,8,whole_run,0
+Rat_office_Colby,8784,0.00022768670309653916,0.0,2,2.0,8,8,reference_calibration,6,0.25,8,whole_run,0

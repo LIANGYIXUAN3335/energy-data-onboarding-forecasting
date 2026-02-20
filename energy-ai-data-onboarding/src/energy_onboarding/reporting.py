@@ -69,6 +69,40 @@ weather and reproducibility metadata only; it stores no personal data.
 """
 
 
+def _findings_paragraph(summary: dict[str, Any]) -> str:
+    """State what this run found, in sentences generated from the summary."""
+
+    gates = summary["quality_gates"]
+    remediation = summary["remediation"]
+    downstream = summary["downstream_faults"]
+    detector = summary["detector_validation"]
+    coverage = summary["coverage"]
+    training_rows = downstream.get("training_rows_before_cutoff")
+    seeded = downstream["fault_records"]
+    share = f" ({seeded / training_rows:.2%} of the {training_rows:,} training rows)" if training_rows else ""
+    recalls = detector.get("recall_by_type") or {}
+    missed = sorted(name for name, value in recalls.items() if value is not None and value < 1)
+    recall_text = (
+        "every seeded fault family was fully detected"
+        if recalls and not missed
+        else "seeded faults were fully detected except "
+        + ", ".join(f"{name} (recall {recalls[name]:.2f})" for name in missed)
+        if missed
+        else "detector recall is reported in `detector_metrics.csv`"
+    )
+    events = downstream.get("fault_events")
+    event_text = f"{events} seeded events, " if events else ""
+    return (
+        f"The reference data ({coverage['rows']:,} hourly rows, {coverage['buildings']} buildings) "
+        f"passed publication with gate status `{gates['reference']['status']}`. "
+        f"{event_text}{seeded} value-level fault rows{share} were written before the cutoff; "
+        f"{recall_text}. Remediation repaired {remediation['repaired_rows']:,} rows and "
+        f"quarantined {remediation['quarantined_rows']:,}; the gate on the remediated condition "
+        f"is `{gates['remediated']['status']}`. Every count here is recomputed from the committed "
+        "artifacts, and adverse outcomes are kept."
+    )
+
+
 def _policy_paragraph(summary: dict[str, Any]) -> str:
     policy = summary.get("detector_policy")
     repair = summary.get("remediation_policy")
@@ -145,6 +179,10 @@ def render_report(summary: dict[str, Any]) -> str:
 {PROJECT_STATEMENT}
 
 Created: `{summary['created_at_utc']}`
+
+## Findings in brief
+
+{_findings_paragraph(summary)}
 
 ## Run scope
 

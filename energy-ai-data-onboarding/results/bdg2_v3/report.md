@@ -2,7 +2,11 @@
 
 This is a reproducible public-data research pipeline for building-energy data onboarding and forecasting preparation.
 
-Created: `2026-09-28T21:49:21Z`
+Created: `2026-09-29T02:18:56Z`
+
+## Findings in brief
+
+The reference data (210,528 hourly rows, 12 buildings) passed publication with gate status `warn`. 24 seeded events, 108 value-level fault rows (0.10% of the 105,408 training rows) were written before the cutoff; seeded faults were fully detected except stuck_segment (recall 0.75). Remediation repaired 1,668 rows and quarantined 7,430; the gate on the remediated condition is `warn`. Every count here is recomputed from the committed artifacts, and adverse outcomes are kept.
 
 ## Run scope
 

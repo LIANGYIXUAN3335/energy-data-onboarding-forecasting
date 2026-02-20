@@ -57,7 +57,7 @@ def build_parser() -> argparse.ArgumentParser:
     verify_results.add_argument(
         "--input-dir",
         type=Path,
-        help="optionally bind targets, hashes, row counts, and scales to a Repo A bundle",
+        help="optionally bind targets, hashes, row counts, and scales to the onboarding bundle that produced the inputs",
     )
     verify_results.add_argument(
         "--expected-models",
@@ -71,7 +71,7 @@ def build_parser() -> argparse.ArgumentParser:
     verify_sensitivity.add_argument(
         "--input-dir",
         type=Path,
-        help="optionally bind targets, hashes, row counts, and scales to a Repo A bundle",
+        help="optionally bind targets, hashes, row counts, and scales to the onboarding bundle that produced the inputs",
     )
     verify_sensitivity.add_argument(
         "--expected-models",
