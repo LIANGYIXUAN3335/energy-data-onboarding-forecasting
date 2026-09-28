@@ -237,7 +237,7 @@ def _anomaly_masks_with_calibration(
             stuck = same_as_prior & same_position.ge(effective_stuck) & ~is_zero
         masks["stuck"].loc[group.index] = stuck.fillna(False)
 
-        _, zero_length = _run_lengths(is_zero)
+        zero_run_id, zero_length = _run_lengths(is_zero)
         if config.run_flagging == "whole_run":
             long_zero = is_zero & zero_length.ge(config.long_zero_threshold)
         else:
@@ -248,8 +248,17 @@ def _anomaly_masks_with_calibration(
             profile = hour_of_week_profile(loads, timestamps, int(config.profile_weeks))
             normally_active = profile.gt(float(config.zero_profile_min_ratio) * median)
             profile_available = profile.notna() & median.notna()
-            # Where no causal profile exists yet the plain run rule applies.
-            long_zero = long_zero & (~profile_available | normally_active)
+            # A run is exempt only when every member hour with a profile is a
+            # normally idle hour; if any member hour is normally active the whole
+            # run stays flagged, so a run is never split into flagged and
+            # unflagged members (which would let a forward fill copy the run's
+            # own zero back into it). Hours without a profile follow the plain
+            # rule for the run.
+            # zero_run_id also covers the non-zero reading that precedes each
+            # run, so restrict the vote to zero members only.
+            row_keep = (~profile_available | normally_active) & is_zero
+            run_keep = row_keep.groupby(zero_run_id, sort=False).transform("max")
+            long_zero = long_zero & run_keep
         masks["long_zero"].loc[group.index] = long_zero.fillna(False)
 
         short_prior = prior.rolling(24, min_periods=6).median()

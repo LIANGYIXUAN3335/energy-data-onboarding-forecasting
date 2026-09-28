@@ -4,7 +4,7 @@
     "files": {
       "pyproject.toml": "b9abef426c54666341bbebd909667a1a4155057c4958a052bfec72807a3be95b",
       "src/energy_forecasting/__init__.py": "587b7d2b67ee6189ba06ccc9c736d1ed1772b5b04b8822d5390002924e85149c",
-      "src/energy_forecasting/cli.py": "84b54717f626eeca1b76cb792a595ff1aac947d07983f7b618f62069e6be6329",
+      "src/energy_forecasting/cli.py": "1af7f692e28a0b1664ec074f2ecec7197d5a7b730f28907a549bc51a24799794",
       "src/energy_forecasting/dataset.py": "34549f5bdc204a250d515f2f525a8e1abe66cc90eed14cd33164a7d69bfa7283",
       "src/energy_forecasting/experiment.py": "b18d671d965992d6a11259d2e6dbc5cf3f926d4fd25502f64000b426cf25e39d",
       "src/energy_forecasting/features.py": "c36be2ef62cd279f83c6325cdc93c7282350e7f98a71752c62fe0630281fc3fb",
@@ -12,13 +12,13 @@
       "src/energy_forecasting/metrics.py": "d12008e44623a833c98ae8736915aeffe39cff7ceb6f3908c64ab149a7f3a47e",
       "src/energy_forecasting/models.py": "d7b946f7dafab1aea6d2d9aa098174e1d5f4f0b70405cc7d10a7dec8af00e84c",
       "src/energy_forecasting/report.py": "ba979c6afa9395d83ddce4dde8c174cd1cf86c235d9a41164cdbf60cd9928305",
-      "src/energy_forecasting/sensitivity.py": "aacdb6a02765c1bf15aa6897b880a781a6a5783ed4fa0038e8adbbcbe6cbdfc7",
-      "src/energy_forecasting/verification.py": "e329fc96caee6cbc05b1106410a99a3399d71b70e4b4db599c7bbbb9394e4d21"
+      "src/energy_forecasting/sensitivity.py": "eabc850c1409c9ad4e0021bf27b237a3ca2f20757c7d9973f4b1a253f0cb0b44",
+      "src/energy_forecasting/verification.py": "50b9fcba02dcfcd0b6e95d122c2dd52c2fc68d2a69994e6eb20593d08f4f2a69"
     },
     "git_commit": null,
     "kind": "source_tree_sha256",
     "note": "Content identity only; no Git commit or earlier creation date is asserted.",
-    "value": "bf7d02659b70e32e8d1474b28b08b94ce8bb44f1060e414725dc5cec336e91f4"
+    "value": "aeed0fd4b7d77a42e1022699a405a3ed449e3d974320f3c979a0e5ee215d218e"
   },
   "common_prediction_count": 79178,
   "config": {
@@ -57,7 +57,7 @@
       "weather_features": true
     }
   },
-  "created_at_utc": "2026-09-28T21:19:11.913791+00:00",
+  "created_at_utc": "2026-09-28T21:51:20.270349+00:00",
   "fault_cutoff": "2017-01-01T00:00:00+00:00",
   "fault_manifest": {
     "path": "fault_manifest.json",
@@ -111,7 +111,7 @@
     "remediated": {
       "path": "remediated.csv.gz",
       "rows": 210528,
-      "sha256": "7146abac2c9a3bfd3db6bb75d7b4c1d245846bd60cf39946f182db0c5685d370"
+      "sha256": "0110faeb83c826afae41d9bb6504fff7a0818a4262e706a0cdca84aabbdcc10f"
     }
   },
   "input_verification": {
@@ -136,7 +136,7 @@
     "input_sha256": {
       "corrupted": "49b3efb15726b8de04d847bdb6b7aca95533082f44add1c10c8d582df96cb121",
       "reference": "63fc0c2afcc3c316794504c0ff73950f73fd72126d766978c297e3b07e12e234",
-      "remediated": "7146abac2c9a3bfd3db6bb75d7b4c1d245846bd60cf39946f182db0c5685d370"
+      "remediated": "0110faeb83c826afae41d9bb6504fff7a0818a4262e706a0cdca84aabbdcc10f"
     },
     "max_fault_timestamp": "2016-12-26T05:00:00+00:00",
     "post_cutoff_condition_parity": {
@@ -148,9 +148,9 @@
       },
       "rule": "all condition loads equal reference at timestamp >= fault_cutoff"
     },
-    "producer_manifest_sha256": "b1a3c477279ed6923e476704d5256dd7e4b955b119864851c75e06197482f519",
-    "remediated_changed_keys": 4924,
-    "remediated_changes_outside_injected_fault_set": 4817,
+    "producer_manifest_sha256": "cf2e7f2b6eba4a23555f8446e3574568fc3c340a0dd6b691cccfd5a413d868de",
+    "remediated_changed_keys": 8993,
+    "remediated_changes_outside_injected_fault_set": 8885,
     "rows_per_condition": {
       "corrupted": 210528,
       "reference": 210528,
@@ -219,7 +219,7 @@
       "test_rows": 79200,
       "total_rows": 210528,
       "train_rows": 105408,
-      "train_target_rows": 101957,
+      "train_target_rows": 97978,
       "validation_rows": 25920
     }
   },
@@ -227,7 +227,7 @@
   "prediction_rows": 950136,
   "producer_manifest": {
     "path": "dataset_manifest.json",
-    "sha256": "b1a3c477279ed6923e476704d5256dd7e4b955b119864851c75e06197482f519"
+    "sha256": "cf2e7f2b6eba4a23555f8446e3574568fc3c340a0dd6b691cccfd5a413d868de"
   },
   "python_version": "3.12.14 (main, Aug 12 2026, 13:57:54) [Clang 21.0.0 (clang-2100.1.1.101)]",
   "reference_training_scale_coverage": {
@@ -266,44 +266,44 @@
   },
   "result_files": {
     "building_mase.csv": {
-      "sha256": "2acb5e042884dce51336befb529351f40c490452ebfcd65440456f8127afeb6e",
-      "size_bytes": 15471
+      "sha256": "b980096acae9e5649fb300a347a4673a48198bb62b59c41f3741e0bfd9264f81",
+      "size_bytes": 15466
     },
     "figures/macro_building_mase.svg": {
-      "sha256": "b7364e9cfb50e193b7a614bc0d6fa3df236ee5b8a6abcdfb32eb0c39fa6420d1",
+      "sha256": "e684977e6c6d7cd52a7cab79029f9d06bf86465561df4c014688fbe23dac91d8",
       "size_bytes": 5683
     },
     "figures/mae_by_condition.svg": {
-      "sha256": "b2f0752bdd814e24651f07d614ed530c5c08f26282639b750ca78a0ee30c2844",
+      "sha256": "a3988b02ab9776370b942e6b6255ecebf337cb04bc301c7375fc24e298f03e92",
       "size_bytes": 5661
     },
     "metrics.csv": {
-      "sha256": "c4e5273114daf809e44845d16d7955abade61c63e508a918cd73bae8ecfc65cc",
-      "size_bytes": 2694
+      "sha256": "6f1fa74231a79070ca8ee5749d8a283801922cb12e8c442b9c1ab9c215fd1f96",
+      "size_bytes": 2687
     },
     "model_card.md": {
       "sha256": "dce5dbb1b089fab50671e6b1512fc25b710b204f660a7aeb582d68cbe9d7ac11",
       "size_bytes": 3122
     },
     "paired_differences.csv": {
-      "sha256": "213b4cad64ff662dba223abd78296aa00135d6b442806aab144304fa9d7bdebb",
+      "sha256": "d2998b5c9aa19d2596a7419bb224338e94d92ed9c4a7e6ddc988d5c24642d0e4",
       "size_bytes": 503
     },
     "predictions.csv.gz": {
-      "sha256": "529ba5858b96954665cdc732b4157f500978498dc428e046b7a2b5d449e1b791",
-      "size_bytes": 13217083
+      "sha256": "62af0695cdcc74b04b1aa802a9d01743f0390c763f8fc1a370b456255ce27d21",
+      "size_bytes": 13227330
     },
     "report.html": {
-      "sha256": "9d3d6e895c2e6d36ff960e55ef48b018052ecf7827ff2ebe986c3b10d37f84ea",
-      "size_bytes": 10079
+      "sha256": "972f382d59008a52da7a748551d5480f9f91d23c8e07f9a1cf3e6efd56d1c684",
+      "size_bytes": 10075
     },
     "report.md": {
-      "sha256": "0147e2377010475937d3f40be176344e398013c923541a023244e45c8a209776",
-      "size_bytes": 5812
+      "sha256": "cee40cdb8b58d35565dbe4c29528cf01d64afe5a2cd53d9888027ae3a2939787",
+      "size_bytes": 5808
     },
     "subgroup_metrics.csv": {
-      "sha256": "a8001e9279b5a46e20772c70c13f858a9f3d33f5b1c00bf12028d38e1476c421",
-      "size_bytes": 45320
+      "sha256": "817d669cc7f8f8b15f7657dcfcb4b8b4af267e859598cb03f8c63c0b2dbb2c1a",
+      "size_bytes": 45329
     }
   },
   "runtime_packages": {

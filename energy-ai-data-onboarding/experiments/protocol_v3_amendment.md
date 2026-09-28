@@ -1,6 +1,6 @@
 # Protocol amendment v3 (onboarding), dated 2026-09-28
 
-This amendment is a separately labeled experiment. The pre-registered v2
+This amendment is a separately labeled experiment. The pre-specified v2
 protocol and its committed bundle (`results/bdg2_mvp_v2_hardened`) are kept
 unchanged as the baseline; nothing below rewrites them.
 
@@ -49,8 +49,24 @@ the fail-closed gates, and the rule that no remediation reads a later value.
 
 ## Known trade-off
 
-A meter whose readings repeat for most of the day (repeat rate 0.75 for
-Eagle_education_April) cannot distinguish an 8-hour stuck segment from
-normal behaviour; one seeded stuck event on that meter is therefore missed
-(stuck-segment recall 0.75 in `detector_metrics.csv`). This is reported, not
-tuned away.
+Per-building calibration cannot make an 8-hour constant reading detectable
+on a meter whose natural constant runs are longer than that. Three of the
+twelve meters have such runs (`detector_calibration.csv`: Eagle_education_Alberto
+62 h, Eagle_office_Bridgett 73 h, Eagle_education_April 1,371 h). In the
+detector-validation suite this costs one of four seeded stuck events, the one
+on Eagle_education_Alberto (stuck-segment recall 0.75 in
+`detector_metrics.csv`); in the downstream suite two of four seeded stuck
+segments, on Eagle_office_Bridgett and Eagle_education_April (16 of 108
+seeded rows), pass through detection and remediation unrepaired into the
+remediated training data. This is reported, not tuned away.
+
+## Post-review fix (same date)
+
+Independent review of the first v3 run found that the hour-of-week exemption
+for zero runs was applied per row, so a zero run spanning idle and active
+hours could be split into flagged and unflagged members, and a forward fill
+could then copy the run's own zero back into it (35 rows). The exemption is
+now decided per run (a run is exempt only when none of its hours is normally
+active), and a flagged zero is never forward-filled with a zero. The bundle
+was regenerated; quarantine rose from 3,451 to 7,430 rows because the Panther
+site's long natural zero stretches are now flagged in full.

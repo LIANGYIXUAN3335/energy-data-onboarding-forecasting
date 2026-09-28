@@ -106,7 +106,7 @@ keys, using the same dependence-aware block resampling; negative values favor
 remediation.
 See `experiments/direct_1_to_24_sensitivity_protocol.md` for the locked design.
 
-Completed bundles are the pre-registered v2 baseline
+Completed bundles are the pre-specified v2 baseline
 (`results/canonical_24h_v2_final`, `results/direct_1_to_24_sensitivity_v1_final`)
 and the v3 amendment dated 2026-09-28 (`results/canonical_24h_v3`,
 `results/direct_1_to_24_sensitivity_v3`; see

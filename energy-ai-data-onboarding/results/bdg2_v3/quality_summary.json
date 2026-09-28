@@ -24,7 +24,7 @@
     "timestamp_max": "2017-12-31T23:00:00+00:00",
     "timestamp_min": "2016-01-01T00:00:00+00:00"
   },
-  "created_at_utc": "2026-09-28T21:17:07Z",
+  "created_at_utc": "2026-09-28T21:49:21Z",
   "dataset": {
     "doi": "10.5281/zenodo.3887306",
     "title": "Building Data Genome Project 2",
@@ -57,7 +57,7 @@
   },
   "quality_gates": {
     "corrupted": {
-      "affected_observations_sum": 13308,
+      "affected_observations_sum": 17522,
       "check_results": [
         {
           "count": 0,
@@ -158,11 +158,11 @@
           }
         },
         {
-          "count": 8174,
+          "count": 12388,
           "denominator": 210528,
           "enforcement": "configurable_or_detector_default",
           "issue_code": "LONG_ZERO_RUN",
-          "rate": 0.03882618939048488,
+          "rate": 0.05884252925976592,
           "status": "warn",
           "threshold": {
             "basis": "rate",
@@ -280,7 +280,7 @@
       }
     },
     "detector_validation": {
-      "affected_observations_sum": 13327,
+      "affected_observations_sum": 16939,
       "check_results": [
         {
           "count": 0,
@@ -381,11 +381,11 @@
           }
         },
         {
-          "count": 8173,
+          "count": 11785,
           "denominator": 210528,
           "enforcement": "configurable_or_detector_default",
           "issue_code": "LONG_ZERO_RUN",
-          "rate": 0.03882143942848457,
+          "rate": 0.055978302173582614,
           "status": "warn",
           "threshold": {
             "basis": "rate",
@@ -506,7 +506,7 @@
       }
     },
     "reference": {
-      "affected_observations_sum": 14488,
+      "affected_observations_sum": 20320,
       "check_results": [
         {
           "count": 0,
@@ -607,11 +607,11 @@
           }
         },
         {
-          "count": 8142,
+          "count": 13974,
           "denominator": 210528,
           "enforcement": "configurable_or_detector_default",
           "issue_code": "LONG_ZERO_RUN",
-          "rate": 0.038674190606475145,
+          "rate": 0.06637596899224807,
           "status": "warn",
           "threshold": {
             "basis": "rate",
@@ -799,7 +799,7 @@
       }
     },
     "remediated": {
-      "affected_observations_sum": 11674,
+      "affected_observations_sum": 19919,
       "check_results": [
         {
           "count": 0,
@@ -844,11 +844,11 @@
           }
         },
         {
-          "count": 3497,
+          "count": 7476,
           "denominator": 210528,
           "enforcement": "configurable_or_detector_default",
           "issue_code": "LOAD_MISSING",
-          "rate": 0.016610617115063078,
+          "rate": 0.035510715914272684,
           "status": "warn",
           "threshold": {
             "basis": "rate",
@@ -886,11 +886,11 @@
           }
         },
         {
-          "count": 2036,
+          "count": 2077,
           "denominator": 210528,
           "enforcement": "configurable_or_detector_default",
           "issue_code": "ROBUST_OUTLIER",
-          "rate": 0.009670922632618938,
+          "rate": 0.009865671074631403,
           "status": "pass",
           "threshold": {
             "basis": "rate",
@@ -900,11 +900,11 @@
           }
         },
         {
-          "count": 5332,
+          "count": 9511,
           "denominator": 210528,
           "enforcement": "configurable_or_detector_default",
           "issue_code": "LONG_ZERO_RUN",
-          "rate": 0.025326797385620915,
+          "rate": 0.04517688858489132,
           "status": "warn",
           "threshold": {
             "basis": "rate",
@@ -928,11 +928,11 @@
           }
         },
         {
-          "count": 672,
+          "count": 718,
           "denominator": 210528,
           "enforcement": "configurable_or_detector_default",
           "issue_code": "LEVEL_OR_UNIT_SHIFT",
-          "rate": 0.0031919744642042863,
+          "rate": 0.0034104727162182704,
           "status": "pass",
           "threshold": {
             "basis": "rate",
@@ -1023,12 +1023,12 @@
     }
   },
   "quarantine": {
-    "rows": 3451
+    "rows": 7430
   },
   "remediation": {
-    "log_rows": 4945,
-    "quarantined_rows": 3451,
-    "repaired_rows": 1494
+    "log_rows": 9098,
+    "quarantined_rows": 7430,
+    "repaired_rows": 1668
   },
   "remediation_policy": {
     "backward_fill_or_interpolation": false,

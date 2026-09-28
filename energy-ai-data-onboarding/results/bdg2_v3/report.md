@@ -2,7 +2,7 @@
 
 This is a reproducible public-data research pipeline for building-energy data onboarding and forecasting preparation.
 
-Created: `2026-09-28T21:17:07Z`
+Created: `2026-09-28T21:49:21Z`
 
 ## Run scope
 
@@ -34,10 +34,10 @@ as seeded ground truth.
 
 The downstream suite injected `108`
 value-level fault records before `2017-01-01T00:00:00+00:00`. It did not add,
-remove, or move keys. Past-only remediation logged `4945`
-actions, including `1494` repaired rows and
-`3451` unresolved actions. The quarantine artifact
-contains `3451` rows. A suspected unit scale is never silently
+remove, or move keys. Past-only remediation logged `9098`
+actions, including `1668` repaired rows and
+`7430` unresolved actions. The quarantine artifact
+contains `7430` rows. A suspected unit scale is never silently
 corrected by dividing by an inferred factor.
 
 ## Detector and remediation policy

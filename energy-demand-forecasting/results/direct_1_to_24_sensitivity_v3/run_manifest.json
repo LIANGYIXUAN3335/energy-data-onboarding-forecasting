@@ -5,7 +5,7 @@
     "files": {
       "pyproject.toml": "b9abef426c54666341bbebd909667a1a4155057c4958a052bfec72807a3be95b",
       "src/energy_forecasting/__init__.py": "587b7d2b67ee6189ba06ccc9c736d1ed1772b5b04b8822d5390002924e85149c",
-      "src/energy_forecasting/cli.py": "84b54717f626eeca1b76cb792a595ff1aac947d07983f7b618f62069e6be6329",
+      "src/energy_forecasting/cli.py": "1af7f692e28a0b1664ec074f2ecec7197d5a7b730f28907a549bc51a24799794",
       "src/energy_forecasting/dataset.py": "34549f5bdc204a250d515f2f525a8e1abe66cc90eed14cd33164a7d69bfa7283",
       "src/energy_forecasting/experiment.py": "b18d671d965992d6a11259d2e6dbc5cf3f926d4fd25502f64000b426cf25e39d",
       "src/energy_forecasting/features.py": "c36be2ef62cd279f83c6325cdc93c7282350e7f98a71752c62fe0630281fc3fb",
@@ -13,13 +13,13 @@
       "src/energy_forecasting/metrics.py": "d12008e44623a833c98ae8736915aeffe39cff7ceb6f3908c64ab149a7f3a47e",
       "src/energy_forecasting/models.py": "d7b946f7dafab1aea6d2d9aa098174e1d5f4f0b70405cc7d10a7dec8af00e84c",
       "src/energy_forecasting/report.py": "ba979c6afa9395d83ddce4dde8c174cd1cf86c235d9a41164cdbf60cd9928305",
-      "src/energy_forecasting/sensitivity.py": "aacdb6a02765c1bf15aa6897b880a781a6a5783ed4fa0038e8adbbcbe6cbdfc7",
-      "src/energy_forecasting/verification.py": "e329fc96caee6cbc05b1106410a99a3399d71b70e4b4db599c7bbbb9394e4d21"
+      "src/energy_forecasting/sensitivity.py": "eabc850c1409c9ad4e0021bf27b237a3ca2f20757c7d9973f4b1a253f0cb0b44",
+      "src/energy_forecasting/verification.py": "50b9fcba02dcfcd0b6e95d122c2dd52c2fc68d2a69994e6eb20593d08f4f2a69"
     },
     "git_commit": null,
     "kind": "source_tree_sha256",
     "note": "Content identity only; no Git commit or earlier creation date is asserted.",
-    "value": "bf7d02659b70e32e8d1474b28b08b94ce8bb44f1060e414725dc5cec336e91f4"
+    "value": "aeed0fd4b7d77a42e1022699a405a3ed449e3d974320f3c979a0e5ee215d218e"
   },
   "common_alignment": {
     "candidate_common_forecast_keys": 79178,
@@ -86,7 +86,7 @@
       "weather_features": true
     }
   },
-  "created_at_utc": "2026-09-28T21:19:41.806592+00:00",
+  "created_at_utc": "2026-09-28T21:51:48.929621+00:00",
   "fault_cutoff": "2017-01-01T00:00:00+00:00",
   "fault_manifest": {
     "path": "fault_manifest.json",
@@ -131,7 +131,7 @@
     "remediated": {
       "path": "remediated.csv.gz",
       "rows": 210528,
-      "sha256": "7146abac2c9a3bfd3db6bb75d7b4c1d245846bd60cf39946f182db0c5685d370"
+      "sha256": "0110faeb83c826afae41d9bb6504fff7a0818a4262e706a0cdca84aabbdcc10f"
     }
   },
   "input_verification": {
@@ -156,7 +156,7 @@
     "input_sha256": {
       "corrupted": "49b3efb15726b8de04d847bdb6b7aca95533082f44add1c10c8d582df96cb121",
       "reference": "63fc0c2afcc3c316794504c0ff73950f73fd72126d766978c297e3b07e12e234",
-      "remediated": "7146abac2c9a3bfd3db6bb75d7b4c1d245846bd60cf39946f182db0c5685d370"
+      "remediated": "0110faeb83c826afae41d9bb6504fff7a0818a4262e706a0cdca84aabbdcc10f"
     },
     "max_fault_timestamp": "2016-12-26T05:00:00+00:00",
     "post_cutoff_condition_parity": {
@@ -168,9 +168,9 @@
       },
       "rule": "all condition loads equal reference at timestamp >= fault_cutoff"
     },
-    "producer_manifest_sha256": "b1a3c477279ed6923e476704d5256dd7e4b955b119864851c75e06197482f519",
-    "remediated_changed_keys": 4924,
-    "remediated_changes_outside_injected_fault_set": 4817,
+    "producer_manifest_sha256": "cf2e7f2b6eba4a23555f8446e3574568fc3c340a0dd6b691cccfd5a413d868de",
+    "remediated_changed_keys": 8993,
+    "remediated_changes_outside_injected_fault_set": 8885,
     "rows_per_condition": {
       "corrupted": 210528,
       "reference": 210528,
@@ -283,7 +283,7 @@
       "test_rows": 79200,
       "total_example_rows": 210240,
       "train_rows": 105120,
-      "train_target_rows": 101755,
+      "train_target_rows": 97776,
       "validation_rows": 25920
     }
   },
@@ -308,7 +308,7 @@
   "prediction_rows": 710640,
   "producer_manifest": {
     "path": "dataset_manifest.json",
-    "sha256": "b1a3c477279ed6923e476704d5256dd7e4b955b119864851c75e06197482f519"
+    "sha256": "cf2e7f2b6eba4a23555f8446e3574568fc3c340a0dd6b691cccfd5a413d868de"
   },
   "python_version": "3.12.14 (main, Aug 12 2026, 13:57:54) [Clang 21.0.0 (clang-2100.1.1.101)]",
   "reference_training_scale_coverage": {
@@ -347,35 +347,35 @@
   },
   "result_files": {
     "building_mase.csv": {
-      "sha256": "8024659b743c72dfaf1d56e81aeae0590ab59c7921dccc72c908e309e0ea576f",
+      "sha256": "f650707deaae61f6a1e5e9bdb44c4d60f9318a424eecc41c5e4bf5e10bc81c59",
       "size_bytes": 11630
     },
     "figures/mae_by_horizon.svg": {
-      "sha256": "015bc5ce6fbddf0fff1f09d6cc3215261a2f6340ca49a5d6c1a4607d5db7cf24",
+      "sha256": "944b86360d849290244655637c727871965edf42843b4d283e1669b24db173b0",
       "size_bytes": 9053
     },
     "horizon_metrics.csv": {
-      "sha256": "c34b76a99263146c93a2404d83a706c79f6312a686645ee60d0623dcf7c7fea1",
-      "size_bytes": 40381
+      "sha256": "a5b5cf78fcd9fbe88030d7851775b03f01769b0b08fa33bf34919f4a0907f290",
+      "size_bytes": 40391
     },
     "horizon_paired_differences.csv": {
-      "sha256": "6ea8d6c3d0101b0a6084e41b7568bb20f8277dd7ea4189ad84f431173d5bdd28",
-      "size_bytes": 7384
+      "sha256": "6db3d312b6d4090a8459e0ce89b94eec044550cab834b1b4c0dd350c4eb70fc3",
+      "size_bytes": 7373
     },
     "metrics.csv": {
-      "sha256": "ee46028a1715976fc5c6af77ce97e5a0edd45b5502e3263154fae92fdf8e15dd",
-      "size_bytes": 1795
+      "sha256": "3a1e18eb7603b34f9e67171829ed8a89fe8b0ab1a07902d5f0d85cbe14a41e9e",
+      "size_bytes": 1796
     },
     "paired_differences.csv": {
-      "sha256": "e34d7c3cd9bfbdb6af08af6e8d48a194bfc0874c0b4492b3c2b3bdd50be4b4b3",
-      "size_bytes": 387
+      "sha256": "13a2b2c7f4fa41bd81ee1df1267fe27afd317fed4b0e1fb01302dcc6912bda0b",
+      "size_bytes": 390
     },
     "predictions.csv.gz": {
-      "sha256": "dee45dbc78498fab11b0e19bf20f10c2936592758da9b8ea8f0848ec1e975bb8",
-      "size_bytes": 7652323
+      "sha256": "21814e80d393a79f51ef45f7a7f32547a6f93cc173d7020663c19eb6dd347293",
+      "size_bytes": 7705230
     },
     "report.md": {
-      "sha256": "e4d4d37f24985ce55c4540fec9d6cc652291a66141d9f56b295e942d9bede837",
+      "sha256": "023092baabe669c804ceeb9beb2e4ef1d8eae088ecf1e1b4229fa8faad78a156",
       "size_bytes": 3735
     }
   },

@@ -59,6 +59,10 @@ def build_parser() -> argparse.ArgumentParser:
         type=Path,
         help="optionally bind targets, hashes, row counts, and scales to a Repo A bundle",
     )
+    verify_results.add_argument(
+        "--expected-models",
+        help="comma-separated model set the bundle must declare exactly (the manifest is unsigned)",
+    )
     verify_sensitivity = subparsers.add_parser(
         "verify-sensitivity-results",
         help="verify a completed direct 1-24h sensitivity bundle",
@@ -68,6 +72,10 @@ def build_parser() -> argparse.ArgumentParser:
         "--input-dir",
         type=Path,
         help="optionally bind targets, hashes, row counts, and scales to a Repo A bundle",
+    )
+    verify_sensitivity.add_argument(
+        "--expected-models",
+        help="comma-separated model set the bundle must declare exactly (the manifest is unsigned)",
     )
     return parser
 
@@ -113,12 +121,16 @@ def main(argv: list[str] | None = None) -> int:
         print(f"Sensitivity results: {args.output_dir.resolve()}")
         return 0
     if args.command == "verify-results":
-        summary = verify_result_directory(args.result_dir, input_dir=args.input_dir)
+        expected = args.expected_models.split(",") if args.expected_models else None
+        summary = verify_result_directory(
+            args.result_dir, input_dir=args.input_dir, expected_model_names=expected
+        )
         print(json.dumps(summary, indent=2, sort_keys=True))
         return 0
     if args.command == "verify-sensitivity-results":
+        expected = args.expected_models.split(",") if args.expected_models else None
         summary = verify_sensitivity_result_directory(
-            args.result_dir, input_dir=args.input_dir
+            args.result_dir, input_dir=args.input_dir, expected_model_names=expected
         )
         print(json.dumps(summary, indent=2, sort_keys=True))
         return 0

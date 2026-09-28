@@ -1,7 +1,7 @@
 # Protocol amendment v3 (forecasting), dated 2026-09-28
 
-Separately labeled experiment. The pre-registered v2 protocol and its
-committed bundles (`results/canonical_24h_v2_final`,
+Separately labeled experiment, designed after the v2 result was examined.
+The pre-specified v2 protocol and its committed bundles (`results/canonical_24h_v2_final`,
 `results/direct_1_to_24_sensitivity_v1_final`) remain the baseline and are
 not modified. Configuration: `configs/experiment_v3.json` and
 `configs/direct_1_to_24_sensitivity_v3.json`.
