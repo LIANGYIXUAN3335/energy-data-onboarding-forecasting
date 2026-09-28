@@ -31,6 +31,11 @@ def build_parser() -> argparse.ArgumentParser:
     run.add_argument("--fault-manifest", required=True, type=Path)
     run.add_argument("--config", required=True, type=Path)
     run.add_argument("--output-dir", required=True, type=Path)
+    run.add_argument(
+        "--weather",
+        type=Path,
+        help="producer weather.csv.gz (defaults to the file next to --reference when the config enables weather features)",
+    )
 
     sensitivity = subparsers.add_parser(
         "run-sensitivity",
@@ -43,6 +48,7 @@ def build_parser() -> argparse.ArgumentParser:
     sensitivity.add_argument("--fault-manifest", required=True, type=Path)
     sensitivity.add_argument("--config", required=True, type=Path)
     sensitivity.add_argument("--output-dir", required=True, type=Path)
+    sensitivity.add_argument("--weather", type=Path, help="producer weather.csv.gz")
 
     verify_results = subparsers.add_parser(
         "verify-results", help="verify a completed result bundle"
@@ -81,6 +87,7 @@ def main(argv: list[str] | None = None) -> int:
             args.output_dir,
             producer_manifest_path=args.producer_manifest,
             fault_manifest_path=args.fault_manifest,
+            weather_path=args.weather,
         )
         print(
             "Completed forecast experiment: "
@@ -97,6 +104,7 @@ def main(argv: list[str] | None = None) -> int:
             args.output_dir,
             producer_manifest_path=args.producer_manifest,
             fault_manifest_path=args.fault_manifest,
+            weather_path=args.weather,
         )
         print(
             "Completed separate 1-24h sensitivity: "

@@ -236,7 +236,7 @@ def test_exact_six_condition_model_pairs_are_required(
         index=False,
         compression={"method": "gzip", "compresslevel": 9, "mtime": 0},
     )
-    with pytest.raises(ValueError, match="exactly the six expected"):
+    with pytest.raises(ValueError, match="exactly the expected condition/model pairs"):
         verify_result_directory(output)
 
 

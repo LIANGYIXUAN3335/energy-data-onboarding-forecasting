@@ -2,8 +2,9 @@
 
 - This is a retrospective public-data benchmark, not an operational utility,
   grid-dispatch, billing, or safety system.
-- The primary experiment uses historical hourly meter load and public metadata.
-  It excludes observed future weather and does not demonstrate a deployable
+- The v2 experiment uses historical hourly meter load and public metadata
+  only. The v3 amendment adds site weather observed at t-24 or earlier; it
+  still uses no weather forecast, so it does not demonstrate a deployable
   weather-forecast integration.
 - The planned Phase 1 Panther/Eagle/Rat subset uses one source timezone
   (US/Eastern). BDG2 raw timestamps are local wall-clock values. Calendar
@@ -16,9 +17,9 @@
 - The 2017 Q1 validation partition is reserved but unused in the canonical run
   because model choices and hyperparameters are fixed a priori.
   This run therefore does not demonstrate a tuning or model-selection study.
-- The seasonal-naive and histogram-gradient-boosting models are deliberately
-  compact controls. Their presence does not establish that the selected model
-  class is optimal.
+- The seasonal-naive, ridge, random-forest and histogram-gradient-boosting
+  models are deliberately compact controls with a priori hyperparameters.
+  Their presence does not establish that any model class is optimal.
 - The canonical primary MASE uses one documented pooled 168-hour scale derived
   from reference training data. Supplementary per-building and macro-building
   MASE improve visibility but may exclude buildings whose reference-training

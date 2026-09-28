@@ -29,12 +29,38 @@ CONDITION_FILES = {
 }
 
 EXPECTED_CONDITIONS = frozenset(CONDITION_FILES)
+# v2 default model set; v3 bundles declare their models in the run manifest.
 EXPECTED_MODELS = frozenset({"seasonal_naive", "hist_gradient_boosting"})
 EXPECTED_CONDITION_MODEL_PAIRS = frozenset(
     (condition, model)
     for condition in EXPECTED_CONDITIONS
     for model in EXPECTED_MODELS
 )
+KNOWN_MODELS = frozenset(
+    {"seasonal_naive", "hist_gradient_boosting", "ridge", "random_forest"}
+)
+
+
+def expected_models(manifest: dict[str, Any]) -> frozenset[str]:
+    """Models a bundle must contain: declared in the manifest, else the v2 pair."""
+
+    declared = manifest.get("models")
+    if not isinstance(declared, dict) or not declared:
+        return EXPECTED_MODELS
+    models = frozenset(str(name) for name in declared)
+    if "seasonal_naive" not in models or len(models) < 2:
+        raise ValueError("Run manifest models must include seasonal_naive and a learned model")
+    if unknown := models - KNOWN_MODELS:
+        raise ValueError(f"Run manifest declares unknown models: {sorted(unknown)}")
+    return models
+
+
+def expected_condition_model_pairs(manifest: dict[str, Any]) -> frozenset[tuple[str, str]]:
+    return frozenset(
+        (condition, model)
+        for condition in EXPECTED_CONDITIONS
+        for model in expected_models(manifest)
+    )
 
 LEGACY_REQUIRED_RESULT_FILES = {
     "metrics.csv",
@@ -701,9 +727,12 @@ def verify_result_directory(
     )
     if pairs != prediction_pairs:
         raise ValueError("Metric and prediction condition/model pairs do not match")
-    if pairs != EXPECTED_CONDITION_MODEL_PAIRS:
+    manifest_models = expected_models(manifest)
+    if pairs != expected_condition_model_pairs(manifest):
         raise ValueError(
-            "Results must contain exactly the six expected condition/model pairs"
+            "Results must contain exactly the expected condition/model pairs "
+            f"({len(EXPECTED_CONDITIONS) * len(manifest_models)} pairs for "
+            f"{sorted(manifest_models)})"
         )
     pair_count = len(pairs)
     key_counts = predictions.groupby(["timestamp", "building_id"], observed=True).size()
@@ -893,9 +922,9 @@ def verify_result_directory(
     if missing := paired_columns - set(paired.columns):
         raise ValueError(f"paired_differences.csv is missing columns: {sorted(missing)}")
     if (
-        len(paired) != len(EXPECTED_MODELS)
+        len(paired) != len(manifest_models)
         or paired.duplicated(["model"]).any()
-        or set(paired["model"]) != EXPECTED_MODELS
+        or set(paired["model"]) != set(manifest_models)
     ):
         raise ValueError(
             "paired_differences.csv must contain exactly one row for each expected model"

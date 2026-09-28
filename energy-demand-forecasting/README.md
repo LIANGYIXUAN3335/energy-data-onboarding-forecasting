@@ -2,9 +2,8 @@
 
 This repository evaluates how documented data-quality conditions affect a reproducible 24-hour-ahead electricity-demand forecasting task. It consumes versioned outputs from the companion `energy-ai-data-onboarding` repository and reports every pre-specified condition, including null or negative results.
 
-The repository is a stateless public-data implementation. It does not retain
-ChatGPT memory, conversation history, prompts, embeddings, vector databases,
-user profiles, personal data, or telemetry.
+The repository is a stateless public-data implementation: it stores no
+personal data and transmits nothing.
 
 ## Research question
 
@@ -24,6 +23,9 @@ The test targets always come from `reference`. Predictions are evaluated on one 
 
 - Seasonal naive using the previous week and then previous day as fallback; it never uses a one-hour lag for this day-ahead task.
 - A fixed `HistGradientBoostingRegressor` pipeline with training-only preprocessing.
+- v3 adds ridge regression (standardized inputs, alpha 1.0) and a random
+  forest (200 trees, minimum 5 samples per leaf, 50% of features per split),
+  all with the same training-only preprocessing and fixed a priori.
 - Primary metric (unchanged): pooled MASE with a 168-hour scale computed once
   from reference training data.
 - Supplementary metric: per-building MASE using each building's own
@@ -104,8 +106,37 @@ keys, using the same dependence-aware block resampling; negative values favor
 remediation.
 See `experiments/direct_1_to_24_sensitivity_protocol.md` for the locked design.
 
-Completed final bundles are `results/canonical_24h_v2_final` and
-`results/direct_1_to_24_sensitivity_v1_final`.
+Completed bundles are the pre-registered v2 baseline
+(`results/canonical_24h_v2_final`, `results/direct_1_to_24_sensitivity_v1_final`)
+and the v3 amendment dated 2026-09-28 (`results/canonical_24h_v3`,
+`results/direct_1_to_24_sensitivity_v3`; see
+`experiments/protocol_v3_amendment.md`).
+
+## v3: weather, a full calendar, and four models
+
+`configs/experiment_v3.json` consumes the v3 onboarding bundle and sets
+`"feature_set": "v3"`, `"weather_features": true` and
+`"models": ["seasonal_naive", "ridge", "random_forest", "hist_gradient_boosting"]`.
+The v3 feature set has 30 features: load lags 24/48/168/336 h; trailing 24 h
+mean, std, min, max and 168 h mean, std ending at t-24; hour, weekday,
+day-of-year and month as sine/cosine pairs; weekend and U.S. federal holiday
+flags; air temperature at t-24, t-48 and t-168, dew temperature and wind speed
+at t-24, and trailing 24 h and 168 h mean air temperature ending at t-24; plus
+building, site and primary-use categories. No weather observed later than
+t-24 is used, so the forecast needs no weather forecast as an input. The
+weather file is read from the producer bundle and must match the SHA-256
+registered in `dataset_manifest.json`.
+
+```bash
+.venv/bin/energy-forecast run \
+  --reference ../energy-ai-data-onboarding/results/bdg2_v3/reference.csv.gz \
+  --corrupted ../energy-ai-data-onboarding/results/bdg2_v3/corrupted.csv.gz \
+  --remediated ../energy-ai-data-onboarding/results/bdg2_v3/remediated.csv.gz \
+  --producer-manifest ../energy-ai-data-onboarding/results/bdg2_v3/dataset_manifest.json \
+  --fault-manifest ../energy-ai-data-onboarding/results/bdg2_v3/fault_manifest.json \
+  --config configs/experiment_v3.json \
+  --output-dir results/canonical_24h_v3_repeat
+```
 
 ## Reproducibility and interpretation
 
