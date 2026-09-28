@@ -50,7 +50,8 @@ else
   echo "warning: not applying constraints.txt (Python $PY_VERSION); committed results used 3.12.14" >&2
 fi
 
-"$VENV_DIR/bin/python" -m pip install --quiet "${PIP_ARGS[@]}" \
+# ${PIP_ARGS[@]+...} keeps macOS bash 3.2 happy with an empty array under set -u.
+"$VENV_DIR/bin/python" -m pip install --quiet ${PIP_ARGS[@]+"${PIP_ARGS[@]}"} \
   -e "$WORKSPACE_DIR/energy-ai-data-onboarding[dev]" \
   -e "$WORKSPACE_DIR/energy-demand-forecasting[dev]"
 
