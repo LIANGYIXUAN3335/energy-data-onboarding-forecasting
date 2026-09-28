@@ -1,0 +1,17 @@
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+dist/
+build/
+*.egg-info/
+.DS_Store
+
+# Public source data is intentionally not versioned; see provenance/bdg2_v1.0.json.
+data/raw/
+data/runs/
+
+# Local runs are ignored; the final verified bundle is versioned.
+results/*
+!results/bdg2_mvp_v2_hardened/

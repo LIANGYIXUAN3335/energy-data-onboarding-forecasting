@@ -1,0 +1,26 @@
+schema_version: 1
+seed: 20251206
+faults:
+  missing_interval:
+    count: 1
+  duplicate_timestamp:
+    count: 1
+  negative_value:
+    count: 1
+  spike:
+    count: 1
+    multiplier: 50.0
+  long_zero:
+    blocks: 1
+    length: 6
+  unit_scale:
+    blocks: 1
+    length: 3
+    multiplier: 100.0
+  metadata_mismatch:
+    count: 1
+  timezone_shift:
+    blocks: 1
+    length: 2
+    hours: 1
+

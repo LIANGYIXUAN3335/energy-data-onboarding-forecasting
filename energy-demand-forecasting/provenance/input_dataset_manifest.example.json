@@ -1,0 +1,24 @@
+{
+  "producer_repository": "energy-ai-data-onboarding",
+  "files": {
+    "reference.csv.gz": {
+      "path": "reference.csv.gz",
+      "sha256": "REPLACE_WITH_64_HEX_CHARACTERS",
+      "rows": 0,
+      "columns": ["timestamp", "building_id", "load", "site_id", "primary_use", "condition"]
+    },
+    "corrupted.csv.gz": {
+      "path": "corrupted.csv.gz",
+      "sha256": "REPLACE_WITH_64_HEX_CHARACTERS",
+      "rows": 0,
+      "columns": ["timestamp", "building_id", "load", "site_id", "primary_use", "condition"]
+    },
+    "remediated.csv.gz": {
+      "path": "remediated.csv.gz",
+      "sha256": "REPLACE_WITH_64_HEX_CHARACTERS",
+      "rows": 0,
+      "columns": ["timestamp", "building_id", "load", "site_id", "primary_use", "condition"]
+    }
+  },
+  "policy": "Illustrative schema only. Preserve and verify the actual producer manifest; never populate provenance fields by hand."
+}

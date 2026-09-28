@@ -1,0 +1,16 @@
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+build/
+dist/
+*.egg-info/
+.DS_Store
+data/raw/
+data/processed/
+
+# Local runs are ignored; the two final verified bundles are versioned.
+results/*
+!results/canonical_24h_v2_final/
+!results/direct_1_to_24_sensitivity_v1_final/

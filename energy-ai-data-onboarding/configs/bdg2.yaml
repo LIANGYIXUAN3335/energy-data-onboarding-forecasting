@@ -1,0 +1,35 @@
+dataset:
+  id: bdg2-v1.0
+  title: Building Data Genome Project 2
+  version: v1.0
+  doi: 10.5281/zenodo.3887306
+  expected_frequency: 1h
+  timestamp_column: timestamp
+  meter_shape: wide
+
+schema:
+  building_id: building_id
+  site_id: site_id
+  primary_use_candidates:
+    - primary_use
+    - primaryspaceusage
+    - primary_space_usage
+  output_columns:
+    - timestamp
+    - building_id
+    - load
+    - site_id
+    - primary_use
+    - condition
+
+quality:
+  long_zero_threshold: 6
+  outlier_ratio: 10.0
+  causal_window_hours: 168
+  rare_group_fraction: 0.01
+
+publishing:
+  format: csv.gz
+  deterministic_gzip_mtime: 0
+  hash: sha256
+

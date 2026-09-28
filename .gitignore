@@ -1,0 +1,22 @@
+# Virtual environments and Python build artifacts
+.venv/
+.venv*/
+**/__pycache__/
+**/.pytest_cache/
+**/*.egg-info/
+**/build/
+**/dist/
+.DS_Store
+
+# Large public source data: download and verify with
+#   .venv/bin/energy-onboard download --manifest energy-ai-data-onboarding/provenance/bdg2_v1.0.json --data-dir energy-ai-data-onboarding/data/raw
+energy-ai-data-onboarding/data/raw/
+energy-ai-data-onboarding/data/runs/
+
+# Generated run directories are local. The final, hash-verified bundles that
+# scripts/verify_all.sh checks ARE versioned (see the negated patterns).
+energy-ai-data-onboarding/results/*
+!energy-ai-data-onboarding/results/bdg2_mvp_v2_hardened/
+energy-demand-forecasting/results/*
+!energy-demand-forecasting/results/canonical_24h_v2_final/
+!energy-demand-forecasting/results/direct_1_to_24_sensitivity_v1_final/

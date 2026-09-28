@@ -1,0 +1,10 @@
+# Exact third-party versions used to produce the committed result bundles
+# (energy-ai-data-onboarding/results/bdg2_mvp_v2_hardened,
+#  energy-demand-forecasting/results/canonical_24h_v2_final,
+#  energy-demand-forecasting/results/direct_1_to_24_sensitivity_v1_final).
+# Interpreter: CPython 3.12.14 on macOS (darwin). Values are copied from the
+# run_manifest.json runtime sections. Used by scripts/bootstrap.sh as a pip
+# constraints file so that a rebuilt environment reproduces the same artifacts.
+numpy==2.3.5
+pandas==2.2.3
+scikit-learn==1.9.1

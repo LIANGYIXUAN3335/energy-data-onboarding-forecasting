@@ -1,0 +1,27 @@
+schema_version: 1
+source_id: bdg2-v1.0
+title: "buds-lab/building-data-genome-project-2: v1.0"
+version: v1.0
+publication_date: "2020-06-10"
+doi: 10.5281/zenodo.3887306
+record_url: https://zenodo.org/records/3887306
+api_url: https://zenodo.org/api/records/3887306
+repository_url: https://github.com/buds-lab/building-data-genome-project-2/tree/v1.0
+license_from_zenodo_record: CC-BY-4.0
+archive:
+  filename: buds-lab-building-data-genome-project-2-v1.0.zip
+  zenodo_key: buds-lab/building-data-genome-project-2-v1.0.zip
+  bytes: 595266464
+  upstream_checksum:
+    algorithm: md5
+    value: 44393dc4cf61e84dec105e955368c890
+  local_sha256: null
+checksum_policy: >-
+  Verify the upstream MD5 after download, compute SHA-256 locally, and copy that
+  value into the run manifest. A SHA-256 is deliberately not invented here
+  because the archive is not downloaded as part of this MVP.
+download_policy: manual_or_separate_script_only
+notes:
+  - Large source data must not be committed to Git.
+  - Confirm licensing for each redistributed component before publication.
+

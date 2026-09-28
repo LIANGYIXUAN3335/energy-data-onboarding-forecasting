@@ -1,0 +1,61 @@
+{
+  "schema_version": "1.0",
+  "dataset": {
+    "id": "bdg2-v1.0",
+    "title": "Building Data Genome Project 2",
+    "version": "v1.0",
+    "doi": "10.5281/zenodo.3887306",
+    "expected_frequency": "1h",
+    "timestamp_column": "timestamp",
+    "meter_shape": "wide",
+    "source_manifest": "provenance/bdg2_v1.0.json"
+  },
+  "selection": {
+    "site_ids": [],
+    "building_ids": [
+      "Eagle_education_Alberto",
+      "Eagle_education_April",
+      "Eagle_office_Amanda",
+      "Eagle_office_Bridgett",
+      "Panther_education_Annetta",
+      "Panther_education_Aurora",
+      "Panther_office_Clementine",
+      "Panther_office_Danica",
+      "Rat_education_Kathryn",
+      "Rat_education_Lee",
+      "Rat_office_Avis",
+      "Rat_office_Colby"
+    ],
+    "maximum_building_count": 12,
+    "maximum_source_rows": null,
+    "full_run": false,
+    "strategy": "metadata_round_robin_by_site_then_primary_use",
+    "read_chunk_rows": 4096
+  },
+  "quality": {
+    "long_zero_threshold": 6,
+    "stuck_threshold": 8,
+    "outlier_mad_z": 12.0,
+    "level_shift_ratio": 8.0,
+    "causal_window_hours": 168,
+    "rare_group_fraction": 0.01
+  },
+  "gate": {
+    "abort_on_reference_fail": true,
+    "fail_severities": ["fail"]
+  },
+  "faults": {
+    "seed": 20251206,
+    "severity": "medium",
+    "fault_cutoff": "2017-01-01T00:00:00Z"
+  },
+  "remediation": {
+    "maximum_forward_fill_hours": 3,
+    "quarantine_unresolved": true
+  },
+  "publishing": {
+    "format": "csv.gz",
+    "deterministic_gzip_mtime": 0,
+    "hash": "sha256"
+  }
+}

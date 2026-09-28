@@ -1,0 +1,278 @@
+{
+  "code_revision": {
+    "file_count": 12,
+    "files": {
+      "pyproject.toml": "56bfca8da9f3c548292328a47437a9861f71fb21f7c100097de911be4c3962dc",
+      "src/energy_forecasting/__init__.py": "587b7d2b67ee6189ba06ccc9c736d1ed1772b5b04b8822d5390002924e85149c",
+      "src/energy_forecasting/cli.py": "3a59a94d2f41abe9e2ba173abde8782ce684b306d30c1d6506ce8ab22222a0d8",
+      "src/energy_forecasting/dataset.py": "34549f5bdc204a250d515f2f525a8e1abe66cc90eed14cd33164a7d69bfa7283",
+      "src/energy_forecasting/experiment.py": "2f515002a9e9e576ca6b581f442bcc51e4a2fa856186fefbf18aac8ca25211e5",
+      "src/energy_forecasting/features.py": "448d884fa23f9b365d3e50717dcc9c4228fcf8a3c85de59808b497817e1c7364",
+      "src/energy_forecasting/figures.py": "3742c20a2c0da2ec42cdce51d92cf790bec9ef4d1aaa69632499b3f0ea88dcb3",
+      "src/energy_forecasting/metrics.py": "d12008e44623a833c98ae8736915aeffe39cff7ceb6f3908c64ab149a7f3a47e",
+      "src/energy_forecasting/models.py": "abbafb4475536f98e10504a6db6d3b35467cc7a2a4d5e43780c5b8cb5742ebef",
+      "src/energy_forecasting/report.py": "37344e87d2a3c29c0e9470bb2205d406587518f3c21e00f9ed8be7bd5122396b",
+      "src/energy_forecasting/sensitivity.py": "9f9bd7f3aa0a544e3f9e7f5b8e172c0dcbc657dd4c6cf2a6fd97c09cc12f7521",
+      "src/energy_forecasting/verification.py": "57cb6d5de603f3be9b3ccbdc3d425213fb3304198f24cc1c03ab5fca8e14d787"
+    },
+    "git_commit": null,
+    "kind": "source_tree_sha256",
+    "note": "Content identity only; no Git commit or earlier creation date is asserted.",
+    "value": "06642bb9bb93086d89fb0f86b3ffd8019388ee7529f974b5477d730bbc4c67d1"
+  },
+  "common_prediction_count": 79178,
+  "config": {
+    "path": "experiment.json",
+    "sha256": "14a6935edcaef22f7e6042c4ce8830ebec98aad72ba73f19ba727f54f057dac8",
+    "values": {
+      "bootstrap_repetitions": 500,
+      "condition_order": [
+        "reference",
+        "corrupted",
+        "remediated"
+      ],
+      "forecast_horizon_hours": 24,
+      "l2_regularization": 0.1,
+      "learning_rate": 0.07,
+      "max_leaf_nodes": 31,
+      "max_model_iterations": 120,
+      "primary_metric": "mase",
+      "seasonal_period_hours": 168,
+      "seed": 20251206,
+      "train_end": "2016-12-31T23:00:00Z",
+      "validation_end": "2017-03-31T23:00:00Z"
+    }
+  },
+  "created_at_utc": "2026-09-28T19:07:57.647287+00:00",
+  "fault_cutoff": "2017-01-01T00:00:00+00:00",
+  "fault_manifest": {
+    "path": "fault_manifest.json",
+    "sha256": "db7f4374a683c0d1de54f196b91a01fe3452333b06b3538c3548c817e673e362"
+  },
+  "features": [
+    "lag_24",
+    "lag_48",
+    "lag_168",
+    "rolling_mean_24",
+    "rolling_std_24",
+    "rolling_mean_168",
+    "rolling_std_168",
+    "hour_sin",
+    "hour_cos",
+    "dow_sin",
+    "dow_cos",
+    "building_id",
+    "site_id",
+    "primary_use"
+  ],
+  "input_files": {
+    "corrupted": {
+      "path": "corrupted.csv.gz",
+      "rows": 210528,
+      "sha256": "1e2760303fde4f14918b773bf8084c28c468e43562d7b253ec46a33a0670aed4"
+    },
+    "reference": {
+      "path": "reference.csv.gz",
+      "rows": 210528,
+      "sha256": "63fc0c2afcc3c316794504c0ff73950f73fd72126d766978c297e3b07e12e234"
+    },
+    "remediated": {
+      "path": "remediated.csv.gz",
+      "rows": 210528,
+      "sha256": "ca6361a77754cdb01c4c1842f239cf45e4a2f3c6b92b52598c07a2212d79759b"
+    }
+  },
+  "input_verification": {
+    "checks": {
+      "corrupted_changes_documented": true,
+      "equal_condition_keys": true,
+      "equal_condition_metadata": true,
+      "fault_cutoff": true,
+      "fault_values": true,
+      "manifest_versions_and_suite": true,
+      "post_cutoff_condition_parity": true,
+      "producer_hashes": true,
+      "producer_row_counts": true,
+      "required_columns": true,
+      "timestamps_parse": true,
+      "unique_keys": true
+    },
+    "documented_affected_keys": 27,
+    "documented_fault_records": 27,
+    "fault_cutoff": "2017-01-01T00:00:00+00:00",
+    "fault_manifest_sha256": "db7f4374a683c0d1de54f196b91a01fe3452333b06b3538c3548c817e673e362",
+    "input_sha256": {
+      "corrupted": "1e2760303fde4f14918b773bf8084c28c468e43562d7b253ec46a33a0670aed4",
+      "reference": "63fc0c2afcc3c316794504c0ff73950f73fd72126d766978c297e3b07e12e234",
+      "remediated": "ca6361a77754cdb01c4c1842f239cf45e4a2f3c6b92b52598c07a2212d79759b"
+    },
+    "max_fault_timestamp": "2016-11-04T22:00:00+00:00",
+    "post_cutoff_condition_parity": {
+      "fault_cutoff": "2017-01-01T00:00:00+00:00",
+      "passed": true,
+      "rows_checked": {
+        "corrupted": 105120,
+        "remediated": 105120
+      },
+      "rule": "all condition loads equal reference at timestamp >= fault_cutoff"
+    },
+    "producer_manifest_sha256": "b589f30791712bfb51340c552c0d8254babc91fef1791b8f3b6509d3a2215334",
+    "remediated_changed_keys": 22107,
+    "remediated_changes_outside_injected_fault_set": 22080,
+    "rows_per_condition": {
+      "corrupted": 210528,
+      "reference": 210528,
+      "remediated": 210528
+    },
+    "schema_version": "1.0",
+    "unique_keys": 210528
+  },
+  "metric_policy": {
+    "primary": "pooled_mase_168",
+    "primary_column": "mase",
+    "primary_status": "unchanged",
+    "scale_source": "reference_training_only",
+    "supplementary": "macro_mean_of_finite_per_building_mase_168",
+    "supplementary_column": "mase_macro_building",
+    "undefined_scale_policy": "retain per-building NaN and exclude it from the finite macro mean"
+  },
+  "models": {
+    "hist_gradient_boosting": {
+      "l2_regularization": 0.1,
+      "learning_rate": 0.07,
+      "max_iter": 120,
+      "max_leaf_nodes": 31,
+      "seed": 20251206
+    },
+    "seasonal_naive": {
+      "fallback_order_hours": [
+        168,
+        24
+      ]
+    }
+  },
+  "package_version": "0.1.0",
+  "partition_row_counts": {
+    "corrupted": {
+      "test_rows": 79200,
+      "total_rows": 210528,
+      "train_rows": 105408,
+      "train_target_rows": 105399,
+      "validation_rows": 25920
+    },
+    "reference": {
+      "test_rows": 79200,
+      "total_rows": 210528,
+      "train_rows": 105408,
+      "train_target_rows": 105400,
+      "validation_rows": 25920
+    },
+    "remediated": {
+      "test_rows": 79200,
+      "total_rows": 210528,
+      "train_rows": 105408,
+      "train_target_rows": 83375,
+      "validation_rows": 25920
+    }
+  },
+  "platform": "macOS-26.6.2-arm64-arm-64bit",
+  "prediction_rows": 475068,
+  "producer_manifest": {
+    "path": "dataset_manifest.json",
+    "sha256": "b589f30791712bfb51340c552c0d8254babc91fef1791b8f3b6509d3a2215334"
+  },
+  "python_version": "3.12.14 (main, Aug 25 2026, 13:50:33) [Clang 22.1.3 ]",
+  "reference_training_scale_coverage": {
+    "building_count": 12,
+    "undefined_scale_buildings": [],
+    "undefined_scale_count": 0,
+    "valid_scale_buildings": [
+      "Eagle_education_Alberto",
+      "Eagle_education_April",
+      "Eagle_office_Amanda",
+      "Eagle_office_Bridgett",
+      "Panther_education_Annetta",
+      "Panther_education_Aurora",
+      "Panther_office_Clementine",
+      "Panther_office_Danica",
+      "Rat_education_Kathryn",
+      "Rat_education_Lee",
+      "Rat_office_Avis",
+      "Rat_office_Colby"
+    ],
+    "valid_scale_count": 12
+  },
+  "reference_training_scales_by_building": {
+    "Eagle_education_Alberto": 51.57437178505106,
+    "Eagle_education_April": 20.93323101207056,
+    "Eagle_office_Amanda": 39.0832217270195,
+    "Eagle_office_Bridgett": 22.509294417363044,
+    "Panther_education_Annetta": 7.606915111420612,
+    "Panther_education_Aurora": 8.016939275766019,
+    "Panther_office_Clementine": 4.599246390436397,
+    "Panther_office_Danica": 0.8172931754874653,
+    "Rat_education_Kathryn": 125.23525894101255,
+    "Rat_education_Lee": 56.62367278216442,
+    "Rat_office_Avis": 186.53863098002788,
+    "Rat_office_Colby": 219.93569089642358
+  },
+  "result_files": {
+    "building_mase.csv": {
+      "sha256": "1ce4bdb38083590a50196f1e2ae59ec0520d56d306b01a03600fbe63273caa34",
+      "size_bytes": 8099
+    },
+    "figures/macro_building_mase.svg": {
+      "sha256": "640ed0604992a04cb8b5839552e2d0fe6ac0e02623202f9110d8b106dcfcf6a8",
+      "size_bytes": 3792
+    },
+    "figures/mae_by_condition.svg": {
+      "sha256": "b9c864e91b9d749a2a1a85462a65e1127d69653daac323fa7cf9251c300d0cfa",
+      "size_bytes": 3763
+    },
+    "metrics.csv": {
+      "sha256": "6fad05e11af54e4becd8e3ae73f96cb64379037ee8161666fb6130dde6812648",
+      "size_bytes": 1455
+    },
+    "model_card.md": {
+      "sha256": "9476b97d0f1b81036d8a8cfe8c9dab1a3fe647fb7dc4911b90c5a90631ca8783",
+      "size_bytes": 2424
+    },
+    "paired_differences.csv": {
+      "sha256": "f2649d97bff1153ba7373439b0e9211205f38ab8a5a3e9be89d7110b1de9af77",
+      "size_bytes": 280
+    },
+    "predictions.csv.gz": {
+      "sha256": "4174629935cea01f25496baeb5d00112465cb0d7a52ee047f659c6fb3d78efae",
+      "size_bytes": 5318934
+    },
+    "report.html": {
+      "sha256": "0d7408ba5b36c1078ededc853d5cb6880bc84fe522ff2dd32d6010dc4483f11a",
+      "size_bytes": 6090
+    },
+    "report.md": {
+      "sha256": "db056a7b02eded15be35560b93ec5ca3d3e223c85cbddaade3d621a908e557a4",
+      "size_bytes": 3336
+    },
+    "subgroup_metrics.csv": {
+      "sha256": "27a313695e4d6bb79411b1adab788bcb02ec44e0667794747fca9fdc91ebe836",
+      "size_bytes": 23257
+    }
+  },
+  "runtime_packages": {
+    "numpy": "2.3.5",
+    "pandas": "2.2.3",
+    "scikit_learn": "1.9.1"
+  },
+  "schema_version": "1.0",
+  "seasonal_scale": 61.942971667505034,
+  "seed": 20251206,
+  "split": {
+    "strategy": "pre_specified_calendar_boundaries",
+    "test_end": "2017-12-31T23:00:00+00:00",
+    "train_end": "2016-12-31T23:00:00+00:00",
+    "validation_end": "2017-03-31T23:00:00+00:00"
+  },
+  "state_policy": "stateless; no conversational state or personal data",
+  "target_source": "reference",
+  "timestamp_semantics": "canonical comparison timestamps; intended Panther/Eagle/Rat inputs preserve US/Eastern source-local wall-clock calendar values and do not establish true UTC offset conversion"
+}

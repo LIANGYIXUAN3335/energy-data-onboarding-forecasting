@@ -1,0 +1,25 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+type: software
+title: "Energy Data Onboarding and Demand Forecasting"
+abstract: >-
+  Two reproducible Python packages for onboarding public building-electricity
+  meter data (Building Data Genome 2) with quality gates, seeded fault
+  injection and past-only remediation, and for measuring how those data
+  conditions affect 24-hour-ahead demand forecasts. Successor to the author's
+  January 2026 capstone "Machine Learning for Reliable Energy Demand
+  Forecasting in U.S. Energy Infrastructure" (IMA 2026 poster).
+authors:
+  - family-names: Liang
+    given-names: Yixuan
+    email: liangyixuan333@gmail.com
+    affiliation: "Illinois Institute of Technology (M.S. Computer Science, 2022)"
+version: 0.1.0
+date-released: "2026-09-28"
+license: MIT
+keywords:
+  - energy demand forecasting
+  - data onboarding
+  - data quality
+  - Building Data Genome 2
+  - reproducibility
