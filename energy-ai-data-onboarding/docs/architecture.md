@@ -23,6 +23,13 @@ sequenceDiagram
     P->>P: deterministic gzip + SHA-256 manifest
 ```
 
+In v3 the ingestion step also normalizes site weather onto the same hourly
+grid and publishes it as `weather.csv.gz`; the fault injector and remediator
+never touch it. The quality suite first calibrates its run detectors per
+building on the reference rows before the fault cutoff, writes
+`detector_calibration.csv`, and then applies those frozen thresholds to every
+condition.
+
 ## Enforced invariants
 
 1. Condition datasets expose only
@@ -37,7 +44,7 @@ sequenceDiagram
 6. Unrepairable rows are preserved in quarantine with reason codes.
 7. Source rows are never overwritten in place; every condition is published as
    a separate artifact.
-8. Local absolute paths, secrets, and conversational/user state are excluded
+8. Local absolute paths, secrets, and user state are excluded
    from published manifests.
 
 ## Gate policy

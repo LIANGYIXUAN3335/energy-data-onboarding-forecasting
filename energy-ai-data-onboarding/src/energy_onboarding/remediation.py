@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections import deque
 from dataclasses import dataclass
 from typing import Any
 
@@ -39,6 +40,8 @@ QUARANTINE_COLUMNS = [
     "reason",
 ]
 
+REPAIR_STRATEGIES = ("forward_fill", "forward_then_profile")
+
 
 def remediate(
     corrupted: pd.DataFrame,
@@ -46,16 +49,39 @@ def remediate(
     quality: QualityConfig | None = None,
     maximum_forward_fill_hours: int = 3,
     repair_before: str | pd.Timestamp | None = None,
+    repair_strategy: str = "forward_fill",
+    maximum_profile_fill_hours: int = 48,
+    profile_weeks: int = 8,
+    profile_fill_ambiguous_scale: bool = False,
 ) -> RemediationResult:
-    """Repair short defects from earlier rows only; quarantine the remainder.
+    """Repair defects from earlier rows only; quarantine the remainder.
+
+    Two past-only repair rules exist:
+
+    * ``forward_fill``: an invalid row inside a gap of at most
+      ``maximum_forward_fill_hours`` consecutive invalid rows takes the last
+      valid value observed before the gap.
+    * ``forward_then_profile`` (v3): rows that the forward fill cannot cover,
+      up to ``maximum_profile_fill_hours`` consecutive invalid rows, take the
+      median of the same weekday/hour over the previous ``profile_weeks`` weeks,
+      computed only from originally valid observations that are strictly
+      earlier than the row being repaired.
 
     The algorithm never performs backward fill, centered smoothing, or linear
-    interpolation. Suspected unit/level shifts are never divided by an inferred
-    scale because the physical unit is not safely knowable from values alone.
+    interpolation, and never divides a suspected unit shift by an inferred
+    factor. Suspected unit/level shifts are quarantined unless
+    ``profile_fill_ambiguous_scale`` explicitly allows the profile rule to
+    replace them with the building's typical value for that hour.
     """
 
     if maximum_forward_fill_hours < 0:
         raise ValueError("maximum_forward_fill_hours must be non-negative.")
+    if repair_strategy not in REPAIR_STRATEGIES:
+        raise ValueError(f"repair_strategy must be one of {REPAIR_STRATEGIES}.")
+    if maximum_profile_fill_hours < 0:
+        raise ValueError("maximum_profile_fill_hours must be non-negative.")
+    if profile_weeks < 1:
+        raise ValueError("profile_weeks must be at least 1.")
     config = quality or QualityConfig()
     work = corrupted.copy(deep=True).reset_index(drop=True)
     work["timestamp"] = pd.to_datetime(work["timestamp"], errors="coerce", utc=True)
@@ -106,13 +132,26 @@ def remediate(
     work.loc[value_invalid, "load"] = np.nan
     log_rows: list[dict[str, Any]] = []
     quarantine_rows: list[dict[str, Any]] = []
+    use_profile = repair_strategy == "forward_then_profile"
+    forward_rule = f"past_only_forward_fill_limit_{maximum_forward_fill_hours}h"
+    profile_rule = (
+        f"past_only_hour_of_week_median_{profile_weeks}w_limit_{maximum_profile_fill_hours}h"
+    )
 
     # Stable ordering preserves same-timestamp order but normal inputs have one key.
     ordered = work.sort_values(["building_id", "timestamp"], kind="stable", na_position="first")
     for _, group in ordered.groupby("building_id", sort=False, dropna=False):
         last_valid: float | None = None
         gap_length = 0
+        # Causal hour-of-week history of originally valid values only.
+        history: dict[int, deque[float]] = {}
         for index in group.index:
+            timestamp = work.at[index, "timestamp"]
+            hour_of_week = (
+                int(timestamp.dayofweek) * 24 + int(timestamp.hour)
+                if pd.notna(timestamp)
+                else None
+            )
             if protected.loc[index]:
                 current_protected = work.at[index, "load"]
                 if pd.notna(current_protected) and np.isfinite(current_protected):
@@ -125,22 +164,44 @@ def remediate(
             if not was_invalid and not invalid_structural and pd.notna(current) and np.isfinite(current):
                 last_valid = float(current)
                 gap_length = 0
+                if hour_of_week is not None:
+                    history.setdefault(hour_of_week, deque(maxlen=profile_weeks)).append(float(current))
                 continue
             gap_length += 1
             reason = ";".join(reasons[int(index)]) or "unresolved_quality_issue"
-            # Ambiguous scale and structural problems are never auto-repaired.
-            can_fill = (
+            is_ambiguous = bool(ambiguous_scale.loc[index])
+            # Structural problems are never auto-repaired. Ambiguous scale is
+            # forward-filled never, and profile-filled only when explicitly allowed.
+            can_forward_fill = (
                 was_invalid
                 and not invalid_structural
-                and not bool(ambiguous_scale.loc[index])
+                and not is_ambiguous
                 and last_valid is not None
                 and gap_length <= maximum_forward_fill_hours
             )
-            if can_fill:
+            profile_value: float | None = None
+            if (
+                not can_forward_fill
+                and use_profile
+                and was_invalid
+                and not invalid_structural
+                and (not is_ambiguous or profile_fill_ambiguous_scale)
+                and gap_length <= maximum_profile_fill_hours
+                and hour_of_week is not None
+            ):
+                values = history.get(hour_of_week)
+                if values and len(values) >= 2:
+                    profile_value = float(np.median(np.fromiter(values, dtype=float)))
+            if can_forward_fill:
                 work.at[index, "load"] = last_valid
                 status = "repaired"
-                rule = f"past_only_forward_fill_limit_{maximum_forward_fill_hours}h"
+                rule = forward_rule
                 remediated_value: Any = last_valid
+            elif profile_value is not None:
+                work.at[index, "load"] = profile_value
+                status = "repaired"
+                rule = profile_rule
+                remediated_value = profile_value
             else:
                 work.at[index, "load"] = np.nan
                 status = "quarantined"

@@ -11,12 +11,11 @@ machine-readable artifacts and generated reports.
 It is a local batch research prototype, not an operational grid service or
 production platform.
 
-## Stateless privacy boundary
+## Data policy
 
-The pipeline has no LLM or chat integration. It does not retain conversation
-history, prompts, user profiles, embeddings, vector indexes, browsing history,
-analytics, personal information, or telemetry. It does not transmit local
-results. See [PRIVACY.md](PRIVACY.md).
+The pipeline processes public building-energy measurements, public site
+weather and reproducibility metadata only. It is a stateless batch program: it
+stores no personal data and transmits nothing. See [PRIVACY.md](PRIVACY.md).
 
 ## Source
 
@@ -78,8 +77,26 @@ a fail-closed reference gate. A run must use a new or empty
 output directory; this prevents a blocked run from being mixed with previously
 published artifacts.
 
-The completed final optimized bundle is
-`results/bdg2_mvp_v2_hardened`.
+Two committed bundles exist:
+
+- `results/bdg2_mvp_v2_hardened`: the pre-registered v2 baseline (fixed
+  run-detector thresholds, forward-fill-only remediation, one seeded event per
+  fault family, no weather).
+- `results/bdg2_v3`: the v3 amendment dated 2026-09-28
+  (`configs/bdg2_v3.json`, `experiments/protocol_v3_amendment.md`): whole-run
+  flagging, per-building stuck-sensor calibration on the reference data,
+  profile-aware zero-run detection, past-only hour-of-week profile repair,
+  four seeded events per fault family, and the published site weather
+  artifact. Run it with the additional `--weather-csv` argument:
+
+```bash
+.venv/bin/energy-onboard run \
+  --config energy-ai-data-onboarding/configs/bdg2_v3.json \
+  --electricity-csv energy-ai-data-onboarding/data/raw/electricity.csv \
+  --metadata-csv energy-ai-data-onboarding/data/raw/metadata.csv \
+  --weather-csv energy-ai-data-onboarding/data/raw/weather.csv \
+  --output-dir energy-ai-data-onboarding/results/bdg2_v3_repeat
+```
 
 The configuration explicitly names twelve buildings—two Education and two
 Office buildings at each of Eagle, Panther, and Rat. Selection is declared
@@ -112,6 +129,11 @@ Additional artifacts are:
 - `quality_issues.csv.gz`, `quality_summary.json`;
 - `remediation_log.csv.gz`, `quarantine.csv.gz`;
 - `fault_manifest.json`, `detector_metrics.csv`;
+- `detector_calibration.csv`: the per-building run-detector thresholds that
+  were actually applied and the statistics they were derived from;
+- `weather.csv.gz` (v3): site weather on the same hourly grid, columns
+  `timestamp,site_id,air_temperature,dew_temperature,wind_speed,cloud_coverage,precip_depth_1hr,sea_lvl_pressure`,
+  nulls preserved, never touched by the fault suites;
 - `dataset_manifest.json`, `run_manifest.json`;
 - generated `data_card.md`, `report.md`, and `report.html`.
 
@@ -136,10 +158,21 @@ original value, corrupted value, type, and severity is recorded. Each seeded
 event also has a deterministic `fault_id`, start/end range, affected-key count,
 and SHA-256 digest; verification recomputes these fields from the per-key rows.
 
-Remediation does not consult fault ground truth. It uses at most the configured
-number of earlier forward-fill hours; it never backfills or interpolates from a
-future value. Ambiguous scale shifts and unresolved problems are left null and
-quarantined. Negative or adverse experimental outcomes remain reportable.
+Remediation does not consult fault ground truth and never backfills or
+interpolates from a future value. The v2 rule forward-fills at most three
+hours from the last valid reading and quarantines everything else. The v3 rule
+adds a second, still past-only step: gaps of up to 48 hours take the median of
+the same weekday and hour over the previous eight weeks, computed only from
+earlier, originally valid readings; a suspected unit shift receives that
+profile value rather than being divided by an inferred factor. Longer gaps
+stay null and quarantined. Negative or adverse experimental outcomes remain
+reportable.
+
+Run detectors are calibrated per building in v3: the stuck-sensor threshold is
+raised to just above the 0.999 quantile of the building's natural constant-run
+lengths (computed on the reference condition strictly before the fault cutoff),
+and a zero run is only flagged during hours when the building is normally
+active. The applied thresholds are published in `detector_calibration.csv`.
 
 See [the data contract](docs/data_contract.md),
 [architecture](docs/architecture.md), and [limitations](LIMITATIONS.md).

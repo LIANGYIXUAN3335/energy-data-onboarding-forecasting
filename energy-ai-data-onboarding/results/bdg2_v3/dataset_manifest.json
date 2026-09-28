@@ -1,0 +1,869 @@
+{
+  "check_counts": {
+    "corrupted": {
+      "fail": 1,
+      "pass": 10,
+      "warn": 4
+    },
+    "detector_validation": {
+      "fail": 4,
+      "pass": 6,
+      "warn": 5
+    },
+    "reference": {
+      "fail": 0,
+      "pass": 16,
+      "warn": 4
+    },
+    "remediated": {
+      "fail": 0,
+      "pass": 13,
+      "warn": 2
+    }
+  },
+  "code_revision": {
+    "file_count": 15,
+    "files": {
+      "pyproject.toml": "2d6d6ba825aac787f3fdf6ef3a1adcc8544a0edeb573316998677d7bc8e2383f",
+      "src/energy_onboarding/__init__.py": "1d8e59216275c5e09c13a1d2c2687279134cffb3d1842a0ad7ee34cddd5ed8c0",
+      "src/energy_onboarding/__main__.py": "2cdd23d4f5cd6c3b3e4cb690ad16d560637767b9ca5b2a3cf129fcc0a5ebc82b",
+      "src/energy_onboarding/checks.py": "d975515cfb72564a2d46c35ba52fea615eafe505f7ba21eaf62928465f456ffe",
+      "src/energy_onboarding/cli.py": "e75848bc608536c95b8c247eda96bcd912a687cfa98a059c27f4524051facb5f",
+      "src/energy_onboarding/contracts.py": "a97b48045f1fce82cf9adf3aa434c943ddfc56d5dd843f0af752d71c5f664fb8",
+      "src/energy_onboarding/downloader.py": "eca177b7618484232a4a45c48109df11a2001383148f8fc4d24c5defc3b021d9",
+      "src/energy_onboarding/faults.py": "ff1f2207be01e47ae0ad28be4c6701aa3ffc1c6a0b63cb3361bce89a7daac22f",
+      "src/energy_onboarding/gates.py": "0083fa3339b4f9fc9c3a5f456c9f58d9eb1e479bc8feb84b5c97a866a57db101",
+      "src/energy_onboarding/ingest.py": "f85ccde584f610305cbf4da1072f49df0c8f409acbfa3cf0dfac34b09a0557dd",
+      "src/energy_onboarding/io_utils.py": "9e5624eb75788bfe3418dde0391b7f84c96f0ab5027dc0c8ff3c2b04a290e9f3",
+      "src/energy_onboarding/pipeline.py": "f162b6abd74a1a7efaa41e783ddf929e7b064e74122de1392d7f2082ac12926a",
+      "src/energy_onboarding/remediation.py": "978c0fd3c6f1f7fcfb3aa11b7cc384211726cc022fad1c1a88ca8f3ffbd44195",
+      "src/energy_onboarding/reporting.py": "ff6ce54d86a5af97ec534a436555b9d1ff40d84c93073c866c7d911dbb2babcd",
+      "src/energy_onboarding/weather.py": "98c4686e2b0f67afe0f3132d7cd53feba33dbfbe2cff3d0bcf78acff890978a2"
+    },
+    "git_commit": null,
+    "kind": "source_tree_sha256",
+    "note": "Content identity only; no Git commit or earlier creation date is asserted.",
+    "value": "164d0e2371bbcd158aea4734b8bea12f37b77284c39eb985df8e41e3383792a7"
+  },
+  "config_hash": "bc03bf0942898255d113dd80053895d48c9ef8fe6d8442f69bf81125db7509b8",
+  "created_at_utc": "2026-09-28T21:17:07Z",
+  "dataset": {
+    "doi": "10.5281/zenodo.3887306",
+    "title": "Building Data Genome Project 2",
+    "version": "v1.0"
+  },
+  "dataset_summary": {
+    "buildings": 12,
+    "by_primary_use": {
+      "Education": 105264,
+      "Office": 105264
+    },
+    "by_season": {
+      "autumn": 52416,
+      "spring": 52992,
+      "summer": 52992,
+      "winter": 52128
+    },
+    "by_site": {
+      "Eagle": 70176,
+      "Panther": 70176,
+      "Rat": 70176
+    },
+    "by_timezone": {
+      "US/Eastern": 210528
+    },
+    "load_missing": 54,
+    "rows": 210528,
+    "timestamp_max": "2017-12-31T23:00:00+00:00",
+    "timestamp_min": "2016-01-01T00:00:00+00:00"
+  },
+  "detector_policy": {
+    "calibration_artifact": "detector_calibration.csv",
+    "calibration_source": "reference condition, strictly before the fault cutoff",
+    "long_zero_threshold": 6,
+    "profile_weeks": 8,
+    "run_flagging": "whole_run",
+    "stuck_calibration_quantile": 0.999,
+    "stuck_threshold_configured": 8,
+    "zero_profile_min_ratio": 0.25
+  },
+  "execution_scope": "verified_bdg2_subset",
+  "fault_cutoff": "2017-01-01T00:00:00+00:00",
+  "fault_event_metadata_version": "1.0",
+  "fault_events_per_type": 4,
+  "files": {
+    "corrupted.csv.gz": {
+      "columns": [
+        "timestamp",
+        "building_id",
+        "load",
+        "site_id",
+        "primary_use",
+        "condition"
+      ],
+      "path": "corrupted.csv.gz",
+      "rows": 210528,
+      "sha256": "49b3efb15726b8de04d847bdb6b7aca95533082f44add1c10c8d582df96cb121",
+      "size_bytes": 1444176
+    },
+    "data_card.md": {
+      "path": "data_card.md",
+      "sha256": "6a60ddf41797b689b9bf4bff13954d9f7d3c624141cadd627e04c7f17a718d63",
+      "size_bytes": 1835
+    },
+    "detector_calibration.csv": {
+      "columns": [
+        "building_id",
+        "calibration_rows",
+        "repeat_rate",
+        "zero_rate",
+        "constant_run_count",
+        "constant_run_length_quantile",
+        "stuck_threshold_configured",
+        "stuck_threshold_effective",
+        "calibration_source",
+        "long_zero_threshold",
+        "zero_profile_min_ratio",
+        "profile_weeks",
+        "run_flagging",
+        "zero_rows_exempted_by_profile"
+      ],
+      "path": "detector_calibration.csv",
+      "rows": 12,
+      "sha256": "f2e34bf37702cfd2d6995b5b2580b2e3ac11a04a8f8bd1dc45855aba39304717",
+      "size_bytes": 1764
+    },
+    "detector_metrics.csv": {
+      "columns": [
+        "fault_type",
+        "true_positive",
+        "false_negative",
+        "false_positive",
+        "true_negative",
+        "precision",
+        "recall",
+        "false_positive_rate"
+      ],
+      "path": "detector_metrics.csv",
+      "rows": 10,
+      "sha256": "9e0127e60f5383601f0c02d532290c0fe4d68dfd84a6b205d321587e0ffbb4a2",
+      "size_bytes": 716
+    },
+    "fault_manifest.json": {
+      "path": "fault_manifest.json",
+      "sha256": "7280204469a9c98fd468e4fcd5882bb751a92220ebc23d61cd8939e4a227c530",
+      "size_bytes": 156907
+    },
+    "quality_issues.csv.gz": {
+      "columns": [
+        "check_name",
+        "issue_code",
+        "severity",
+        "timestamp",
+        "building_id",
+        "observed_value",
+        "expected_rule",
+        "action",
+        "source_condition",
+        "seeded_fault",
+        "count",
+        "denominator",
+        "rate",
+        "repairable",
+        "message",
+        "threshold_basis",
+        "warn_above",
+        "fail_above",
+        "threshold_comparison"
+      ],
+      "path": "quality_issues.csv.gz",
+      "rows": 156,
+      "sha256": "b61781836be8b654dd0dcdaf8a35f510de1f4385f087a9ed40da3f6b96506ba6",
+      "size_bytes": 3504
+    },
+    "quality_summary.json": {
+      "path": "quality_summary.json",
+      "sha256": "744cc7205041ab5db529f4bd12a19004dc39d1040c4dc3458ccaaa6e2aff2d72",
+      "size_bytes": 32996
+    },
+    "quarantine.csv.gz": {
+      "columns": [
+        "timestamp",
+        "building_id",
+        "load",
+        "site_id",
+        "primary_use",
+        "condition",
+        "reason"
+      ],
+      "path": "quarantine.csv.gz",
+      "rows": 3451,
+      "sha256": "bb19dcf928e9242c4b2f1e3d435bff615a1bb6286b3ee42a9304736cfd00e39d",
+      "size_bytes": 11124
+    },
+    "reference.csv.gz": {
+      "columns": [
+        "timestamp",
+        "building_id",
+        "load",
+        "site_id",
+        "primary_use",
+        "condition"
+      ],
+      "path": "reference.csv.gz",
+      "rows": 210528,
+      "sha256": "63fc0c2afcc3c316794504c0ff73950f73fd72126d766978c297e3b07e12e234",
+      "size_bytes": 1444294
+    },
+    "remediated.csv.gz": {
+      "columns": [
+        "timestamp",
+        "building_id",
+        "load",
+        "site_id",
+        "primary_use",
+        "condition"
+      ],
+      "path": "remediated.csv.gz",
+      "rows": 210528,
+      "sha256": "7146abac2c9a3bfd3db6bb75d7b4c1d245846bd60cf39946f182db0c5685d370",
+      "size_bytes": 1447600
+    },
+    "remediation_log.csv.gz": {
+      "columns": [
+        "timestamp",
+        "building_id",
+        "original_value",
+        "remediated_value",
+        "rule",
+        "status",
+        "reason"
+      ],
+      "path": "remediation_log.csv.gz",
+      "rows": 4945,
+      "sha256": "326c441706941569e383ef9c2e59ed9ba73b821e09fb7f17947f0a032581baf6",
+      "size_bytes": 23796
+    },
+    "report.html": {
+      "path": "report.html",
+      "sha256": "b9c8df726fd79e0d455cbc3c25cea44a325612eef3de124617fc5b9bb11a4c2d",
+      "size_bytes": 49519
+    },
+    "report.md": {
+      "path": "report.md",
+      "sha256": "c1e6655d3ce5fdf1e5504071a27997bf9960f23cac3b30fffaead08701bd761c",
+      "size_bytes": 3954
+    },
+    "run_manifest.json": {
+      "path": "run_manifest.json",
+      "sha256": "df8899cb0394fe86dbe17138d601c65f908eca13b91ce8275175a8d9ae9d5f8d",
+      "size_bytes": 3124
+    },
+    "weather.csv.gz": {
+      "columns": [
+        "timestamp",
+        "site_id",
+        "air_temperature",
+        "dew_temperature",
+        "wind_speed",
+        "cloud_coverage",
+        "precip_depth_1hr",
+        "sea_lvl_pressure"
+      ],
+      "path": "weather.csv.gz",
+      "rows": 52632,
+      "sha256": "89182d330d06c904bc57eb5e0278f2fb7db68a5d872a21780058f05ab6c9e1e8",
+      "size_bytes": 449146
+    }
+  },
+  "input_files": {
+    "electricity": {
+      "path": "electricity.csv",
+      "sha256": "039d909d8981e2d69eaeb366144e6ab7e84fa5e7e216aee42bddd95384a66418",
+      "size_bytes": 174239039
+    },
+    "metadata": {
+      "path": "metadata.csv",
+      "sha256": "992d0b29f24f96ad4332bc4dbb534b7bdd7dd2689aad093f94e93068ecddca02",
+      "size_bytes": 272024
+    },
+    "weather": {
+      "path": "weather.csv",
+      "sha256": "94dc014ebaf1b67488c8321936ad76e22628ed2ca9f30dfdbeda911b64026484",
+      "size_bytes": 19457782
+    }
+  },
+  "outputs": {
+    "corrupted.csv.gz": {
+      "columns": [
+        "timestamp",
+        "building_id",
+        "load",
+        "site_id",
+        "primary_use",
+        "condition"
+      ],
+      "path": "corrupted.csv.gz",
+      "rows": 210528,
+      "sha256": "49b3efb15726b8de04d847bdb6b7aca95533082f44add1c10c8d582df96cb121",
+      "size_bytes": 1444176
+    },
+    "data_card.md": {
+      "path": "data_card.md",
+      "sha256": "6a60ddf41797b689b9bf4bff13954d9f7d3c624141cadd627e04c7f17a718d63",
+      "size_bytes": 1835
+    },
+    "detector_calibration.csv": {
+      "columns": [
+        "building_id",
+        "calibration_rows",
+        "repeat_rate",
+        "zero_rate",
+        "constant_run_count",
+        "constant_run_length_quantile",
+        "stuck_threshold_configured",
+        "stuck_threshold_effective",
+        "calibration_source",
+        "long_zero_threshold",
+        "zero_profile_min_ratio",
+        "profile_weeks",
+        "run_flagging",
+        "zero_rows_exempted_by_profile"
+      ],
+      "path": "detector_calibration.csv",
+      "rows": 12,
+      "sha256": "f2e34bf37702cfd2d6995b5b2580b2e3ac11a04a8f8bd1dc45855aba39304717",
+      "size_bytes": 1764
+    },
+    "detector_metrics.csv": {
+      "columns": [
+        "fault_type",
+        "true_positive",
+        "false_negative",
+        "false_positive",
+        "true_negative",
+        "precision",
+        "recall",
+        "false_positive_rate"
+      ],
+      "path": "detector_metrics.csv",
+      "rows": 10,
+      "sha256": "9e0127e60f5383601f0c02d532290c0fe4d68dfd84a6b205d321587e0ffbb4a2",
+      "size_bytes": 716
+    },
+    "fault_manifest.json": {
+      "path": "fault_manifest.json",
+      "sha256": "7280204469a9c98fd468e4fcd5882bb751a92220ebc23d61cd8939e4a227c530",
+      "size_bytes": 156907
+    },
+    "quality_issues.csv.gz": {
+      "columns": [
+        "check_name",
+        "issue_code",
+        "severity",
+        "timestamp",
+        "building_id",
+        "observed_value",
+        "expected_rule",
+        "action",
+        "source_condition",
+        "seeded_fault",
+        "count",
+        "denominator",
+        "rate",
+        "repairable",
+        "message",
+        "threshold_basis",
+        "warn_above",
+        "fail_above",
+        "threshold_comparison"
+      ],
+      "path": "quality_issues.csv.gz",
+      "rows": 156,
+      "sha256": "b61781836be8b654dd0dcdaf8a35f510de1f4385f087a9ed40da3f6b96506ba6",
+      "size_bytes": 3504
+    },
+    "quality_summary.json": {
+      "path": "quality_summary.json",
+      "sha256": "744cc7205041ab5db529f4bd12a19004dc39d1040c4dc3458ccaaa6e2aff2d72",
+      "size_bytes": 32996
+    },
+    "quarantine.csv.gz": {
+      "columns": [
+        "timestamp",
+        "building_id",
+        "load",
+        "site_id",
+        "primary_use",
+        "condition",
+        "reason"
+      ],
+      "path": "quarantine.csv.gz",
+      "rows": 3451,
+      "sha256": "bb19dcf928e9242c4b2f1e3d435bff615a1bb6286b3ee42a9304736cfd00e39d",
+      "size_bytes": 11124
+    },
+    "reference.csv.gz": {
+      "columns": [
+        "timestamp",
+        "building_id",
+        "load",
+        "site_id",
+        "primary_use",
+        "condition"
+      ],
+      "path": "reference.csv.gz",
+      "rows": 210528,
+      "sha256": "63fc0c2afcc3c316794504c0ff73950f73fd72126d766978c297e3b07e12e234",
+      "size_bytes": 1444294
+    },
+    "remediated.csv.gz": {
+      "columns": [
+        "timestamp",
+        "building_id",
+        "load",
+        "site_id",
+        "primary_use",
+        "condition"
+      ],
+      "path": "remediated.csv.gz",
+      "rows": 210528,
+      "sha256": "7146abac2c9a3bfd3db6bb75d7b4c1d245846bd60cf39946f182db0c5685d370",
+      "size_bytes": 1447600
+    },
+    "remediation_log.csv.gz": {
+      "columns": [
+        "timestamp",
+        "building_id",
+        "original_value",
+        "remediated_value",
+        "rule",
+        "status",
+        "reason"
+      ],
+      "path": "remediation_log.csv.gz",
+      "rows": 4945,
+      "sha256": "326c441706941569e383ef9c2e59ed9ba73b821e09fb7f17947f0a032581baf6",
+      "size_bytes": 23796
+    },
+    "report.html": {
+      "path": "report.html",
+      "sha256": "b9c8df726fd79e0d455cbc3c25cea44a325612eef3de124617fc5b9bb11a4c2d",
+      "size_bytes": 49519
+    },
+    "report.md": {
+      "path": "report.md",
+      "sha256": "c1e6655d3ce5fdf1e5504071a27997bf9960f23cac3b30fffaead08701bd761c",
+      "size_bytes": 3954
+    },
+    "run_manifest.json": {
+      "path": "run_manifest.json",
+      "sha256": "df8899cb0394fe86dbe17138d601c65f908eca13b91ce8275175a8d9ae9d5f8d",
+      "size_bytes": 3124
+    },
+    "weather.csv.gz": {
+      "columns": [
+        "timestamp",
+        "site_id",
+        "air_temperature",
+        "dew_temperature",
+        "wind_speed",
+        "cloud_coverage",
+        "precip_depth_1hr",
+        "sea_lvl_pressure"
+      ],
+      "path": "weather.csv.gz",
+      "rows": 52632,
+      "sha256": "89182d330d06c904bc57eb5e0278f2fb7db68a5d872a21780058f05ab6c9e1e8",
+      "size_bytes": 449146
+    }
+  },
+  "quarantine_counts": {
+    "rows": 3451
+  },
+  "remediation_counts": {
+    "log_rows": 4945,
+    "quarantined_rows": 3451,
+    "repaired_rows": 1494
+  },
+  "remediation_policy": {
+    "backward_fill_or_interpolation": false,
+    "future_values_used": false,
+    "maximum_forward_fill_hours": 3,
+    "maximum_profile_fill_hours": 48,
+    "profile_fill_ambiguous_scale": true,
+    "profile_weeks": 8,
+    "repair_strategy": "forward_then_profile",
+    "unit_scale_division": false
+  },
+  "runtime": {
+    "implementation": "CPython",
+    "numpy": "2.3.5",
+    "pandas": "2.2.3",
+    "platform": "darwin",
+    "python": "3.12.14"
+  },
+  "schema": {
+    "columns": [
+      "timestamp",
+      "building_id",
+      "load",
+      "site_id",
+      "primary_use",
+      "condition"
+    ],
+    "frequency": "1h",
+    "key": [
+      "timestamp",
+      "building_id"
+    ],
+    "null_policy": "preserve key with null and log/quarantine when unresolved",
+    "unit": "as supplied by BDG2; no unit conversion performed"
+  },
+  "schema_version": "1.0",
+  "seed": 20251206,
+  "selection": {
+    "exclusions": [
+      {
+        "building_id": "Bobcat_education_Rafael",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Bull_assembly_Freda",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Cockatoo_education_Ernesto",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Cockatoo_education_Noah",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Cockatoo_education_Priscilla",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Cockatoo_health_Ashlie",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Cockatoo_industrial_Elina",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Cockatoo_lodging_Fritz",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Cockatoo_office_Nola",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Hog_education_Martha",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Hog_education_Mathilda",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Hog_health_May",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Hog_industrial_Willette",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Hog_office_Darlene",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Hog_office_Ervin",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Hog_office_Eugene",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Hog_office_Jillian",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Hog_services_Cory",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Hog_services_Danny",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Hog_warehouse_Kaye",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Lamb_office_Anthony",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Moose_education_Dennis",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Moose_education_Omar",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Panther_education_Guillermina",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Panther_education_Jarrett",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Panther_education_Joyce",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Panther_education_Lacey",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Panther_education_Richard",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Panther_lodging_Aaron",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Panther_lodging_Alyssa",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Panther_lodging_Amos",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Panther_lodging_Arlene",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Panther_lodging_Bonnie",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Panther_lodging_Carroll",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Panther_lodging_Dean",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Panther_lodging_Drew",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Panther_lodging_Georgie",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Panther_lodging_Heather",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Panther_lodging_Jacquelyn",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Panther_lodging_Juliet",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Panther_lodging_Marlyn",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Panther_lodging_Otis",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Panther_lodging_Paulette",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Panther_lodging_Ricky",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Panther_lodging_Shelia",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Panther_office_Bryce",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Panther_office_Daina",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Panther_office_Gino",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Panther_office_Woodrow",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Panther_other_Ismael",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Panther_other_Iva",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Panther_other_Luis",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Panther_parking_Clarence",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Panther_retail_Jeanette",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Peacock_lodging_Erica",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Peacock_office_Ronda",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Swan_unknown_Darrin",
+        "reason": "not_present_in_meter_header"
+      },
+      {
+        "building_id": "Swan_unknown_Yoshiko",
+        "reason": "not_present_in_meter_header"
+      }
+    ],
+    "selected_buildings": [
+      "Eagle_education_Alberto",
+      "Eagle_education_April",
+      "Eagle_office_Amanda",
+      "Eagle_office_Bridgett",
+      "Panther_education_Annetta",
+      "Panther_education_Aurora",
+      "Panther_office_Clementine",
+      "Panther_office_Danica",
+      "Rat_education_Kathryn",
+      "Rat_education_Lee",
+      "Rat_office_Avis",
+      "Rat_office_Colby"
+    ],
+    "selected_sites": [
+      "Eagle",
+      "Panther",
+      "Rat"
+    ],
+    "source_rows_read": 17544,
+    "strategy": "metadata_round_robin_by_site_then_primary_use"
+  },
+  "source_manifest": "bdg2_v1.0.json",
+  "source_manifest_hash": "8da9b8255dd6ca827e584b1e1b22019865378f3aa00b17f4b95e079f90ad553c",
+  "source_verification": {
+    "electricity": {
+      "local_relative_path": "electricity.csv",
+      "name": "electricity.csv",
+      "observed_sha256": "039d909d8981e2d69eaeb366144e6ab7e84fa5e7e216aee42bddd95384a66418",
+      "observed_size_bytes": 174239039,
+      "verification_status": "verified"
+    },
+    "metadata": {
+      "local_relative_path": "metadata.csv",
+      "name": "metadata.csv",
+      "observed_sha256": "992d0b29f24f96ad4332bc4dbb534b7bdd7dd2689aad093f94e93068ecddca02",
+      "observed_size_bytes": 272024,
+      "verification_status": "verified"
+    },
+    "weather": {
+      "local_relative_path": "weather.csv",
+      "name": "weather.csv",
+      "observed_sha256": "94dc014ebaf1b67488c8321936ad76e22628ed2ca9f30dfdbeda911b64026484",
+      "observed_size_bytes": 19457782,
+      "verification_status": "verified"
+    }
+  },
+  "state_policy": {
+    "analytics": false,
+    "data_scope": "public energy data plus reproducibility artifacts",
+    "external_transmission": false,
+    "mode": "stateless"
+  },
+  "timestamp_semantics": "BDG2 raw meter timestamps are source-local wall-clock readings. For this prototype they are represented with a UTC marker for stable parsing without performing an offset conversion. The committed subset is restricted to sites with the same source timezone (US/Eastern). This must not be described as cross-timezone UTC harmonization; DST interpretation remains a limitation.",
+  "timestamp_semantics_machine": {
+    "basis": "source_local_wall_clock",
+    "canonical_marker": "UTC",
+    "dst_disambiguated": false,
+    "offset_conversion_applied": false
+  },
+  "weather": {
+    "duplicate_keys_averaged": 6,
+    "grid_end": "2017-12-31T23:00:00+00:00",
+    "grid_hours_materialized_as_null": 19,
+    "grid_start": "2016-01-01T00:00:00+00:00",
+    "missing_rate_by_site": {
+      "Eagle": {
+        "air_temperature": 0.0007409940720474236,
+        "cloud_coverage": 0.3999658002735978,
+        "dew_temperature": 0.0007409940720474236,
+        "precip_depth_1hr": 0.006041951664386685,
+        "sea_lvl_pressure": 0.01236890104879161,
+        "wind_speed": 0.0027359781121751026
+      },
+      "Panther": {
+        "air_temperature": 0.00028499772001823985,
+        "cloud_coverage": 0.42994756041951665,
+        "dew_temperature": 0.00028499772001823985,
+        "precip_depth_1hr": 0.0006269949840401277,
+        "sea_lvl_pressure": 0.018524851801185592,
+        "wind_speed": 0.00011399908800729594
+      },
+      "Rat": {
+        "air_temperature": 0.0007409940720474236,
+        "cloud_coverage": 0.4276675786593707,
+        "dew_temperature": 0.0009119927040583675,
+        "precip_depth_1hr": 0.0031919744642042863,
+        "sea_lvl_pressure": 0.01749886000911993,
+        "wind_speed": 0.0010259917920656635
+      }
+    },
+    "policy": "condition-independent; not touched by fault suites; nulls preserved; downstream imputation is fitted on the training partition only",
+    "rows": 52632,
+    "sites": [
+      "Eagle",
+      "Panther",
+      "Rat"
+    ],
+    "source_rows_for_selected_sites": 52619,
+    "unparseable_timestamps_in_source": 0,
+    "variables": [
+      "air_temperature",
+      "dew_temperature",
+      "wind_speed",
+      "cloud_coverage",
+      "precip_depth_1hr",
+      "sea_lvl_pressure"
+    ]
+  }
+}

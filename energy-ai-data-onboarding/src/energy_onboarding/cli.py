@@ -29,6 +29,10 @@ def _parser() -> argparse.ArgumentParser:
     meter.add_argument("--electricity-csv")
     meter.add_argument("--meter-csv", dest="electricity_csv")
     run.add_argument("--metadata-csv", required=True)
+    run.add_argument(
+        "--weather-csv",
+        help="optional pinned BDG2 weather.csv; publishes weather.csv.gz alongside the conditions",
+    )
     run.add_argument("--output-dir", required=True)
     run.add_argument("--fault-cutoff")
     run.add_argument("--seed", type=int)
@@ -65,6 +69,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 args.electricity_csv,
                 args.metadata_csv,
                 args.output_dir,
+                weather_csv=args.weather_csv,
                 fixture_mode=bool(args.fixture_mode),
                 fault_cutoff=args.fault_cutoff,
                 seed=args.seed,

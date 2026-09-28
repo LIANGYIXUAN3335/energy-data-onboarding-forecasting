@@ -1,0 +1,172 @@
+{
+  "schema_version": "1.2",
+  "dataset": {
+    "id": "bdg2-v1.0",
+    "title": "Building Data Genome Project 2",
+    "version": "v1.0",
+    "doi": "10.5281/zenodo.3887306",
+    "expected_frequency": "1h",
+    "timestamp_column": "timestamp",
+    "meter_shape": "wide",
+    "source_manifest": "provenance/bdg2_v1.0.json"
+  },
+  "selection": {
+    "site_ids": [],
+    "building_ids": [
+      "Eagle_education_Alberto",
+      "Eagle_education_April",
+      "Eagle_office_Amanda",
+      "Eagle_office_Bridgett",
+      "Panther_education_Annetta",
+      "Panther_education_Aurora",
+      "Panther_office_Clementine",
+      "Panther_office_Danica",
+      "Rat_education_Kathryn",
+      "Rat_education_Lee",
+      "Rat_office_Avis",
+      "Rat_office_Colby"
+    ],
+    "maximum_building_count": 12,
+    "maximum_source_rows": null,
+    "full_run": false,
+    "strategy": "metadata_round_robin_by_site_then_primary_use",
+    "read_chunk_rows": 4096
+  },
+  "quality": {
+    "long_zero_threshold": 6,
+    "stuck_threshold": 8,
+    "outlier_mad_z": 12.0,
+    "level_shift_ratio": 8.0,
+    "causal_window_hours": 168,
+    "rare_group_fraction": 0.01,
+    "run_flagging": "whole_run",
+    "stuck_calibration_quantile": 0.999,
+    "zero_profile_min_ratio": 0.25,
+    "profile_weeks": 8
+  },
+  "gate": {
+    "abort_on_reference_fail": true,
+    "fail_severities": [
+      "fail"
+    ],
+    "check_thresholds": {
+      "SCHEMA_REQUIRED_COLUMN_MISSING": {
+        "basis": "count",
+        "fail_above": 0
+      },
+      "TIMESTAMP_PARSE_ERROR": {
+        "basis": "count",
+        "fail_above": 0
+      },
+      "TIMESTAMP_ORDER_ERROR": {
+        "basis": "count",
+        "fail_above": 0
+      },
+      "DUPLICATE_OBSERVATION_KEY": {
+        "basis": "count",
+        "fail_above": 0
+      },
+      "LOAD_MISSING": {
+        "basis": "rate",
+        "warn_above": 0,
+        "fail_above": 0.05
+      },
+      "LOAD_INFINITE": {
+        "basis": "count",
+        "fail_above": 0
+      },
+      "NEGATIVE_LOAD": {
+        "basis": "count",
+        "fail_above": 0
+      },
+      "ROBUST_OUTLIER": {
+        "basis": "rate",
+        "warn_above": 0.01,
+        "fail_above": 0.2
+      },
+      "LONG_ZERO_RUN": {
+        "basis": "rate",
+        "warn_above": 0.01,
+        "fail_above": 0.5
+      },
+      "STUCK_SENSOR": {
+        "basis": "rate",
+        "warn_above": 0.01,
+        "fail_above": 0.5
+      },
+      "LEVEL_OR_UNIT_SHIFT": {
+        "basis": "rate",
+        "warn_above": 0.005,
+        "fail_above": 0.1
+      },
+      "METADATA_JOIN_MISSING": {
+        "basis": "count",
+        "fail_above": 0
+      },
+      "TIMEZONE_MISSING": {
+        "basis": "rate",
+        "warn_above": 0,
+        "fail_above": 0.1
+      },
+      "INTERVAL_CONTINUITY_GAP": {
+        "basis": "rate",
+        "warn_above": 0,
+        "fail_above": 0.05
+      },
+      "COVERAGE_RARE_GROUP": {
+        "basis": "rate",
+        "warn_above": 0
+      },
+      "SUBGROUP_METADATA_INSTABILITY": {
+        "basis": "count",
+        "fail_above": 0
+      },
+      "SPLIT_BUILDING_COVERAGE": {
+        "basis": "count",
+        "fail_above": 0
+      },
+      "SUBGROUP_SPLIT_COVERAGE": {
+        "basis": "rate",
+        "warn_above": 0,
+        "fail_above": 0.25
+      },
+      "METADATA_DUPLICATE_KEY": {
+        "basis": "count",
+        "fail_above": 0
+      },
+      "METADATA_MISSING_KEY": {
+        "basis": "count",
+        "fail_above": 0
+      },
+      "METADATA_REQUIRED_VALUE_MISSING": {
+        "basis": "rate",
+        "warn_above": 0,
+        "fail_above": 0.1
+      }
+    }
+  },
+  "faults": {
+    "seed": 20251206,
+    "severity": "medium",
+    "fault_cutoff": "2017-01-01T00:00:00Z",
+    "events_per_type": 4
+  },
+  "remediation": {
+    "maximum_forward_fill_hours": 3,
+    "repair_strategy": "forward_then_profile",
+    "maximum_profile_fill_hours": 48,
+    "profile_weeks": 8,
+    "profile_fill_ambiguous_scale": true,
+    "quarantine_unresolved": true
+  },
+  "publishing": {
+    "format": "csv.gz",
+    "deterministic_gzip_mtime": 0,
+    "hash": "sha256"
+  },
+  "weather": {
+    "required": true,
+    "source_file": "weather.csv"
+  },
+  "_protocol_note": "v3 policy: see experiments/protocol_v3_amendment.md (dated 2026-09-28)"
+}

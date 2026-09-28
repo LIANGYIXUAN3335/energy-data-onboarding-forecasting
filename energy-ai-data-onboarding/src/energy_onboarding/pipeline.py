@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Any
 
@@ -13,6 +13,7 @@ import pandas as pd
 from .checks import (
     QualityConfig,
     coverage_summary,
+    detector_calibration_table,
     run_quality_checks,
     split_boundary_checks,
     validate_fault_cutoff,
@@ -47,6 +48,7 @@ from .io_utils import (
 )
 from .remediation import remediate
 from .reporting import write_reports
+from .weather import prepare_weather, read_weather_csv, validate_weather_frame
 
 
 TIMESTAMP_SEMANTICS = (
@@ -88,6 +90,8 @@ class ReferenceQualityGateError(RuntimeError):
 
 def _quality_config(values: dict[str, Any]) -> QualityConfig:
     quality = values.get("quality", {})
+    quantile = quality.get("stuck_calibration_quantile")
+    zero_ratio = quality.get("zero_profile_min_ratio")
     return QualityConfig(
         frequency=str(values.get("dataset", {}).get("expected_frequency", "1h")),
         long_zero_threshold=int(quality.get("long_zero_threshold", 6)),
@@ -96,7 +100,24 @@ def _quality_config(values: dict[str, Any]) -> QualityConfig:
         level_shift_ratio=float(quality.get("level_shift_ratio", 8.0)),
         causal_window=int(quality.get("causal_window_hours", 168)),
         rare_group_fraction=float(quality.get("rare_group_fraction", 0.01)),
+        run_flagging=str(quality.get("run_flagging", "tail")),
+        stuck_calibration_quantile=float(quantile) if quantile is not None else None,
+        zero_profile_min_ratio=float(zero_ratio) if zero_ratio is not None else None,
+        profile_weeks=int(quality.get("profile_weeks", 8)),
     )
+
+
+def _remediation_kwargs(values: dict[str, Any]) -> dict[str, Any]:
+    remediation = values.get("remediation", {})
+    return {
+        "maximum_forward_fill_hours": int(remediation.get("maximum_forward_fill_hours", 3)),
+        "repair_strategy": str(remediation.get("repair_strategy", "forward_fill")),
+        "maximum_profile_fill_hours": int(remediation.get("maximum_profile_fill_hours", 48)),
+        "profile_weeks": int(remediation.get("profile_weeks", 8)),
+        "profile_fill_ambiguous_scale": bool(
+            remediation.get("profile_fill_ambiguous_scale", False)
+        ),
+    }
 
 
 def _selection_config(
@@ -146,16 +167,20 @@ def _verify_authoritative_inputs(
     source_manifest_path: Path,
     electricity_csv: Path,
     metadata_csv: Path,
+    weather_csv: Path | None = None,
 ) -> dict[str, Any]:
     source = read_json(source_manifest_path)
     declarations = {
         str(record["name"]): record for record in source.get("files", [])
     }
     result: dict[str, Any] = {}
-    for role, path, expected_name in (
+    roles = [
         ("electricity", electricity_csv, "electricity.csv"),
         ("metadata", metadata_csv, "metadata.csv"),
-    ):
+    ]
+    if weather_csv is not None:
+        roles.append(("weather", weather_csv, "weather.csv"))
+    for role, path, expected_name in roles:
         record = declarations.get(expected_name)
         if record is None:
             raise ValueError(f"Source manifest has no {expected_name} declaration.")
@@ -292,6 +317,7 @@ def run_pipeline(
     metadata_csv: str | Path,
     output_dir: str | Path,
     *,
+    weather_csv: str | Path | None = None,
     fixture_mode: bool = False,
     fault_cutoff: str | None = None,
     seed: int | None = None,
@@ -304,6 +330,12 @@ def run_pipeline(
     values = resolved_config.values
     electricity_path = Path(electricity_csv)
     metadata_path = Path(metadata_csv)
+    weather_path = Path(weather_csv) if weather_csv is not None else None
+    weather_values = values.get("weather", {})
+    if not isinstance(weather_values, dict):
+        raise ValueError("weather must be an object.")
+    if bool(weather_values.get("required", False)) and weather_path is None:
+        raise ValueError("This configuration requires --weather-csv (weather.required is true).")
     target = Path(output_dir)
     created_at = utc_now()
     _prepare_empty_target(target)
@@ -330,7 +362,7 @@ def run_pipeline(
     else:
         try:
             source_verification = _verify_authoritative_inputs(
-                source_manifest_path, electricity_path, metadata_path
+                source_manifest_path, electricity_path, metadata_path, weather_path
             )
         except (OSError, ValueError, SourceVerificationError, json.JSONDecodeError) as exc:
             _write_blocked_diagnostics(
@@ -355,7 +387,6 @@ def run_pipeline(
         timestamp_column=dataset.get("timestamp_column"),
         source_version=str(dataset.get("version", "v1.0")),
     )
-    quality_config = _quality_config(values)
     reference_internal = ingestion.frame.copy()
     fault_values = values.get("faults", {})
     chosen_cutoff = fault_cutoff or str(fault_values.get("fault_cutoff"))
@@ -363,6 +394,38 @@ def run_pipeline(
         raise ValueError("faults.fault_cutoff or --fault-cutoff is required.")
     chosen_seed = int(seed if seed is not None else fault_values.get("seed", 20251206))
     chosen_severity = str(severity or fault_values.get("severity", "medium"))
+    events_per_type = int(fault_values.get("events_per_type", 1))
+    # Run-detector calibration is derived from the natural reference data only
+    # and strictly before the fault cutoff; the same per-building thresholds
+    # are then applied to every condition so that seeded faults can never
+    # influence their own detection thresholds.
+    base_quality_config = replace(_quality_config(values), calibration_end=chosen_cutoff)
+    calibration_table = detector_calibration_table(
+        reference_internal.assign(
+            timestamp=pd.to_datetime(reference_internal["timestamp"], errors="coerce", utc=True)
+        ),
+        base_quality_config,
+    )
+    if base_quality_config.stuck_calibration_quantile is not None:
+        quality_config = replace(
+            base_quality_config,
+            stuck_thresholds_by_building={
+                str(row.building_id): int(row.stuck_threshold_effective)
+                for row in calibration_table.itertuples(index=False)
+            },
+        )
+        # Re-derive the published table with the frozen thresholds so that the
+        # artifact records the policy actually applied to every condition.
+        calibration_table = detector_calibration_table(
+            reference_internal.assign(
+                timestamp=pd.to_datetime(
+                    reference_internal["timestamp"], errors="coerce", utc=True
+                )
+            ),
+            quality_config,
+        )
+    else:
+        quality_config = base_quality_config
     gate_values = values.get("gate", {})
     if not isinstance(gate_values, dict):
         raise ValueError("gate must be an object.")
@@ -424,6 +487,7 @@ def run_pipeline(
         cutoff=chosen_cutoff,
         seed=chosen_seed,
         severity=chosen_severity,
+        events_per_type=events_per_type,
     )
     detector_checks = apply_check_thresholds(
         run_quality_checks(
@@ -442,6 +506,7 @@ def run_pipeline(
         cutoff=chosen_cutoff,
         seed=chosen_seed,
         severity=chosen_severity,
+        events_per_type=events_per_type,
     )
     corrupted_internal = downstream_suite.frame
     corrupted = condition_frame(corrupted_internal, "corrupted")
@@ -451,14 +516,12 @@ def run_pipeline(
         ),
         gate_values,
     )
-    remediation_values = values.get("remediation", {})
+    remediation_kwargs = _remediation_kwargs(values)
     remediation_result = remediate(
         corrupted_internal,
         quality=quality_config,
-        maximum_forward_fill_hours=int(
-            remediation_values.get("maximum_forward_fill_hours", 3)
-        ),
         repair_before=chosen_cutoff,
+        **remediation_kwargs,
     )
     remediated = remediation_result.frame
     remediated_checks = apply_check_thresholds(
@@ -502,6 +565,23 @@ def run_pipeline(
     }
     for filename, frame in condition_frames.items():
         write_csv_gzip(target / filename, frame)
+
+    weather_summary: dict[str, Any] | None = None
+    weather_frame: pd.DataFrame | None = None
+    if weather_path is not None:
+        reference_timestamps = pd.to_datetime(reference["timestamp"], utc=True)
+        weather_frame, weather_summary = prepare_weather(
+            read_weather_csv(weather_path),
+            site_ids=ingestion.selected_sites,
+            grid_start=reference_timestamps.min(),
+            grid_end=reference_timestamps.max(),
+            frequency=quality_config.frequency,
+        )
+        weather_errors = validate_weather_frame(weather_frame)
+        if weather_errors:
+            raise ValueError("Weather output contract failed: " + "; ".join(weather_errors))
+        write_csv_gzip(target / "weather.csv.gz", weather_frame)
+    _write_plain_csv(target / "detector_calibration.csv", calibration_table)
 
     reference_hash = sha256_file(target / "reference.csv.gz")
     fault_manifest = {
@@ -547,10 +627,30 @@ def run_pipeline(
         (remediation_result.log["status"] == "quarantined").sum()
     )
     coverage = coverage_summary(reference_internal)
+    detector_policy = {
+        "run_flagging": quality_config.run_flagging,
+        "stuck_threshold_configured": int(quality_config.stuck_threshold),
+        "stuck_calibration_quantile": quality_config.stuck_calibration_quantile,
+        "long_zero_threshold": int(quality_config.long_zero_threshold),
+        "zero_profile_min_ratio": quality_config.zero_profile_min_ratio,
+        "profile_weeks": int(quality_config.profile_weeks),
+        "calibration_source": "reference condition, strictly before the fault cutoff",
+        "calibration_artifact": "detector_calibration.csv",
+    }
+    remediation_policy = {
+        **remediation_kwargs,
+        "future_values_used": False,
+        "backward_fill_or_interpolation": False,
+        "unit_scale_division": False,
+    }
     summary: dict[str, Any] = {
         "schema_version": "1.0",
         "created_at_utc": created_at,
         "execution_scope": "fixture_test_only" if fixture_mode else "verified_bdg2_subset",
+        "detector_policy": detector_policy,
+        "remediation_policy": remediation_policy,
+        "fault_events_per_type": events_per_type,
+        "weather": weather_summary,
         "dataset": {
             "title": dataset.get("title", "Building Data Genome Project 2"),
             "version": dataset.get("version", "v1.0"),
@@ -596,7 +696,7 @@ def run_pipeline(
         "selected_sites": ingestion.selected_sites,
         "runtime": runtime_versions(),
         "code_revision": source_tree_revision(Path(__file__).resolve().parents[2]),
-        "state_policy": "stateless; no conversational memory or personal data",
+        "state_policy": "stateless batch run; public data and reproducibility metadata only, no personal data",
     }
     write_json(target / "run_manifest.json", run_manifest)
     write_reports(target, summary)
@@ -614,6 +714,12 @@ def run_pipeline(
             "size_bytes": metadata_path.stat().st_size,
         },
     }
+    if weather_path is not None:
+        input_files["weather"] = {
+            "path": weather_path.name,
+            "sha256": sha256_file(weather_path),
+            "size_bytes": weather_path.stat().st_size,
+        }
     tabular_rows: dict[str, tuple[int, list[str]]] = {
         **{
             name: (len(frame), list(frame.columns))
@@ -629,7 +735,13 @@ def run_pipeline(
             list(remediation_result.quarantine.columns),
         ),
         "detector_metrics.csv": (len(detector_table), list(detector_table.columns)),
+        "detector_calibration.csv": (
+            len(calibration_table),
+            list(calibration_table.columns),
+        ),
     }
+    if weather_frame is not None:
+        tabular_rows["weather.csv.gz"] = (len(weather_frame), list(weather_frame.columns))
     artifact_names = [
         *tabular_rows,
         "fault_manifest.json",
@@ -691,6 +803,10 @@ def run_pipeline(
             "null_policy": "preserve key with null and log/quarantine when unresolved",
         },
         "check_counts": check_counts,
+        "detector_policy": detector_policy,
+        "remediation_policy": remediation_policy,
+        "fault_events_per_type": events_per_type,
+        "weather": weather_summary,
         "remediation_counts": summary["remediation"],
         "quarantine_counts": summary["quarantine"],
         "fault_cutoff": pd.Timestamp(chosen_cutoff).isoformat(),
@@ -782,6 +898,23 @@ def verify_result_dir(result_dir: str | Path) -> list[str]:
         for condition in ("corrupted", "remediated"):
             if not keys.equals(_condition_keys(conditions[condition])):
                 errors.append(f"{condition}: key set/order differs from reference")
+
+        if manifest.get("weather") is not None:
+            if "weather.csv.gz" not in files:
+                errors.append("manifest declares weather but weather.csv.gz is not registered")
+            elif (directory / "weather.csv.gz").is_file():
+                weather = pd.read_csv(directory / "weather.csv.gz")
+                errors.extend(f"weather: {message}" for message in validate_weather_frame(weather))
+                weather_sites = set(weather["site_id"].astype(str))
+                reference_sites = set(conditions["reference"]["site_id"].astype(str))
+                if not reference_sites.issubset(weather_sites):
+                    errors.append("weather: reference sites are not all covered")
+        if "detector_calibration.csv" in files:
+            calibration = pd.read_csv(directory / "detector_calibration.csv")
+            calibrated = set(calibration["building_id"].astype(str))
+            reference_buildings = set(conditions["reference"]["building_id"].astype(str))
+            if calibrated != reference_buildings:
+                errors.append("detector_calibration.csv does not cover the reference buildings exactly")
 
         fault_manifest = read_json(directory / "fault_manifest.json")
         if fault_manifest.get("reference_sha256") != sha256_file(
