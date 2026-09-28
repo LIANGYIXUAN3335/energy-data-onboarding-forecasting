@@ -31,4 +31,7 @@ testpaths = ["tests"]
 filterwarnings = [
   "error",
   "ignore:invalid value encountered in cast:RuntimeWarning",
+  # pandas < 3.0 emits this from its own Timedelta arithmetic on numpy >= 2.5;
+  # harmless here and fixed upstream in pandas 3.0.
+  "ignore:The 'generic' unit for NumPy timedelta is deprecated:DeprecationWarning",
 ]
