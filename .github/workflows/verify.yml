@@ -1,0 +1,21 @@
+name: verify
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  tests-and-artifacts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Bootstrap (pinned to the versions that produced the committed bundles)
+        run: PYTHON_BIN="$(command -v python3.12)" scripts/bootstrap.sh
+      - name: Tests and hash verification of every committed result bundle
+        run: scripts/verify_all.sh
