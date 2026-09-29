@@ -1,5 +1,5 @@
 {
-  "producer_repository": "energy-ai-data-onboarding",
+  "producer_package": "energy-ai-data-onboarding",
   "files": {
     "reference.csv.gz": {
       "path": "reference.csv.gz",

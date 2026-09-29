@@ -5,7 +5,7 @@
     "files": {
       "pyproject.toml": "b9abef426c54666341bbebd909667a1a4155057c4958a052bfec72807a3be95b",
       "src/energy_forecasting/__init__.py": "587b7d2b67ee6189ba06ccc9c736d1ed1772b5b04b8822d5390002924e85149c",
-      "src/energy_forecasting/cli.py": "1af7f692e28a0b1664ec074f2ecec7197d5a7b730f28907a549bc51a24799794",
+      "src/energy_forecasting/cli.py": "0535e618f4be0d7cb93c0a71b6ad69f6cd92107596f9c0c4ea696478c4987fd8",
       "src/energy_forecasting/dataset.py": "34549f5bdc204a250d515f2f525a8e1abe66cc90eed14cd33164a7d69bfa7283",
       "src/energy_forecasting/experiment.py": "b18d671d965992d6a11259d2e6dbc5cf3f926d4fd25502f64000b426cf25e39d",
       "src/energy_forecasting/features.py": "c36be2ef62cd279f83c6325cdc93c7282350e7f98a71752c62fe0630281fc3fb",
@@ -14,12 +14,12 @@
       "src/energy_forecasting/models.py": "d7b946f7dafab1aea6d2d9aa098174e1d5f4f0b70405cc7d10a7dec8af00e84c",
       "src/energy_forecasting/report.py": "ba979c6afa9395d83ddce4dde8c174cd1cf86c235d9a41164cdbf60cd9928305",
       "src/energy_forecasting/sensitivity.py": "eabc850c1409c9ad4e0021bf27b237a3ca2f20757c7d9973f4b1a253f0cb0b44",
-      "src/energy_forecasting/verification.py": "50b9fcba02dcfcd0b6e95d122c2dd52c2fc68d2a69994e6eb20593d08f4f2a69"
+      "src/energy_forecasting/verification.py": "d461e1e79d28d13ee4f50890e9b5303e7337c103836739f58c1b3bbc0d547baf"
     },
     "git_commit": null,
     "kind": "source_tree_sha256",
     "note": "Content identity only; no Git commit or earlier creation date is asserted.",
-    "value": "aeed0fd4b7d77a42e1022699a405a3ed449e3d974320f3c979a0e5ee215d218e"
+    "value": "ffbcfa11a15e048fa3bbacf8ec2c3b085881055d406d3298cf9b67b95672b239"
   },
   "common_alignment": {
     "candidate_common_forecast_keys": 79178,
@@ -86,11 +86,11 @@
       "weather_features": true
     }
   },
-  "created_at_utc": "2026-09-28T21:51:48.929621+00:00",
+  "created_at_utc": "2026-09-29T02:23:24.632028+00:00",
   "fault_cutoff": "2017-01-01T00:00:00+00:00",
   "fault_manifest": {
     "path": "fault_manifest.json",
-    "sha256": "7280204469a9c98fd468e4fcd5882bb751a92220ebc23d61cd8939e4a227c530"
+    "sha256": "d1389618de723c5bca7a49198bf1e9c86ea5a74ee2c1dc227df13a1ee766f3fb"
   },
   "feature_count": 22,
   "features": [
@@ -152,7 +152,7 @@
     "documented_affected_keys": 108,
     "documented_fault_records": 108,
     "fault_cutoff": "2017-01-01T00:00:00+00:00",
-    "fault_manifest_sha256": "7280204469a9c98fd468e4fcd5882bb751a92220ebc23d61cd8939e4a227c530",
+    "fault_manifest_sha256": "d1389618de723c5bca7a49198bf1e9c86ea5a74ee2c1dc227df13a1ee766f3fb",
     "input_sha256": {
       "corrupted": "49b3efb15726b8de04d847bdb6b7aca95533082f44add1c10c8d582df96cb121",
       "reference": "63fc0c2afcc3c316794504c0ff73950f73fd72126d766978c297e3b07e12e234",
@@ -168,7 +168,7 @@
       },
       "rule": "all condition loads equal reference at timestamp >= fault_cutoff"
     },
-    "producer_manifest_sha256": "cf2e7f2b6eba4a23555f8446e3574568fc3c340a0dd6b691cccfd5a413d868de",
+    "producer_manifest_sha256": "467129651ab23e5adcc38e639144a80ef5112fa12a0e2a0eb41fea6c1f238eeb",
     "remediated_changed_keys": 8993,
     "remediated_changes_outside_injected_fault_set": 8885,
     "rows_per_condition": {
@@ -308,7 +308,7 @@
   "prediction_rows": 710640,
   "producer_manifest": {
     "path": "dataset_manifest.json",
-    "sha256": "cf2e7f2b6eba4a23555f8446e3574568fc3c340a0dd6b691cccfd5a413d868de"
+    "sha256": "467129651ab23e5adcc38e639144a80ef5112fa12a0e2a0eb41fea6c1f238eeb"
   },
   "python_version": "3.12.14 (main, Aug 12 2026, 13:57:54) [Clang 21.0.0 (clang-2100.1.1.101)]",
   "reference_training_scale_coverage": {

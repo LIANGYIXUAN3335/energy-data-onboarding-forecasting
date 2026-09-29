@@ -33,4 +33,14 @@ VENV_DIR="$WORKSPACE_DIR/.venv"
   --input-dir "$WORKSPACE_DIR/energy-ai-data-onboarding/results/bdg2_v3" \
   --expected-models seasonal_naive,ridge,hist_gradient_boosting
 
+# v3 at literature-calibrated fault prevalence (docs/fault_prevalence.md)
+"$VENV_DIR/bin/energy-onboard" verify \
+  --result-dir "$WORKSPACE_DIR/energy-ai-data-onboarding/results/bdg2_v3_dense"
+"$VENV_DIR/bin/energy-forecast" verify-inputs \
+  --input-dir "$WORKSPACE_DIR/energy-ai-data-onboarding/results/bdg2_v3_dense"
+"$VENV_DIR/bin/energy-forecast" verify-results \
+  --result-dir "$WORKSPACE_DIR/energy-demand-forecasting/results/canonical_24h_v3_dense" \
+  --input-dir "$WORKSPACE_DIR/energy-ai-data-onboarding/results/bdg2_v3_dense" \
+  --expected-models seasonal_naive,ridge,random_forest,hist_gradient_boosting
+
 echo "All tests and artifact verifications passed."

@@ -31,6 +31,7 @@ from .faults import (
     fault_event_summaries,
     inject_detector_validation_faults,
     inject_downstream_faults,
+    normalize_event_counts,
     validate_fault_record_metadata,
 )
 from .gates import apply_check_thresholds, gate_summary, hard_structural_failures
@@ -394,7 +395,7 @@ def run_pipeline(
         raise ValueError("faults.fault_cutoff or --fault-cutoff is required.")
     chosen_seed = int(seed if seed is not None else fault_values.get("seed", 20251206))
     chosen_severity = str(severity or fault_values.get("severity", "medium"))
-    events_per_type = int(fault_values.get("events_per_type", 1))
+    events_per_type = normalize_event_counts(fault_values.get("events_per_type", 1))
     # Run-detector calibration is derived from the natural reference data only
     # and strictly before the fault cutoff; the same per-building thresholds
     # are then applied to every condition so that seeded faults can never
@@ -594,7 +595,7 @@ def run_pipeline(
         "timestamp_semantics_machine": TIMESTAMP_SEMANTICS_MACHINE,
         "reference_sha256": reference_hash,
         "key_policy": "value_only_faults; timestamp/building_id keys unchanged",
-        "test_target_policy": "at/after cutoff values equal reference; Repo B uses reference targets",
+        "test_target_policy": "at/after cutoff values equal reference; the forecasting package uses reference targets",
         "faults": downstream_suite.faults,
         "fault_events": fault_event_summaries(downstream_suite.faults),
         "detector_validation_faults": detector_suite.faults,
@@ -666,8 +667,20 @@ def run_pipeline(
             "remediated": gate_summary(remediated_checks),
             "detector_validation": gate_summary(detector_checks),
         },
-        "downstream_faults": {"fault_records": len(downstream_suite.faults)},
-        "detector_validation": {"fault_records": len(detector_suite.faults)},
+        "downstream_faults": {
+            "fault_records": len(downstream_suite.faults),
+            "fault_events": len(fault_event_summaries(downstream_suite.faults)),
+            "training_rows_before_cutoff": int(
+                pd.to_datetime(reference_internal["timestamp"], utc=True).lt(boundary).sum()
+            ),
+        },
+        "detector_validation": {
+            "fault_records": len(detector_suite.faults),
+            "recall_by_type": {
+                str(row.fault_type): (None if pd.isna(row.recall) else float(row.recall))
+                for row in detector_table.itertuples(index=False)
+            },
+        },
         "remediation": {
             "log_rows": len(remediation_result.log),
             "repaired_rows": repaired_count,

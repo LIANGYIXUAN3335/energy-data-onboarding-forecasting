@@ -16,3 +16,4 @@ data/runs/
 results/*
 !results/bdg2_mvp_v2_hardened/
 !results/bdg2_v3/
+!results/bdg2_v3_dense/

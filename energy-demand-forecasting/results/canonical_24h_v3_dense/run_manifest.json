@@ -1,0 +1,345 @@
+{
+  "code_revision": {
+    "file_count": 12,
+    "files": {
+      "pyproject.toml": "b9abef426c54666341bbebd909667a1a4155057c4958a052bfec72807a3be95b",
+      "src/energy_forecasting/__init__.py": "587b7d2b67ee6189ba06ccc9c736d1ed1772b5b04b8822d5390002924e85149c",
+      "src/energy_forecasting/cli.py": "0535e618f4be0d7cb93c0a71b6ad69f6cd92107596f9c0c4ea696478c4987fd8",
+      "src/energy_forecasting/dataset.py": "34549f5bdc204a250d515f2f525a8e1abe66cc90eed14cd33164a7d69bfa7283",
+      "src/energy_forecasting/experiment.py": "b18d671d965992d6a11259d2e6dbc5cf3f926d4fd25502f64000b426cf25e39d",
+      "src/energy_forecasting/features.py": "c36be2ef62cd279f83c6325cdc93c7282350e7f98a71752c62fe0630281fc3fb",
+      "src/energy_forecasting/figures.py": "733cd9688344414d42f554eefd7d86fba08c1d349fe5f9c88a76b3b95b06b8f1",
+      "src/energy_forecasting/metrics.py": "d12008e44623a833c98ae8736915aeffe39cff7ceb6f3908c64ab149a7f3a47e",
+      "src/energy_forecasting/models.py": "d7b946f7dafab1aea6d2d9aa098174e1d5f4f0b70405cc7d10a7dec8af00e84c",
+      "src/energy_forecasting/report.py": "ba979c6afa9395d83ddce4dde8c174cd1cf86c235d9a41164cdbf60cd9928305",
+      "src/energy_forecasting/sensitivity.py": "eabc850c1409c9ad4e0021bf27b237a3ca2f20757c7d9973f4b1a253f0cb0b44",
+      "src/energy_forecasting/verification.py": "d461e1e79d28d13ee4f50890e9b5303e7337c103836739f58c1b3bbc0d547baf"
+    },
+    "git_commit": null,
+    "kind": "source_tree_sha256",
+    "note": "Content identity only; no Git commit or earlier creation date is asserted.",
+    "value": "ffbcfa11a15e048fa3bbacf8ec2c3b085881055d406d3298cf9b67b95672b239"
+  },
+  "common_prediction_count": 79178,
+  "config": {
+    "path": "experiment_v3.json",
+    "sha256": "2fdbe4d5219e543a338855c8cba5d0520117f4513890d280a9f14ebf35c0f443",
+    "values": {
+      "_protocol_note": "v3 amendment dated 2026-09-28: see experiments/protocol_v3_amendment.md",
+      "bootstrap_repetitions": 500,
+      "condition_order": [
+        "reference",
+        "corrupted",
+        "remediated"
+      ],
+      "feature_set": "v3",
+      "forecast_horizon_hours": 24,
+      "l2_regularization": 0.1,
+      "learning_rate": 0.07,
+      "max_leaf_nodes": 31,
+      "max_model_iterations": 120,
+      "models": [
+        "seasonal_naive",
+        "ridge",
+        "random_forest",
+        "hist_gradient_boosting"
+      ],
+      "primary_metric": "mase",
+      "random_forest_max_features": 0.5,
+      "random_forest_min_samples_leaf": 5,
+      "random_forest_n_estimators": 200,
+      "random_forest_n_jobs": 4,
+      "ridge_alpha": 1.0,
+      "seasonal_period_hours": 168,
+      "seed": 20251206,
+      "train_end": "2016-12-31T23:00:00Z",
+      "validation_end": "2017-03-31T23:00:00Z",
+      "weather_features": true
+    }
+  },
+  "created_at_utc": "2026-09-29T02:22:55.632927+00:00",
+  "fault_cutoff": "2017-01-01T00:00:00+00:00",
+  "fault_manifest": {
+    "path": "fault_manifest.json",
+    "sha256": "7963d93de80875c2e0142a66cb2138983407c5433f9041734b739a30d370dafb"
+  },
+  "feature_count": 30,
+  "feature_set": "v3",
+  "features": [
+    "lag_24",
+    "lag_48",
+    "lag_168",
+    "lag_336",
+    "rolling_mean_24",
+    "rolling_std_24",
+    "rolling_min_24",
+    "rolling_max_24",
+    "rolling_mean_168",
+    "rolling_std_168",
+    "hour_sin",
+    "hour_cos",
+    "dow_sin",
+    "dow_cos",
+    "doy_sin",
+    "doy_cos",
+    "month_sin",
+    "month_cos",
+    "is_weekend",
+    "is_us_federal_holiday",
+    "air_temperature_lag_24",
+    "air_temperature_lag_48",
+    "air_temperature_lag_168",
+    "dew_temperature_lag_24",
+    "wind_speed_lag_24",
+    "air_temperature_mean_24_lag_24",
+    "air_temperature_mean_168_lag_24",
+    "building_id",
+    "site_id",
+    "primary_use"
+  ],
+  "input_files": {
+    "corrupted": {
+      "path": "corrupted.csv.gz",
+      "rows": 210528,
+      "sha256": "dad25f2fc137cffe8b3fbd426576c798b64eeb9f602c590908d1ace0f3fb5952"
+    },
+    "reference": {
+      "path": "reference.csv.gz",
+      "rows": 210528,
+      "sha256": "63fc0c2afcc3c316794504c0ff73950f73fd72126d766978c297e3b07e12e234"
+    },
+    "remediated": {
+      "path": "remediated.csv.gz",
+      "rows": 210528,
+      "sha256": "6a0799e5a747a98a3a8af242988a0e910d7f0a04d294ef2ba6595fd09c36c82f"
+    }
+  },
+  "input_verification": {
+    "checks": {
+      "corrupted_changes_documented": true,
+      "equal_condition_keys": true,
+      "equal_condition_metadata": true,
+      "fault_cutoff": true,
+      "fault_values": true,
+      "manifest_versions_and_suite": true,
+      "post_cutoff_condition_parity": true,
+      "producer_hashes": true,
+      "producer_row_counts": true,
+      "required_columns": true,
+      "timestamps_parse": true,
+      "unique_keys": true
+    },
+    "documented_affected_keys": 1660,
+    "documented_fault_records": 1660,
+    "fault_cutoff": "2017-01-01T00:00:00+00:00",
+    "fault_manifest_sha256": "7963d93de80875c2e0142a66cb2138983407c5433f9041734b739a30d370dafb",
+    "input_sha256": {
+      "corrupted": "dad25f2fc137cffe8b3fbd426576c798b64eeb9f602c590908d1ace0f3fb5952",
+      "reference": "63fc0c2afcc3c316794504c0ff73950f73fd72126d766978c297e3b07e12e234",
+      "remediated": "6a0799e5a747a98a3a8af242988a0e910d7f0a04d294ef2ba6595fd09c36c82f"
+    },
+    "max_fault_timestamp": "2016-12-31T22:00:00+00:00",
+    "post_cutoff_condition_parity": {
+      "fault_cutoff": "2017-01-01T00:00:00+00:00",
+      "passed": true,
+      "rows_checked": {
+        "corrupted": 105120,
+        "remediated": 105120
+      },
+      "rule": "all condition loads equal reference at timestamp >= fault_cutoff"
+    },
+    "producer_manifest_sha256": "0668e9a51c51dd670474e77832b901dfefc8a085c7695bbf3afcb4d7fc65dcd5",
+    "remediated_changed_keys": 7270,
+    "remediated_changes_outside_injected_fault_set": 5763,
+    "rows_per_condition": {
+      "corrupted": 210528,
+      "reference": 210528,
+      "remediated": 210528
+    },
+    "schema_version": "1.0",
+    "unique_keys": 210528
+  },
+  "metric_policy": {
+    "primary": "pooled_mase_168",
+    "primary_column": "mase",
+    "primary_status": "unchanged",
+    "scale_source": "reference_training_only",
+    "supplementary": "macro_mean_of_finite_per_building_mase_168",
+    "supplementary_column": "mase_macro_building",
+    "undefined_scale_policy": "retain per-building NaN and exclude it from the finite macro mean"
+  },
+  "model_order": [
+    "seasonal_naive",
+    "ridge",
+    "random_forest",
+    "hist_gradient_boosting"
+  ],
+  "models": {
+    "hist_gradient_boosting": {
+      "l2_regularization": 0.1,
+      "learning_rate": 0.07,
+      "max_iter": 120,
+      "max_leaf_nodes": 31,
+      "seed": 20251206
+    },
+    "random_forest": {
+      "max_features": 0.5,
+      "min_samples_leaf": 5,
+      "n_estimators": 200,
+      "seed": 20251206
+    },
+    "ridge": {
+      "alpha": 1.0,
+      "standardized_numeric_inputs": true
+    },
+    "seasonal_naive": {
+      "fallback_order_hours": [
+        168,
+        24
+      ]
+    }
+  },
+  "package_version": "0.1.0",
+  "partition_row_counts": {
+    "corrupted": {
+      "test_rows": 79200,
+      "total_rows": 210528,
+      "train_rows": 105408,
+      "train_target_rows": 104800,
+      "validation_rows": 25920
+    },
+    "reference": {
+      "test_rows": 79200,
+      "total_rows": 210528,
+      "train_rows": 105408,
+      "train_target_rows": 105400,
+      "validation_rows": 25920
+    },
+    "remediated": {
+      "test_rows": 79200,
+      "total_rows": 210528,
+      "train_rows": 105408,
+      "train_target_rows": 100990,
+      "validation_rows": 25920
+    }
+  },
+  "platform": "macOS-26.6.2-arm64-arm-64bit",
+  "prediction_rows": 950136,
+  "producer_manifest": {
+    "path": "dataset_manifest.json",
+    "sha256": "0668e9a51c51dd670474e77832b901dfefc8a085c7695bbf3afcb4d7fc65dcd5"
+  },
+  "python_version": "3.12.14 (main, Aug 12 2026, 13:57:54) [Clang 21.0.0 (clang-2100.1.1.101)]",
+  "reference_training_scale_coverage": {
+    "building_count": 12,
+    "undefined_scale_buildings": [],
+    "undefined_scale_count": 0,
+    "valid_scale_buildings": [
+      "Eagle_education_Alberto",
+      "Eagle_education_April",
+      "Eagle_office_Amanda",
+      "Eagle_office_Bridgett",
+      "Panther_education_Annetta",
+      "Panther_education_Aurora",
+      "Panther_office_Clementine",
+      "Panther_office_Danica",
+      "Rat_education_Kathryn",
+      "Rat_education_Lee",
+      "Rat_office_Avis",
+      "Rat_office_Colby"
+    ],
+    "valid_scale_count": 12
+  },
+  "reference_training_scales_by_building": {
+    "Eagle_education_Alberto": 51.57437178505106,
+    "Eagle_education_April": 20.93323101207056,
+    "Eagle_office_Amanda": 39.0832217270195,
+    "Eagle_office_Bridgett": 22.509294417363044,
+    "Panther_education_Annetta": 7.606915111420612,
+    "Panther_education_Aurora": 8.016939275766019,
+    "Panther_office_Clementine": 4.599246390436397,
+    "Panther_office_Danica": 0.8172931754874653,
+    "Rat_education_Kathryn": 125.23525894101255,
+    "Rat_education_Lee": 56.62367278216442,
+    "Rat_office_Avis": 186.53863098002788,
+    "Rat_office_Colby": 219.93569089642358
+  },
+  "result_files": {
+    "building_mase.csv": {
+      "sha256": "ffe52acc170cf2c2448a0a01dab5dc00cce0fedd24b65728d6fb1c73475ec83a",
+      "size_bytes": 15461
+    },
+    "figures/macro_building_mase.svg": {
+      "sha256": "b30b5fdbcd92bb5059f958f15042432602f64ed7e7ff3167cb36278d14a4c2e0",
+      "size_bytes": 5677
+    },
+    "figures/mae_by_condition.svg": {
+      "sha256": "55b4258328232355ef9f83259e9f1f331e0ad13506de26a7423c297c0fb2d1c9",
+      "size_bytes": 5660
+    },
+    "metrics.csv": {
+      "sha256": "684e90ded6b1447304e96a67fc4958de925c73851053d24a98c67d4609247fab",
+      "size_bytes": 2687
+    },
+    "model_card.md": {
+      "sha256": "dce5dbb1b089fab50671e6b1512fc25b710b204f660a7aeb582d68cbe9d7ac11",
+      "size_bytes": 3122
+    },
+    "paired_differences.csv": {
+      "sha256": "fbbcdecab3de66c6439b72d084044592ca65be94ac4b2a3f2d3f7d817fb67757",
+      "size_bytes": 511
+    },
+    "predictions.csv.gz": {
+      "sha256": "37e5bc3519e5a463a5474311a4182af69f0babe43df1d7f4f5046cfd693fdd2d",
+      "size_bytes": 13188058
+    },
+    "report.html": {
+      "sha256": "b246ff282f1a5fb09ec58b1955134102001bb56a2e70ef28a52392fce433d5d7",
+      "size_bytes": 10116
+    },
+    "report.md": {
+      "sha256": "bf4da4e58e81908996cc6f8a636f39df1efcd91442eb040b3947dd12461611c8",
+      "size_bytes": 5849
+    },
+    "subgroup_metrics.csv": {
+      "sha256": "6f06c34ede171aaf9c09330e856ed11bcee9bdb0bb09373a8d21eebea6dd07bb",
+      "size_bytes": 45302
+    }
+  },
+  "runtime_packages": {
+    "numpy": "2.3.5",
+    "pandas": "2.2.3",
+    "scikit_learn": "1.9.1"
+  },
+  "schema_version": "1.0",
+  "seasonal_scale": 61.942971667505034,
+  "seed": 20251206,
+  "split": {
+    "strategy": "pre_specified_calendar_boundaries",
+    "test_end": "2017-12-31T23:00:00+00:00",
+    "train_end": "2016-12-31T23:00:00+00:00",
+    "validation_end": "2017-03-31T23:00:00+00:00"
+  },
+  "state_policy": "stateless batch run; public data and reproducibility metadata only, no personal data",
+  "target_source": "reference",
+  "timestamp_semantics": "canonical comparison timestamps; intended Panther/Eagle/Rat inputs preserve US/Eastern source-local wall-clock calendar values and do not establish true UTC offset conversion",
+  "weather": {
+    "availability_rule": "every weather feature is observed at t-24 or earlier",
+    "path": "weather.csv.gz",
+    "rows": 52632,
+    "sha256": "89182d330d06c904bc57eb5e0278f2fb7db68a5d872a21780058f05ab6c9e1e8",
+    "sites": [
+      "Eagle",
+      "Panther",
+      "Rat"
+    ],
+    "variables": [
+      "air_temperature",
+      "dew_temperature",
+      "wind_speed",
+      "cloud_coverage",
+      "precip_depth_1hr",
+      "sea_lvl_pressure"
+    ]
+  }
+}

@@ -1,8 +1,8 @@
 # Energy Demand Forecasting
 
-This repository evaluates how documented data-quality conditions affect a reproducible 24-hour-ahead electricity-demand forecasting task. It consumes versioned outputs from the companion `energy-ai-data-onboarding` repository and reports every pre-specified condition, including null or negative results.
+This package evaluates how documented data-quality conditions affect a reproducible 24-hour-ahead electricity-demand forecasting task. It consumes versioned outputs from the companion `energy-ai-data-onboarding` package and reports every pre-specified condition, including null or negative results.
 
-The repository is a stateless public-data implementation: it stores no
+The package is a stateless public-data implementation: it stores no
 personal data and transmits nothing.
 
 ## Research question
@@ -159,4 +159,4 @@ accepting the recorded results.
 See [LIMITATIONS.md](LIMITATIONS.md) and [DATA_CARD.md](DATA_CARD.md) for scope,
 assumptions, and interpretation constraints.
 
-Dataset licensing remains separate from this MIT-licensed code. See the companion repository's source manifest and the [Building Data Genome 2 project](https://github.com/buds-lab/building-data-genome-project-2).
+Dataset licensing remains separate from this MIT-licensed code. See the companion package's source manifest and the [Building Data Genome 2 project](https://github.com/buds-lab/building-data-genome-project-2).

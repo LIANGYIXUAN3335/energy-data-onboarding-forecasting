@@ -24,7 +24,7 @@
     "timestamp_max": "2017-12-31T23:00:00+00:00",
     "timestamp_min": "2016-01-01T00:00:00+00:00"
   },
-  "created_at_utc": "2026-09-28T21:49:21Z",
+  "created_at_utc": "2026-09-29T02:18:56Z",
   "dataset": {
     "doi": "10.5281/zenodo.3887306",
     "title": "Building Data Genome Project 2",
@@ -41,14 +41,35 @@
     "zero_profile_min_ratio": 0.25
   },
   "detector_validation": {
-    "fault_records": 112
+    "fault_records": 112,
+    "recall_by_type": {
+      "duplicate_key": 1.0,
+      "long_zero_block": 1.0,
+      "metadata_mismatch": 1.0,
+      "missing_interval": 1.0,
+      "missing_value": 1.0,
+      "negative_value": 1.0,
+      "positive_spike": 1.0,
+      "stuck_segment": 0.75,
+      "timestamp_shift": 1.0,
+      "unit_scale_segment": 1.0
+    }
   },
   "downstream_faults": {
-    "fault_records": 108
+    "fault_events": 24,
+    "fault_records": 108,
+    "training_rows_before_cutoff": 105408
   },
   "execution_scope": "verified_bdg2_subset",
   "fault_cutoff": "2017-01-01T00:00:00+00:00",
-  "fault_events_per_type": 4,
+  "fault_events_per_type": {
+    "long_zero_block": 4,
+    "missing_value": 4,
+    "negative_value": 4,
+    "positive_spike": 4,
+    "stuck_segment": 4,
+    "unit_scale_segment": 4
+  },
   "privacy": {
     "analytics": false,
     "data_scope": "public building-energy observations and reproducibility metadata only",

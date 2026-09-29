@@ -1,15 +1,21 @@
 # Architecture
 
+Rendered copy: [`architecture_forecasting.png`](../../docs/figures/architecture_forecasting.png) (source below).
+
 ```mermaid
 flowchart LR
     A[Versioned onboarding outputs] --> B[Schema key hash and manifest verification]
     B --> B2[Fault cutoff and exact-change verification]
-    B2 --> C[Time-aware feature builder]
+    B2 --> C[Time-aware feature builder: lags, calendar, lagged site weather]
     C --> D[Chronological split from reference]
     D --> E1[Seasonal naive]
-    D --> E2[Fixed gradient boosting pipeline]
+    D --> E2[Ridge regression]
+    D --> E3[Random forest]
+    D --> E4[Gradient boosting]
     E1 --> F[Common-key alignment]
     E2 --> F
+    E3 --> F
+    E4 --> F
     F --> G[MASE MAE RMSE wMAPE R2]
     G --> H[Bootstrap intervals paired differences and subgroup analysis]
     H --> I[Machine-readable results]

@@ -2,7 +2,11 @@
 
 This is a reproducible public-data research pipeline for building-energy data onboarding and forecasting preparation.
 
-Created: `2026-09-28T21:49:21Z`
+Created: `2026-09-29T02:18:56Z`
+
+## Findings in brief
+
+The reference data (210,528 hourly rows, 12 buildings) passed publication with gate status `warn`. 24 seeded events, 108 value-level fault rows (0.10% of the 105,408 training rows) were written before the cutoff; seeded faults were fully detected except stuck_segment (recall 0.75). Remediation repaired 1,668 rows and quarantined 7,430; the gate on the remediated condition is `warn`. Every count here is recomputed from the committed artifacts, and adverse outcomes are kept.
 
 ## Run scope
 
@@ -90,7 +94,7 @@ transmitted.
     &quot;timestamp_max&quot;: &quot;2017-12-31T23:00:00+00:00&quot;,
     &quot;timestamp_min&quot;: &quot;2016-01-01T00:00:00+00:00&quot;
   },
-  &quot;created_at_utc&quot;: &quot;2026-09-28T21:49:21Z&quot;,
+  &quot;created_at_utc&quot;: &quot;2026-09-29T02:18:56Z&quot;,
   &quot;dataset&quot;: {
     &quot;doi&quot;: &quot;10.5281/zenodo.3887306&quot;,
     &quot;title&quot;: &quot;Building Data Genome Project 2&quot;,
@@ -107,14 +111,35 @@ transmitted.
     &quot;zero_profile_min_ratio&quot;: 0.25
   },
   &quot;detector_validation&quot;: {
-    &quot;fault_records&quot;: 112
+    &quot;fault_records&quot;: 112,
+    &quot;recall_by_type&quot;: {
+      &quot;duplicate_key&quot;: 1.0,
+      &quot;long_zero_block&quot;: 1.0,
+      &quot;metadata_mismatch&quot;: 1.0,
+      &quot;missing_interval&quot;: 1.0,
+      &quot;missing_value&quot;: 1.0,
+      &quot;negative_value&quot;: 1.0,
+      &quot;positive_spike&quot;: 1.0,
+      &quot;stuck_segment&quot;: 0.75,
+      &quot;timestamp_shift&quot;: 1.0,
+      &quot;unit_scale_segment&quot;: 1.0
+    }
   },
   &quot;downstream_faults&quot;: {
-    &quot;fault_records&quot;: 108
+    &quot;fault_events&quot;: 24,
+    &quot;fault_records&quot;: 108,
+    &quot;training_rows_before_cutoff&quot;: 105408
   },
   &quot;execution_scope&quot;: &quot;verified_bdg2_subset&quot;,
   &quot;fault_cutoff&quot;: &quot;2017-01-01T00:00:00+00:00&quot;,
-  &quot;fault_events_per_type&quot;: 4,
+  &quot;fault_events_per_type&quot;: {
+    &quot;long_zero_block&quot;: 4,
+    &quot;missing_value&quot;: 4,
+    &quot;negative_value&quot;: 4,
+    &quot;positive_spike&quot;: 4,
+    &quot;stuck_segment&quot;: 4,
+    &quot;unit_scale_segment&quot;: 4
+  },
   &quot;privacy&quot;: {
     &quot;analytics&quot;: false,
     &quot;data_scope&quot;: &quot;public building-energy observations and reproducibility metadata only&quot;,
